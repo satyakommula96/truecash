@@ -328,15 +328,26 @@ class _DashboardState extends State<Dashboard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Expense Tracker", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+                    Text("TrueCash", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
                     Text("Your Financial Outlook", style: TextStyle(fontSize: 12, color: semantic.secondaryText, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ],
             ),
-            IconButton(
-              icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 22, color: colorScheme.onSurface),
-              onPressed: () => themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark,
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 22, color: colorScheme.onSurface),
+                  onPressed: () => themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark,
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings_outlined, size: 22, color: colorScheme.onSurface),
+                  onPressed: () async {
+                    await Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+                    load();
+                  },
+                ),
+              ],
             ),
           ],
         ),

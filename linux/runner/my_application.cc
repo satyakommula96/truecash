@@ -45,16 +45,28 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "truecash");
+    gtk_header_bar_set_title(header_bar, "TrueCash");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "truecash");
+    gtk_window_set_title(window, "TrueCash");
   }
 
   gtk_window_set_default_size(window, 1280, 720);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
+  
+  // Set application name and icon
+  g_set_application_name("TrueCash");
+  const gchar* assets_path = fl_dart_project_get_assets_path(project);
+  g_autofree gchar* icon_path = g_build_filename(assets_path, "assets", "icons", "app_icon.png", nullptr);
+  
+  if (!gtk_window_set_icon_from_file(window, icon_path, nullptr)) {
+    gtk_window_set_icon_from_file(window, "assets/icons/app_icon.png", nullptr);
+  }
+  // Also set as default for all future windows
+  gtk_window_set_default_icon_from_file(icon_path, nullptr);
+
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 

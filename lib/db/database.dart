@@ -11,7 +11,7 @@ class AppDatabase {
   }
 
   static Future<Database> _initDb() async {
-    final path = join(await getDatabasesPath(), 'tracker_v10.db'); 
+    final path = join(await getDatabasesPath(), 'tracker_v11.db'); 
 
     return openDatabase(
       path,
@@ -48,90 +48,92 @@ class AppDatabase {
         ''');
         await db.execute('CREATE TABLE saving_goals (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, target_amount INTEGER, current_amount INTEGER)');
         await db.execute('CREATE TABLE budgets (id INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, monthly_limit INTEGER)');
-
-        // --- EXTENSIVE SEED DUMMY DATA ---
-        final now = DateTime.now();
-        final nowStr = now.toIso8601String();
-        
-        await db.insert('income_sources', {'source': 'Main Salary', 'amount': 167000, 'date': nowStr});
-        await db.insert('income_sources', {'source': 'Freelance Project', 'amount': 25000, 'date': nowStr});
-
-        await db.insert('fixed_expenses', {'name': 'Luxury Apartment Rent', 'amount': 45000, 'category': 'Housing', 'date': nowStr});
-        await db.insert('fixed_expenses', {'name': 'Car EMI', 'amount': 18500, 'category': 'Transport', 'date': nowStr});
-
-        await db.insert('retirement_contributions', {'type': 'NPS', 'amount': 50000, 'date': nowStr});
-        await db.insert('retirement_contributions', {'type': 'EPF', 'amount': 145000, 'date': nowStr});
-
-        // Loans / Borrowings
-        await db.insert('loans', {
-          'name': 'Gold Loan (Sovereign)',
-          'loan_type': 'Gold',
-          'total_amount': 200000,
-          'remaining_amount': 185000,
-          'emi': 5200,
-          'interest_rate': 8.5,
-          'due_date': '5th',
-          'date': nowStr
-        });
-        await db.insert('loans', {
-          'name': 'Car Finance (Tata)',
-          'loan_type': 'Car',
-          'total_amount': 800000,
-          'remaining_amount': 620000,
-          'emi': 18500,
-          'interest_rate': 9.2,
-          'due_date': '10th',
-          'date': nowStr
-        });
-        await db.insert('loans', {
-          'name': 'In-Person Borrowing (Friend)',
-          'loan_type': 'Person',
-          'total_amount': 50000,
-          'remaining_amount': 45000,
-          'emi': 5000,
-          'interest_rate': 0.0,
-          'due_date': '1st',
-          'date': nowStr
-        });
-
-        // Last 6 Months Trends
-        for (int i = 0; i < 6; i++) {
-          final monthDate = DateTime(now.year, now.month - i, 15);
-          final monthStr = monthDate.toIso8601String();
-          final baseAmount = 20000 + (i * 3500);
-          
-          await db.insert('variable_expenses', {'date': monthStr, 'amount': baseAmount + 500, 'category': 'Food', 'note': 'Groceries & Dining'});
-          await db.insert('variable_expenses', {'date': monthStr, 'amount': (baseAmount * 0.4).toInt(), 'category': 'Transport', 'note': 'Fuel & Uber'});
-          await db.insert('variable_expenses', {'date': monthStr, 'amount': (baseAmount * 0.6).toInt(), 'category': 'Shopping', 'note': 'Amazon/Myntra'});
-        }
-
-        await db.insert('investments', {'name': 'Nifty 50 Index Fund', 'amount': 250000, 'active': 1, 'type': 'Equity', 'date': nowStr});
-        await db.insert('investments', {'name': 'Gold Bonds', 'amount': 50000, 'active': 1, 'type': 'Commodity', 'date': nowStr});
-
-        await db.insert('subscriptions', {'name': 'Netflix 4K', 'amount': 649, 'active': 1, 'billing_date': '5', 'date': nowStr});
-        await db.insert('subscriptions', {'name': 'Youtube Premium', 'amount': 189, 'active': 1, 'billing_date': '12', 'date': nowStr});
-
-        await db.insert('credit_cards', {
-          'bank': 'Amex Platinum',
-          'credit_limit': 1000000,
-          'statement_balance': 125000,
-          'min_due': 6250,
-          'due_date': '20th Jan'
-        });
-        await db.insert('credit_cards', {
-          'bank': 'HDFC Infinia',
-          'credit_limit': 800000,
-          'statement_balance': 45000,
-          'min_due': 2250,
-          'due_date': '15th Feb'
-        });
-
-        await db.insert('saving_goals', {'name': 'Tesla Model 3', 'target_amount': 4500000, 'current_amount': 850000});
-        await db.insert('saving_goals', {'name': 'Switzerland Trip', 'target_amount': 600000, 'current_amount': 320000});
-
-        await db.insert('budgets', {'category': 'Food', 'monthly_limit': 15000});
-        await db.insert('budgets', {'category': 'Shopping', 'monthly_limit': 10000});
       },
     );
+  }
+
+  static Future<void> clearData() async {
+    final _db = await db;
+    await _db.delete('income_sources');
+    await _db.delete('fixed_expenses');
+    await _db.delete('variable_expenses');
+    await _db.delete('investments');
+    await _db.delete('subscriptions');
+    await _db.delete('retirement_contributions');
+    await _db.delete('credit_cards');
+    await _db.delete('loans');
+    await _db.delete('saving_goals');
+    await _db.delete('budgets');
+  }
+
+  static Future<void> seedDummyData() async {
+    final _db = await db;
+    final now = DateTime.now();
+    final nowStr = now.toIso8601String();
+    
+    await _db.insert('income_sources', {'source': 'Main Salary', 'amount': 167000, 'date': nowStr});
+    await _db.insert('income_sources', {'source': 'Freelance Project', 'amount': 25000, 'date': nowStr});
+
+    await _db.insert('fixed_expenses', {'name': 'Luxury Apartment Rent', 'amount': 45000, 'category': 'Housing', 'date': nowStr});
+    await _db.insert('fixed_expenses', {'name': 'Car EMI', 'amount': 18500, 'category': 'Transport', 'date': nowStr});
+
+    await _db.insert('retirement_contributions', {'type': 'NPS', 'amount': 50000, 'date': nowStr});
+    await _db.insert('retirement_contributions', {'type': 'EPF', 'amount': 145000, 'date': nowStr});
+
+    await _db.insert('loans', {
+      'name': 'Gold Loan (Sovereign)',
+      'loan_type': 'Gold',
+      'total_amount': 200000,
+      'remaining_amount': 185000,
+      'emi': 5200,
+      'interest_rate': 8.5,
+      'due_date': '5th',
+      'date': nowStr
+    });
+    await _db.insert('loans', {
+      'name': 'Car Finance (Tata)',
+      'loan_type': 'Car',
+      'total_amount': 800000,
+      'remaining_amount': 620000,
+      'emi': 18500,
+      'interest_rate': 9.2,
+      'due_date': '10th',
+      'date': nowStr
+    });
+    await _db.insert('loans', {
+      'name': 'In-Person Borrowing (Friend)',
+      'loan_type': 'Person',
+      'total_amount': 50000,
+      'remaining_amount': 45000,
+      'emi': 5000,
+      'interest_rate': 0.0,
+      'due_date': '1st',
+      'date': nowStr
+    });
+
+    for (int i = 0; i < 6; i++) {
+      final monthDate = DateTime(now.year, now.month - i, 15);
+      final monthStr = monthDate.toIso8601String();
+      final baseAmount = 20000 + (i * 3500);
+      
+      await _db.insert('variable_expenses', {'date': monthStr, 'amount': baseAmount + 500, 'category': 'Food', 'note': 'Groceries & Dining'});
+      await _db.insert('variable_expenses', {'date': monthStr, 'amount': (baseAmount * 0.4).toInt(), 'category': 'Transport', 'note': 'Fuel & Uber'});
+      await _db.insert('variable_expenses', {'date': monthStr, 'amount': (baseAmount * 0.6).toInt(), 'category': 'Shopping', 'note': 'Amazon/Myntra'});
+    }
+
+    await _db.insert('investments', {'name': 'Nifty 50 Index Fund', 'amount': 250000, 'active': 1, 'type': 'Equity', 'date': nowStr});
+    await _db.insert('investments', {'name': 'Gold Bonds', 'amount': 50000, 'active': 1, 'type': 'Commodity', 'date': nowStr});
+
+    await _db.insert('subscriptions', {'name': 'Netflix 4K', 'amount': 649, 'active': 1, 'billing_date': '5', 'date': nowStr});
+    await _db.insert('subscriptions', {'name': 'Youtube Premium', 'amount': 189, 'active': 1, 'billing_date': '12', 'date': nowStr});
+
+    await _db.insert('credit_cards', {'bank': 'Amex Platinum', 'credit_limit': 1000000, 'statement_balance': 125000, 'min_due': 6250, 'due_date': '20th Jan'});
+    await _db.insert('credit_cards', {'bank': 'HDFC Infinia', 'credit_limit': 800000, 'statement_balance': 45000, 'min_due': 2250, 'due_date': '15th Feb'});
+
+    await _db.insert('saving_goals', {'name': 'Tesla Model 3', 'target_amount': 4500000, 'current_amount': 850000});
+    await _db.insert('saving_goals', {'name': 'Switzerland Trip', 'target_amount': 600000, 'current_amount': 320000});
+
+    await _db.insert('budgets', {'category': 'Food', 'monthly_limit': 15000});
+    await _db.insert('budgets', {'category': 'Shopping', 'monthly_limit': 10000});
   }
 }

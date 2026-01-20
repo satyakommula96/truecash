@@ -1,4 +1,4 @@
-package com.example.truecash
+package com.truecash
 
 import io.flutter.embedding.android.FlutterActivity
 

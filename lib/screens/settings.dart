@@ -33,6 +33,28 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _seedData(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Generate Sample Data?"),
+        content: const Text("This will add professional demo entries to your ledger. Existing data will not be deleted."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("CANCEL")),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("CONTINUE")),
+        ],
+      )
+    );
+
+    if (confirmed == true) {
+      await AppDatabase.seedDummyData();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Sample data generated successfully")));
+        Navigator.pop(context);
+      }
+    }
+  }
+
   Future<void> _resetData(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -47,17 +69,7 @@ class SettingsScreen extends StatelessWidget {
     );
 
     if (confirmed == true) {
-      final db = await AppDatabase.db;
-      await db.delete('income_sources');
-      await db.delete('fixed_expenses');
-      await db.delete('variable_expenses');
-      await db.delete('investments');
-      await db.delete('subscriptions');
-      await db.delete('credit_cards');
-      await db.delete('saving_goals');
-      await db.delete('budgets');
-      await db.delete('retirement_contributions');
-      
+      await AppDatabase.clearData();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("All data has been reset")));
         Navigator.pop(context);
@@ -76,10 +88,19 @@ class SettingsScreen extends StatelessWidget {
           _buildOption(
             context,
             "Export to CSV",
-            "Download your transaction history for Excel",
+            "Download your transaction history",
             Icons.download_rounded,
             colorScheme.primary,
             () => _exportToCSV(context),
+          ),
+          const SizedBox(height: 16),
+          _buildOption(
+            context,
+            "Seed Sample Data",
+            "Populate app with demo entries",
+            Icons.science_rounded,
+            Colors.amber,
+            () => _seedData(context),
           ),
           const SizedBox(height: 16),
           _buildOption(
@@ -94,8 +115,8 @@ class SettingsScreen extends StatelessWidget {
           const Center(
             child: Column(
               children: [
-                Text("EXPENSE TRACKER", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.grey)),
-                Text("Version 1.0.0", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                Text("TRUECASH", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.grey)),
+                Text("Version 1.1.0", style: TextStyle(fontSize: 10, color: Colors.grey)),
               ],
             ),
           )
