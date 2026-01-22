@@ -25,6 +25,64 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
   @override
   void initState() { super.initState(); load(); }
 
+  void _showPayDialog(CreditCard card) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Record Payment - ${card.bank}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Current Balance: ₹${card.statementBalance}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: "Amount",
+                border: OutlineInputBorder(),
+                prefixText: "₹",
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                if (card.minDue > 0)
+                  TextButton(
+                    onPressed: () => controller.text = card.minDue.toString(),
+                    child: Text("Min Due (₹${card.minDue})"),
+                  ),
+                TextButton(
+                  onPressed: () => controller.text = card.statementBalance.toString(),
+                  child: const Text("Full Balance"),
+                ),
+              ],
+            )
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              if (controller.text.isEmpty) return;
+              final amount = int.tryParse(controller.text);
+              if (amount == null || amount <= 0) return;
+
+              Navigator.pop(ctx);
+              setState(() => _isLoading = true);
+              await FinancialRepository().payCreditCardBill(card.id, amount);
+              load();
+            },
+            child: const Text("RECORD"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -120,6 +178,19 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                           Text("LIMIT: ₹${limit.toInt()}", style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: semantic.secondaryText, letterSpacing: 0.5)),
                           Text("${util.toStringAsFixed(1)}% UTILIZED", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: isHighUtil ? semantic.warning : semantic.secondaryText)),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showPayDialog(c),
+                          icon: const Icon(Icons.payment, size: 16),
+                          label: const Text("RECORD PAYMENT"),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.primary,
+                            side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
+                          ),
+                        ),
                       ),
                     ],
                   ),

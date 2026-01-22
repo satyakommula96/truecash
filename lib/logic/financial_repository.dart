@@ -182,6 +182,27 @@ class FinancialRepository {
     );
   }
 
+  Future<void> payCreditCardBill(int id, int amount) async {
+    final db = await AppDatabase.db;
+    final cardList = await db.query('credit_cards', where: 'id = ?', whereArgs: [id]);
+    if (cardList.isNotEmpty) {
+      final card = cardList.first;
+      int currentBal = card['statement_balance'] as int;
+      int currentMin = card['min_due'] as int;
+
+      int newBal = currentBal - amount;
+      if (newBal < 0) newBal = 0;
+
+      int newMin = currentMin - amount;
+      if (newMin < 0) newMin = 0;
+
+      await db.update('credit_cards', {
+        'statement_balance': newBal,
+        'min_due': newMin
+      }, where: 'id = ?', whereArgs: [id]);
+    }
+  }
+
   Future<void> addGoal(String name, int targetAmount) async {
     final db = await AppDatabase.db;
     await db.insert('saving_goals', {'name': name, 'target_amount': targetAmount, 'current_amount': 0});

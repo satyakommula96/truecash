@@ -50,7 +50,34 @@ class _EditCreditCardScreenState extends State<EditCreditCardScreen> {
             _buildField("Statement Balance", stmtCtrl, Icons.account_balance_wallet, isNumber: true),
             _buildField("Minimum Due", minDueCtrl, Icons.low_priority, isNumber: true),
             _buildField("Due Date (e.g. 15th)", dueDateCtrl, Icons.calendar_today),
+            _buildField("Due Date (e.g. 15th)", dueDateCtrl, Icons.calendar_today),
+            const SizedBox(height: 20),
+            
+            // New Bill Section
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.receipt_long, color: colorScheme.primary, size: 20),
+                      const SizedBox(width: 8),
+                      Text("NEW BILL GENERATED?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: colorScheme.primary, letterSpacing: 1)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text("Update the statement details below for the new billing cycle.", style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
             const SizedBox(height: 40),
+            
             SizedBox(
               width: double.infinity,
               height: 60,
