@@ -50,7 +50,7 @@ Future<void> main() async {
 }
 
 // Global theme notifier
-final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 class TrueCashApp extends StatelessWidget {
   final bool showIntro;

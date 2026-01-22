@@ -46,10 +46,7 @@ class DashboardHeader extends StatelessWidget {
             ),
             Row(
               children: [
-                IconButton(
-                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 22, color: colorScheme.onSurface),
-                  onPressed: () => themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark,
-                ),
+
                 IconButton(
                   icon: Icon(Icons.settings_outlined, size: 22, color: colorScheme.onSurface),
                   onPressed: () async {

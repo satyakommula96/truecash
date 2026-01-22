@@ -11,9 +11,51 @@ import '../logic/financial_repository.dart';
 import '../db/database.dart';
 
 import '../services/notification_service.dart';
+import '../main.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+  
+  void _showThemePicker(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Select Theme"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text("System Default"),
+              leading: const Icon(Icons.settings_suggest_rounded),
+              onTap: () {
+                themeNotifier.value = ThemeMode.system;
+                Navigator.pop(context);
+              },
+              trailing: themeNotifier.value == ThemeMode.system ? const Icon(Icons.check, color: Colors.blue) : null,
+            ),
+            ListTile(
+              title: const Text("Light Mode"),
+              leading: const Icon(Icons.light_mode_rounded),
+              onTap: () {
+                themeNotifier.value = ThemeMode.light;
+                Navigator.pop(context);
+              },
+               trailing: themeNotifier.value == ThemeMode.light ? const Icon(Icons.check, color: Colors.blue) : null,
+            ),
+            ListTile(
+              title: const Text("Dark Mode"),
+              leading: const Icon(Icons.dark_mode_rounded),
+              onTap: () {
+                themeNotifier.value = ThemeMode.dark;
+                Navigator.pop(context);
+              },
+               trailing: themeNotifier.value == ThemeMode.dark ? const Icon(Icons.check, color: Colors.blue) : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _exportToCSV(BuildContext context) async {
     final repo = FinancialRepository();
@@ -268,6 +310,15 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
+          _buildOption(
+            context,
+            "App Appearance",
+            "Switch between Light, Dark, or System theme",
+            Icons.dark_mode_outlined,
+            Colors.indigo,
+            () => _showThemePicker(context),
+          ),
+          const SizedBox(height: 16),
           _buildOption(
             context,
             "Export to CSV",
