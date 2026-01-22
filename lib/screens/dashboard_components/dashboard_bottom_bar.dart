@@ -21,80 +21,102 @@ class DashboardBottomBar extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-      child: Container(
-        height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10)),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: SizedBox(
+        height: 80,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.bottomCenter,
           children: [
-            _buildActionIcon(
-                context,
-                Icons.handshake_outlined,
-                "LOANS",
-                () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const LoansScreen())),
-                semantic),
-            _buildActionIcon(
-                context,
-                Icons.credit_card_outlined,
-                "CARDS",
-                () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const CreditCardsScreen())),
-                semantic),
-            InkWell(
-              onTap: () async {
-                await Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const AddExpense()));
-                onLoad();
-              },
-              child: Container(
-                height: 54,
-                width: 54,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [colorScheme.primary, colorScheme.primary]),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6)),
-                  ],
-                ),
-                child: const Icon(Icons.add, color: Colors.white, size: 28),
+            Container(
+              height: 64,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: semantic.divider),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10)),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: _buildActionIcon(
+                        context,
+                        Icons.handshake_outlined,
+                        "LOANS",
+                        () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const LoansScreen())),
+                        semantic),
+                  ),
+                  Expanded(
+                    child: _buildActionIcon(
+                        context,
+                        Icons.credit_card_outlined,
+                        "CARDS",
+                        () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const CreditCardsScreen())),
+                        semantic),
+                  ),
+                  const SizedBox(width: 60),
+                  Expanded(
+                    child: _buildActionIcon(
+                        context,
+                        Icons.event_repeat,
+                        "SUBS",
+                        () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const SubscriptionsScreen())),
+                        semantic),
+                  ),
+                  Expanded(
+                    child: _buildActionIcon(
+                        context,
+                        Icons.history_outlined,
+                        "HISTORY",
+                        () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const MonthlyHistoryScreen())),
+                        semantic),
+                  ),
+                ],
               ),
             ),
-            _buildActionIcon(
-                context,
-                Icons.event_repeat,
-                "SUBS",
-                () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const SubscriptionsScreen())),
-                semantic),
-            _buildActionIcon(
-                context,
-                Icons.history_outlined,
-                "HISTORY",
-                () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const MonthlyHistoryScreen())),
-                semantic),
+            Positioned(
+              top: 0,
+              child: InkWell(
+                onTap: () async {
+                  await Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const AddExpense()));
+                  onLoad();
+                },
+                borderRadius: BorderRadius.circular(22),
+                child: Container(
+                  height: 64,
+                  width: 64,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [colorScheme.primary, colorScheme.primary]),
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                          color: colorScheme.primary.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6)),
+                    ],
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 32),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -106,25 +128,18 @@ class DashboardBottomBar extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: semantic.secondaryText),
-            const SizedBox(height: 4),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w800,
-                    color: semantic.secondaryText,
-                    letterSpacing: 0.5)),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 24, color: semantic.secondaryText),
+          const SizedBox(height: 4),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: semantic.secondaryText,
+                  letterSpacing: 0.5)),
+        ],
       ),
     );
   }

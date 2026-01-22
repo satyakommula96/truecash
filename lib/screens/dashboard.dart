@@ -78,6 +78,7 @@ class _DashboardState extends State<Dashboard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBody: true,
       bottomNavigationBar: DashboardBottomBar(onLoad: load),
       body: SafeArea(
         child: RefreshIndicator(
@@ -162,7 +163,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     const SizedBox(height: 16),
                     UpcomingBills(bills: upcomingBills, semantic: semantic),
-                    const SizedBox(height: 64),
+                    const SizedBox(height: 120),
                   ]),
                 ),
               ),
