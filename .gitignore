@@ -60,3 +60,5 @@ app.*.symbols
 *.apk
 *.aab
 *.exe
+*.deb
+*.dmg
