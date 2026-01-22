@@ -175,13 +175,20 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
   }
 
   Future<void> _save() async {
-    if (nameCtrl.text.isEmpty || remainingCtrl.text.isEmpty) return;
+    if (nameCtrl.text.isEmpty) return;
+    
+    final total = int.tryParse(totalCtrl.text) ?? 0;
+    // If remaining is left empty, assume it's a new loan equal to the total amount
+    final remaining = remainingCtrl.text.isEmpty 
+        ? total 
+        : (int.tryParse(remainingCtrl.text) ?? 0);
+
     final repo = FinancialRepository();
     await repo.addLoan(
       nameCtrl.text,
       selectedType,
-      int.tryParse(totalCtrl.text) ?? 0,
-      int.tryParse(remainingCtrl.text) ?? 0,
+      total,
+      remaining,
       int.tryParse(emiCtrl.text) ?? 0,
       double.tryParse(rateCtrl.text) ?? 0.0,
       dueCtrl.text,

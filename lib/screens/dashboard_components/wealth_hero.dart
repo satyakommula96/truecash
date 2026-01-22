@@ -24,6 +24,10 @@ class WealthHero extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
               color: colorScheme.primary.withValues(alpha: 0.3),
@@ -53,7 +57,8 @@ class WealthHero extends StatelessWidget {
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.1))),
                       child: Row(
                         children: [
                           Icon(Icons.verified_user_outlined,

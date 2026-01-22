@@ -21,10 +21,23 @@ class AssetLiabilityCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-                color: semantic.income.withValues(alpha: 0.05),
+                gradient: LinearGradient(
+                  colors: [
+                    semantic.income.withValues(alpha: 0.15),
+                    semantic.income.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(20),
-                border:
-                    Border.all(color: semantic.income.withValues(alpha: 0.2))),
+                border: Border.all(color: semantic.income.withValues(alpha: 0.2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: semantic.income.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ]),
             child: Stack(
               children: [
                 Positioned(
@@ -47,10 +60,23 @@ class AssetLiabilityCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-                color: semantic.overspent.withValues(alpha: 0.05),
+                gradient: LinearGradient(
+                  colors: [
+                    semantic.overspent.withValues(alpha: 0.15),
+                    semantic.overspent.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: semantic.overspent.withValues(alpha: 0.2))),
+                border: Border.all(color: semantic.overspent.withValues(alpha: 0.2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: semantic.overspent.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ]),
             child: Stack(
               children: [
                 Positioned(

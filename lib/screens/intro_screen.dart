@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard.dart';
 import '../services/notification_service.dart';
+import '../theme/theme.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -20,21 +21,18 @@ class _IntroScreenState extends State<IntroScreen> {
       'description':
           'Monitor your income and expenses with ease. Get a clear view of your financial health at a glance.',
       'icon': Icons.trending_up_rounded,
-      'color': const Color(0xFF34D399),
     },
     {
       'title': 'Smart Budgeting',
       'description':
-          'Set monthly budgets and track your spending. Stay on top of your financial goals without the stress.',
+          'Set monthly budgets and track your spending. Stay on top of financial goals without the stress.',
       'icon': Icons.pie_chart_rounded,
-      'color': Colors.blueAccent,
     },
     {
       'title': 'Secure & Private',
       'description':
           'Your financial data is stored locally on your device. We respect your privacy and security.',
       'icon': Icons.security_rounded,
-      'color': Colors.orangeAccent,
     },
   ];
 
@@ -53,9 +51,24 @@ class _IntroScreenState extends State<IntroScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
+          // Subtle Gradient Background
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  colorScheme.surface,
+                  colorScheme.primary.withValues(alpha: 0.05),
+                ],
+              ),
+            ),
+          ),
           PageView.builder(
             controller: _pageController,
             itemCount: _pages.length,
@@ -70,23 +83,32 @@ class _IntroScreenState extends State<IntroScreen> {
                 title: page['title'],
                 description: page['description'],
                 icon: page['icon'],
-                iconColor: page['color'],
               );
             },
           ),
           Positioned(
-            top: 50,
-            right: 20,
+            top: 50 + MediaQuery.of(context).padding.top, // Safe area
+            right: 24,
             child: TextButton(
               onPressed: _finishIntro,
-              child: const Text('SKIP',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              style: TextButton.styleFrom(
+                backgroundColor: colorScheme.surface.withValues(alpha: 0.5),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+              child: Text('SKIP',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800, 
+                    color: colorScheme.secondary,
+                    fontSize: 12,
+                    letterSpacing: 1.0,
+                  )),
             ),
           ),
           Positioned(
-            bottom: 40,
-            left: 20,
-            right: 20,
+            bottom: 40 + MediaQuery.of(context).padding.bottom,
+            left: 24,
+            right: 24,
             child: Column(
               children: [
                 Row(
@@ -96,53 +118,63 @@ class _IntroScreenState extends State<IntroScreen> {
                     (index) => AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 8,
-                      width: _currentPage == index ? 24 : 8,
+                      height: 6,
+                      width: _currentPage == index ? 32 : 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
+                            ? colorScheme.primary
+                            : colorScheme.primary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
                 if (_currentPage == _pages.length - 1)
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 56,
                     child: FilledButton(
                       onPressed: _finishIntro,
                       style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        elevation: 8,
+                        shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       child: const Text(
                         'GET STARTED',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 1),
                       ),
                     ),
                   )
                 else
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 56,
                     child: OutlinedButton(
                       onPressed: () {
                         _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeOutQuint,
                         );
                       },
                       style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.4), width: 1.5),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: const Text('NEXT'),
+                      child: Text('NEXT', style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                        color: colorScheme.primary
+                      )),
                     ),
                   ),
               ],
@@ -158,40 +190,61 @@ class _IntroPage extends StatelessWidget {
   final String title;
   final String description;
   final IconData icon;
-  final Color iconColor;
 
   const _IntroPage({
     required this.title,
     required this.description,
     required this.icon,
-    required this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppColors>(); // May be null if not provided in theme, but standard is there
+
     return Padding(
       padding: const EdgeInsets.all(40.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(30),
+            width: 160,
+            height: 160,
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.primary.withValues(alpha: 0.15),
+                  colorScheme.primary.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
             ),
             child: Icon(
               icon,
-              size: 80,
-              color: iconColor,
+              size: 72,
+              color: colorScheme.primary,
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 60),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -1,
             ),
             textAlign: TextAlign.center,
           ),
@@ -200,11 +253,9 @@ class _IntroPage extends StatelessWidget {
             description,
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.7),
-              height: 1.5,
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+              height: 1.6,
+              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),

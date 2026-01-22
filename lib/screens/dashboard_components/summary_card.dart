@@ -22,9 +22,23 @@ class SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: semantic.divider),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            valueColor.withValues(alpha: 0.1),
+            valueColor.withValues(alpha: 0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: valueColor.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: valueColor.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,9 +52,16 @@ class SummaryCard extends StatelessWidget {
                       color: semantic.secondaryText,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1)),
-              Icon(icon,
-                  size: 16,
-                  color: semantic.secondaryText.withValues(alpha: 0.5)),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: valueColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon,
+                    size: 14,
+                    color: valueColor),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -73,21 +94,52 @@ class FullWidthSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: semantic.divider),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            valueColor.withValues(alpha: 0.1),
+            valueColor.withValues(alpha: 0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: valueColor.withValues(alpha: 0.2)),
+         boxShadow: [
+          BoxShadow(
+            color: valueColor.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label.toUpperCase(),
-              style: TextStyle(
-                  fontSize: 12,
-                  color: semantic.secondaryText,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1)),
+           Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: valueColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  valueColor == semantic.income ? Icons.account_balance_wallet_outlined : Icons.receipt_long_outlined,
+                  size: 16,
+                  color: valueColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(label.toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1)),
+            ],
+          ),
           Text(value,
               style: TextStyle(
                   fontSize: 20,

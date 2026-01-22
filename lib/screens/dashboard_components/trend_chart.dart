@@ -20,10 +20,31 @@ class TrendChart extends StatelessWidget {
         .map((e) => e['total'] as num)
         .reduce((a, b) => a > b ? a : b)).toDouble();
     return Container(
-      height: 160,
-      padding: const EdgeInsets.only(right: 12),
-      child: LineChart(
-        LineChartData(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.surface,
+            colorScheme.surface.withValues(alpha: 0.5),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: semantic.divider.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Container(
+        height: 180,
+        padding: const EdgeInsets.only(right: 12),
+        child: LineChart(
+          LineChartData(
           minX: 0,
           maxX: (trendData.length - 1).toDouble(),
           gridData: FlGridData(
@@ -101,6 +122,7 @@ class TrendChart extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

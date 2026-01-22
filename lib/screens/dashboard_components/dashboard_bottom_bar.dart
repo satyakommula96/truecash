@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../theme/theme.dart';
 import '../loans.dart';
 import '../credit_cards.dart';
@@ -27,23 +28,27 @@ class DashboardBottomBar extends StatelessWidget {
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
-            Container(
-              height: 64,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: semantic.divider),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10)),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  height: 64,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10)),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
                   Expanded(
                     child: _buildActionIcon(
                         context,
@@ -88,6 +93,8 @@ class DashboardBottomBar extends StatelessWidget {
                         semantic),
                   ),
                 ],
+                  ),
+                ),
               ),
             ),
             Positioned(
