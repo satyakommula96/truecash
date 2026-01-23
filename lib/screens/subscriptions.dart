@@ -63,7 +63,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
             child: subs.isEmpty
                 ? const Center(child: Text("Empty stream", style: TextStyle(color: Colors.grey)))
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: EdgeInsets.fromLTRB(24, 0, 24, 100 + MediaQuery.of(context).padding.bottom),
                     itemCount: subs.length,
                     itemBuilder: (context, i) {
                       final s = subs[i];

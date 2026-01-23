@@ -86,7 +86,7 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                     if (items.isEmpty) return Center(child: Text("NO ENTRIES FOUND", style: TextStyle(color: semantic.secondaryText, fontSize: 10, fontWeight: FontWeight.bold)));
                     
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.of(context).padding.bottom),
                       itemCount: items.length,
                       itemBuilder: (context, i) {
                         final item = items[i];

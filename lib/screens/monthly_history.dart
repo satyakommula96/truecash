@@ -37,7 +37,7 @@ class _MonthlyHistoryScreenState extends State<MonthlyHistoryScreen> {
         : monthSummaries.isEmpty
           ? Center(child: Text("NO PERIODS TRACKED.", style: TextStyle(color: semantic.secondaryText, fontSize: 10, fontWeight: FontWeight.bold)))
           : ListView.builder(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
             itemCount: monthSummaries.length,
             itemBuilder: (_, i) {
               final s = monthSummaries[i];
