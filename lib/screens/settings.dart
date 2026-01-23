@@ -313,7 +313,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           _buildOption(
             context,
-            "App Appearance",
+            "Appearance",
             "Switch between Light, Dark, or System theme",
             Icons.dark_mode_outlined,
             Colors.indigo,
@@ -331,7 +331,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "Backup Data (Cloud Ready)",
+            "Backup Data",
             "Save full backup to file",
             Icons.cloud_upload_outlined,
             Colors.blueAccent,
