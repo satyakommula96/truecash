@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Semantic Colors mapped from the USER's HTML sample tokens
@@ -45,6 +46,7 @@ class AppTheme {
               color: Color(0xFFE5E7EB)),
           iconTheme: IconThemeData(color: Color(0xFFE5E7EB)),
         ),
+        textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
         cardTheme: CardThemeData(
           color: const Color(0xFF1E293B),
           elevation: 0,
@@ -78,6 +80,7 @@ class AppTheme {
               color: Color(0xFF1F2933)),
           iconTheme: IconThemeData(color: Color(0xFF1F2933)),
         ),
+        textTheme: GoogleFonts.outfitTextTheme(ThemeData.light().textTheme),
         cardTheme: CardThemeData(
           color: const Color(0xFFF6F7F9),
           elevation: 0,

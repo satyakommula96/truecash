@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
 class AddLoanScreen extends StatefulWidget {
@@ -16,13 +18,14 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
   final emiCtrl = TextEditingController();
   final rateCtrl = TextEditingController();
   final dueCtrl = TextEditingController();
-  String selectedType = 'Personal';
+  String selectedType = 'Bank';
+  DateTime? _selectedDate;
 
   final List<String> loanTypes = [
+    'Bank',
+    'Individual',
     'Gold',
     'Car',
-    'Personal',
-    'Person',
     'Home',
     'Education'
   ];
@@ -77,20 +80,20 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
               children: [
                 Expanded(
                     child: _buildField("REMAINING BALANCE", remainingCtrl,
-                        hint: "0", type: TextInputType.number, prefix: "₹")),
+                        hint: "0", type: TextInputType.number, prefix: CurrencyHelper.symbol)),
                 const SizedBox(width: 16),
                 Expanded(
                     child: _buildField("TOTAL LOAN", totalCtrl,
-                        hint: "0", type: TextInputType.number, prefix: "₹")),
+                        hint: "0", type: TextInputType.number, prefix: CurrencyHelper.symbol)),
               ],
             ),
             const SizedBox(height: 24),
-            if (selectedType != 'Person') ...[
+            if (selectedType != 'Individual') ...[
               Row(
                 children: [
                   Expanded(
                       child: _buildField("MONTHLY EMI", emiCtrl,
-                          hint: "0", type: TextInputType.number, prefix: "₹")),
+                          hint: "0", type: TextInputType.number, prefix: CurrencyHelper.symbol)),
                   const SizedBox(width: 16),
                   Expanded(
                       child: _buildField("INTEREST RATE", rateCtrl,
@@ -101,13 +104,31 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
               ),
               const SizedBox(height: 24),
             ],
-            _buildField(
-                selectedType == 'Person'
-                    ? "EXPECTED REPAYMENT DATE"
-                    : "DUE DATE (DAY OF MONTH)",
-                dueCtrl,
-                hint: selectedType == 'Person' ? "e.g. Next Month" : "e.g. 5th",
-                type: TextInputType.text),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildField(
+                      selectedType == 'Individual'
+                          ? "EXPECTED REPAYMENT DATE"
+                          : "DUE DATE (DAY OF MONTH)",
+                      dueCtrl,
+                      hint: selectedType == 'Individual' ? "Select Date" : "Select Day",
+                      type: TextInputType.text,
+                      readOnly: true,
+                      onTap: _pickDate),
+                ),
+                if (selectedType == 'Individual') ...[
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: TextButton(
+                      onPressed: () => setState(() => dueCtrl.text = "Flexible"),
+                      child: const Text("FLEXIBLE"),
+                    ),
+                  ),
+                ],
+              ],
+            ),
             const SizedBox(height: 48),
             SizedBox(
               width: double.infinity,
@@ -137,7 +158,9 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
   Widget _buildField(String label, TextEditingController ctrl,
       {String hint = "",
       TextInputType type = TextInputType.text,
-      String? prefix}) {
+      String? prefix,
+      bool readOnly = false,
+      VoidCallback? onTap}) {
     final semantic = Theme.of(context).extension<AppColors>()!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,6 +175,8 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
         TextField(
           controller: ctrl,
           keyboardType: type,
+          readOnly: readOnly,
+          onTap: onTap,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             hintText: hint,
@@ -196,5 +221,21 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
       DateTime.now().toIso8601String(),
     );
     if (mounted) Navigator.pop(context);
+  }
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: DateTime(now.year, now.month - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        dueCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
   }
 }

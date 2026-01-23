@@ -145,7 +145,7 @@ class FinancialRepository {
         break;
       case 'Investment':
         await db.insert('investments', {
-          'name': category,
+          'name': note.isNotEmpty ? note : category,
           'amount': amount,
           'active': 1,
           'type': category,
@@ -251,7 +251,7 @@ class FinancialRepository {
   }
 
   Future<void> addCreditCard(String bank, int creditLimit, int statementBalance,
-      int minDue, String dueDate) async {
+      int minDue, String dueDate, String generationDate) async {
     final db = await AppDatabase.db;
     await db.insert('credit_cards', {
       'bank': bank,
@@ -259,11 +259,12 @@ class FinancialRepository {
       'statement_balance': statementBalance,
       'min_due': minDue,
       'due_date': dueDate,
+      'generation_date': generationDate,
     });
   }
 
   Future<void> updateCreditCard(int id, String bank, int creditLimit,
-      int statementBalance, int minDue, String dueDate) async {
+      int statementBalance, int minDue, String dueDate, String generationDate) async {
     final db = await AppDatabase.db;
     await db.update(
       'credit_cards',
@@ -273,6 +274,7 @@ class FinancialRepository {
         'statement_balance': statementBalance,
         'min_due': minDue,
         'due_date': dueDate,
+        'generation_date': generationDate,
       },
       where: 'id = ?',
       whereArgs: [id],

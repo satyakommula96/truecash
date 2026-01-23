@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
+import '../models/models.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
-  const AddSubscriptionScreen({super.key});
+  final Subscription? subscription;
+  const AddSubscriptionScreen({super.key, this.subscription});
 
   @override
   State<AddSubscriptionScreen> createState() => _AddSubscriptionScreenState();
@@ -12,11 +16,51 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   final nameCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   final dateCtrl = TextEditingController();
+  DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.subscription != null) {
+      nameCtrl.text = widget.subscription!.name;
+      amountCtrl.text = widget.subscription!.amount.toString();
+      
+      // Try parsing ISO date, fallback to raw text if legacy
+      try {
+        final date = DateTime.parse(widget.subscription!.billingDate);
+        _selectedDate = date;
+        dateCtrl.text = DateFormat('dd MMM yyyy').format(date);
+      } catch (e) {
+         // Fallback for legacy "5th" etc
+         dateCtrl.text = widget.subscription!.billingDate;
+      }
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: DateTime(now.year, now.month - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        dateCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("New Subscription")),
+      appBar: AppBar(
+          title: Text(widget.subscription == null
+              ? "New Subscription"
+              : "Edit Subscription")),
       body: Padding(
         padding: EdgeInsets.fromLTRB(
             24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
@@ -31,14 +75,20 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             TextField(
               controller: amountCtrl,
               keyboardType: TextInputType.number,
-              decoration:
-                  const InputDecoration(labelText: "Monthly Amount (₹)"),
+              decoration: InputDecoration(
+                labelText: "Monthly Amount",
+                prefixText: "${CurrencyHelper.symbol} ",
+              ),
             ),
             const SizedBox(height: 20),
             TextField(
               controller: dateCtrl,
-              decoration:
-                  const InputDecoration(labelText: "Billing Date (e.g. 5th)"),
+              readOnly: true,
+              onTap: _pickDate,
+              decoration: const InputDecoration(
+                labelText: "Billing Date",
+                suffixIcon: Icon(Icons.calendar_today),
+              ),
             ),
             const SizedBox(height: 40),
             SizedBox(
@@ -46,7 +96,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
               height: 60,
               child: ElevatedButton(
                 onPressed: _save,
-                child: const Text("SAVE SUBSCRIPTION"),
+                child: Text(widget.subscription == null
+                    ? "SAVE SUBSCRIPTION"
+                    : "UPDATE SUBSCRIPTION"),
               ),
             ),
           ],
@@ -56,10 +108,23 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   }
 
   Future<void> _save() async {
-    if (nameCtrl.text.isEmpty || amountCtrl.text.isEmpty) return;
+    if (nameCtrl.text.isEmpty || amountCtrl.text.isEmpty || dateCtrl.text.isEmpty) return;
     final repo = FinancialRepository();
-    await repo.addSubscription(
-        nameCtrl.text, int.parse(amountCtrl.text), dateCtrl.text);
+    final amount = int.parse(amountCtrl.text);
+    
+    // Store ISO string if date selected, else raw text (legacy fallback)
+    final billingDate = _selectedDate?.toIso8601String() ?? dateCtrl.text;
+
+    if (widget.subscription == null) {
+      await repo.addSubscription(nameCtrl.text, amount, billingDate);
+    } else {
+      await repo.updateEntry('Subscription', widget.subscription!.id, {
+        'name': nameCtrl.text,
+        'amount': amount,
+        'billing_date': billingDate
+      });
+    }
+
     if (mounted) Navigator.pop(context);
   }
 }

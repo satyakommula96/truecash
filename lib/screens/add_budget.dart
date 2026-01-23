@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 
 class AddBudgetScreen extends StatefulWidget {
   const AddBudgetScreen({super.key});
@@ -30,7 +31,10 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
             TextField(
               controller: limitCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Monthly Limit (₹)"),
+              decoration: InputDecoration(
+                labelText: "Monthly Limit",
+                prefixText: "${CurrencyHelper.symbol} ",
+              ),
             ),
             const SizedBox(height: 40),
             SizedBox(

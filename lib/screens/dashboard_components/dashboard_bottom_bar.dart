@@ -4,8 +4,8 @@ import '../../theme/theme.dart';
 import '../loans.dart';
 import '../credit_cards.dart';
 import '../add_expense.dart';
-import '../subscriptions.dart';
 import '../monthly_history.dart';
+import '../analysis_screen.dart';
 
 class DashboardBottomBar extends StatelessWidget {
   final VoidCallback onLoad;
@@ -77,13 +77,13 @@ class DashboardBottomBar extends StatelessWidget {
                       Expanded(
                         child: _buildActionIcon(
                             context,
-                            Icons.event_repeat,
-                            "SUBS",
+                            Icons.analytics_outlined,
+                            "ANALYSIS",
                             () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) =>
-                                        const SubscriptionsScreen())),
+                                        const AnalysisScreen())),
                             semantic),
                       ),
                       Expanded(

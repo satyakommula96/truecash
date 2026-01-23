@@ -13,6 +13,7 @@ import '../db/database.dart';
 
 import '../config/version.dart';
 import '../main.dart';
+import '../logic/currency_helper.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -66,6 +67,37 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _showCurrencyPicker(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) => ValueListenableBuilder<String>(
+        valueListenable: CurrencyHelper.currencyNotifier,
+        builder: (context, currentCurrency, _) {
+          return AlertDialog(
+            title: const Text("Select Currency"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...CurrencyHelper.currencies.entries.map((entry) {
+                  return ListTile(
+                    title: Text("${entry.key} (${entry.value})"),
+                    onTap: () {
+                      CurrencyHelper.setCurrency(entry.key);
+                      Navigator.pop(context);
+                    },
+                    trailing: currentCurrency == entry.key
+                        ? const Icon(Icons.check, color: Colors.blue)
+                        : null,
+                  );
+                }),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -331,6 +363,15 @@ class SettingsScreen extends StatelessWidget {
             Icons.dark_mode_outlined,
             Colors.indigo,
             () => _showThemePicker(context),
+          ),
+          const SizedBox(height: 16),
+          _buildOption(
+            context,
+            "Currency",
+            "Choose your preferred currency (${CurrencyHelper.symbol})",
+            Icons.payments_outlined,
+            Colors.teal,
+            () => _showCurrencyPicker(context),
           ),
           const SizedBox(height: 16),
           _buildOption(

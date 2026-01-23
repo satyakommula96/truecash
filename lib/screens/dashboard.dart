@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../logic/financial_repository.dart';
 import '../logic/monthly_calc.dart';
+import '../logic/currency_helper.dart';
 import '../models/models.dart';
 import '../theme/theme.dart';
-import 'add_budget.dart';
 import 'dashboard_components/asset_liability_card.dart';
-import 'dashboard_components/borrowing_summary.dart';
-import 'dashboard_components/budget_section.dart';
 import 'dashboard_components/dashboard_bottom_bar.dart';
 import 'dashboard_components/dashboard_header.dart';
 import 'dashboard_components/section_header.dart';
 import 'dashboard_components/summary_card.dart';
-import 'dashboard_components/trend_chart.dart';
-import 'dashboard_components/upcoming_bills.dart';
+import 'dashboard_components/payment_calendar.dart';
 import 'dashboard_components/wealth_hero.dart';
-import 'loans.dart';
-import 'subscriptions.dart';
+
+
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -82,8 +78,11 @@ class _DashboardState extends State<Dashboard> {
     final semantic = Theme.of(context).extension<AppColors>()!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      extendBody: true,
+    return ValueListenableBuilder<String>(
+      valueListenable: CurrencyHelper.currencyNotifier,
+      builder: (context, currency, _) {
+        return Scaffold(
+          extendBody: true,
       bottomNavigationBar: DashboardBottomBar(onLoad: load),
       body: SafeArea(
         child: RefreshIndicator(
@@ -104,8 +103,7 @@ class _DashboardState extends State<Dashboard> {
                         Expanded(
                             child: SummaryCard(
                                 label: "Income",
-                                value:
-                                    "₹${NumberFormat.compact(locale: 'en_IN').format(summary!.totalIncome)}",
+                                value: CurrencyHelper.format(summary!.totalIncome),
                                 valueColor: semantic.income,
                                 semantic: semantic,
                                 icon: Icons.arrow_downward)),
@@ -113,79 +111,28 @@ class _DashboardState extends State<Dashboard> {
                         Expanded(
                             child: SummaryCard(
                                 label: "Expenses",
-                                value:
-                                    "₹${NumberFormat.compact(locale: 'en_IN').format(summary!.totalFixed + summary!.totalVariable + summary!.totalSubscriptions)}",
+                                value: CurrencyHelper.format(summary!.totalFixed + summary!.totalVariable + summary!.totalSubscriptions),
                                 valueColor: semantic.overspent,
                                 semantic: semantic,
                                 icon: Icons.arrow_upward)),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    FullWidthSummaryCard(
-                        label: "Net Balance",
-                        value: "₹${summary!.net}",
-                        valueColor: summary!.net >= 0
-                            ? semantic.income
-                            : semantic.warning,
-                        semantic: semantic),
                     const SizedBox(height: 32),
                     SectionHeader(
                         title: "Financial Overview",
                         sub: "Assets vs Liabilities",
                         semantic: semantic),
                     const SizedBox(height: 16),
-                    AssetLiabilityCard(summary: summary!, semantic: semantic),
-                    const SizedBox(height: 32),
-                    SectionHeader(
-                        title: "Borrowings",
-                        sub: "Active loans & debts",
-                        semantic: semantic,
-                        onAdd: () async {
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const LoansScreen()));
-                          load();
-                        }),
-                    const SizedBox(height: 16),
-                    BorrowingSummary(
+                    AssetLiabilityCard(
                         summary: summary!, semantic: semantic, onLoad: load),
                     const SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     SectionHeader(
-                        title: "Spending Trend",
-                        sub: "6-month activity",
+                        title: "Payment Calendar",
+                        sub: "Month view",
                         semantic: semantic),
-                    const SizedBox(height: 24),
-                    TrendChart(trendData: trendData, semantic: semantic),
-                    const SizedBox(height: 32),
-                    SectionHeader(
-                        title: "Active Budgets",
-                        sub: "Target monitoring",
-                        semantic: semantic,
-                        onAdd: () async {
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const AddBudgetScreen()));
-                          load();
-                        }),
                     const SizedBox(height: 16),
-                    BudgetSection(
-                        budgets: budgets, semantic: semantic, onLoad: load),
-                    const SizedBox(height: 32),
-                    SectionHeader(
-                        title: "Obligations",
-                        sub: "Bills and recurring",
-                        semantic: semantic,
-                        onAdd: () async {
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const SubscriptionsScreen()));
-                          load();
-                        }),
-                    const SizedBox(height: 16),
-                    UpcomingBills(bills: upcomingBills, semantic: semantic),
+                    PaymentCalendar(bills: upcomingBills, semantic: semantic),
                     const SizedBox(height: 120),
                   ]),
                 ),
@@ -194,6 +141,8 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
       ),
+    );
+      }
     );
   }
 }

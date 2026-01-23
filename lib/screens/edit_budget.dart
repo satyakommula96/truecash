@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../logic/financial_repository.dart';
 import '../models/models.dart';
+import '../logic/currency_helper.dart';
 
 class EditBudgetScreen extends StatefulWidget {
   final Budget budget;
@@ -41,7 +42,8 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
               controller: limitCtrl,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "Monthly Limit (₹)",
+                labelText: "Monthly Limit",
+                prefixText: "${CurrencyHelper.symbol} ",
                 filled: true,
                 fillColor: Theme.of(context)
                     .colorScheme

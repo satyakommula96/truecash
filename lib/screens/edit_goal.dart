@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 
 class EditGoalScreen extends StatefulWidget {
   final Map<String, dynamic> goal;
@@ -42,8 +43,8 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
         child: Column(
           children: [
             _buildField("Goal Name", nameCtrl),
-            _buildField("Target Amount (₹)", targetCtrl, isNum: true),
-            _buildField("Current Saved (₹)", currentCtrl, isNum: true),
+            _buildField("Target Amount", targetCtrl, isNum: true, prefix: CurrencyHelper.symbol),
+            _buildField("Current Saved", currentCtrl, isNum: true, prefix: CurrencyHelper.symbol),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
@@ -67,7 +68,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl,
-      {bool isNum = false}) {
+      {bool isNum = false, String? prefix}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextField(
@@ -75,6 +76,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
         keyboardType: isNum ? TextInputType.number : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
+          prefixText: prefix != null ? "$prefix " : null,
           filled: true,
           fillColor:
               Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),

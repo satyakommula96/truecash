@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
+import '../services/notification_service.dart';
 
 class AddCreditCardScreen extends StatefulWidget {
   const AddCreditCardScreen({super.key});
@@ -14,6 +17,43 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
   final stmtCtrl = TextEditingController();
   final minDueCtrl = TextEditingController();
   final dueDateCtrl = TextEditingController();
+  final genDateCtrl = TextEditingController();
+  DateTime? _selectedDueDate;
+  DateTime? _selectedGenDate;
+
+  Future<void> _pickDueDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDueDate ?? now,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDueDate = picked;
+        dueDateCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
+  }
+
+  Future<void> _pickGenDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedGenDate ?? now,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedGenDate = picked;
+        genDateCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +67,15 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
         child: Column(
           children: [
             _buildField("Bank Name", bankCtrl, Icons.account_balance),
-            _buildField("Credit Limit", limitCtrl, Icons.speed, isNumber: true),
+            _buildField("Credit Limit", limitCtrl, Icons.speed, isNumber: true, prefix: CurrencyHelper.symbol),
+            _buildField("Statement Balance", stmtCtrl, Icons.account_balance_wallet, isNumber: true, prefix: CurrencyHelper.symbol),
+            _buildField("Minimum Due", minDueCtrl, Icons.low_priority, isNumber: true, prefix: CurrencyHelper.symbol),
             _buildField(
-                "Statement Balance", stmtCtrl, Icons.account_balance_wallet,
-                isNumber: true),
-            _buildField("Minimum Due", minDueCtrl, Icons.low_priority,
-                isNumber: true),
+                "Statement Generation Date", genDateCtrl, Icons.event,
+                readOnly: true, onTap: _pickGenDate),
             _buildField(
-                "Due Date (e.g. 15th)", dueDateCtrl, Icons.calendar_today),
+                "Payment Due Date", dueDateCtrl, Icons.calendar_today,
+                readOnly: true, onTap: _pickDueDate),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
@@ -58,16 +99,19 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl, IconData icon,
-      {bool isNumber = false}) {
+      {bool isNumber = false, String? prefix, bool readOnly = false, VoidCallback? onTap}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: TextField(
         controller: ctrl,
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        readOnly: readOnly,
+        onTap: onTap,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),
+          prefixText: prefix != null ? "$prefix " : null,
           filled: true,
           fillColor: colorScheme.onSurface.withValues(alpha: 0.05),
           border: OutlineInputBorder(
@@ -86,7 +130,14 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
         int.tryParse(limitCtrl.text) ?? 0,
         int.tryParse(stmtCtrl.text) ?? 0,
         int.tryParse(minDueCtrl.text) ?? 0,
-        dueDateCtrl.text);
+        dueDateCtrl.text,
+        genDateCtrl.text);
+
+    // Trigger notification
+    if (_selectedGenDate != null) {
+      await NotificationService().scheduleCreditCardReminder(
+          bankCtrl.text, _selectedGenDate!.day);
+    }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Credit Card Added"),

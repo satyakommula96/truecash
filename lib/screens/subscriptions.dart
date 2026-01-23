@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
 import '../models/models.dart';
+import '../logic/currency_helper.dart';
+import '../logic/date_helper.dart';
 import 'add_subscription.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
@@ -71,7 +74,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                               fontSize: 10,
                               letterSpacing: 2,
                               color: Colors.grey)),
-                      Text("₹$total",
+                      Text(CurrencyHelper.format(total),
                           style: const TextStyle(
                               fontWeight: FontWeight.w900, fontSize: 24)),
                     ],
@@ -88,61 +91,73 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                           itemCount: subs.length,
                           itemBuilder: (context, i) {
                             final s = subs[i];
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surface,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                    color: colorScheme.onSurface
-                                        .withValues(alpha: 0.06)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    margin: const EdgeInsets.only(right: 16),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.secondaryContainer
-                                          .withValues(alpha: 0.5),
-                                      borderRadius: BorderRadius.circular(12),
+                            return InkWell(
+                              onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => AddSubscriptionScreen(
+                                            subscription: s)));
+                                load();
+                              },
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.06)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      margin: const EdgeInsets.only(right: 16),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.secondaryContainer
+                                            .withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(Icons.subscriptions_rounded,
+                                          color:
+                                              colorScheme.onSecondaryContainer,
+                                          size: 20),
                                     ),
-                                    child: Icon(Icons.subscriptions_rounded,
-                                        color: colorScheme.onSecondaryContainer,
-                                        size: 20),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(s.name.toUpperCase(),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 13,
-                                                letterSpacing: 1)),
-                                        Text("Billed on: ${s.billingDate}",
-                                            style: const TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.bold)),
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(s.name.toUpperCase(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 13,
+                                                  letterSpacing: 1)),
+                                          Text(DateHelper.formatDue(s.billingDate, prefix: "NEXT"),
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Text("₹${s.amount}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 15)),
-                                  const SizedBox(width: 16),
-                                  IconButton(
-                                    onPressed: () => _delete(s.id),
-                                    icon: Icon(Icons.remove_circle_outline,
-                                        color: colorScheme.onSurface
-                                            .withValues(alpha: 0.3),
-                                        size: 18),
-                                  )
-                                ],
+                                    Text(CurrencyHelper.format(s.amount),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 15)),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      onPressed: () => _delete(s.id),
+                                      icon: Icon(Icons.delete_outline,
+                                          color: colorScheme.error
+                                              .withValues(alpha: 0.5),
+                                          size: 20),
+                                    )
+                                  ],
+                                ),
                               ),
                             );
                           },

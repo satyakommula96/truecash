@@ -4,6 +4,8 @@ import '../models/models.dart';
 import '../theme/theme.dart';
 import 'add_card.dart';
 import 'edit_card.dart';
+import '../logic/currency_helper.dart';
+import '../logic/date_helper.dart';
 
 class CreditCardsScreen extends StatefulWidget {
   const CreditCardsScreen({super.key});
@@ -43,17 +45,17 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Current Balance: ₹${card.statementBalance}",
+            Text("Current Balance: ${CurrencyHelper.format(card.statementBalance.toInt())}",
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Amount",
-                border: OutlineInputBorder(),
-                prefixText: "₹",
+                border: const OutlineInputBorder(),
+                prefixText: CurrencyHelper.symbol,
               ),
             ),
             const SizedBox(height: 10),
@@ -62,7 +64,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                 if (card.minDue > 0)
                   TextButton(
                     onPressed: () => controller.text = card.minDue.toString(),
-                    child: Text("Min Due (₹${card.minDue})"),
+                    child: Text("Min Due (${CurrencyHelper.format(card.minDue)})"),
                   ),
                 TextButton(
                   onPressed: () =>
@@ -169,9 +171,32 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                                             color: semantic.secondaryText)),
                                   ],
                                 ),
-                                if (isHighUtil)
-                                  Icon(Icons.warning_amber_rounded,
-                                      color: semantic.warning, size: 18),
+                                Row(
+                                  children: [
+                                    if (isHighUtil)
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 8),
+                                        child: Icon(Icons.warning_amber_rounded,
+                                            color: semantic.warning, size: 18),
+                                      ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        if (c.generationDate.isNotEmpty)
+                                          Text("BILL DATE: ${c.generationDate.split(' ')[0]} ${c.generationDate.split(' ')[1]}".toUpperCase(),
+                                              style: TextStyle(
+                                                  fontSize: 8,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: semantic.secondaryText)),
+                                        Text(DateHelper.formatDue(c.dueDate),
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w900,
+                                                color: semantic.secondaryText)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -181,7 +206,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("₹${stmt.toInt()}",
+                                    Text(CurrencyHelper.format(stmt.toInt()),
                                         style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.w800,
@@ -197,7 +222,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text("₹${minDue.toInt()}",
+                                    Text(CurrencyHelper.format(minDue.toInt()),
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w800,
@@ -229,7 +254,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("LIMIT: ₹${limit.toInt()}",
+                                Text("LIMIT: ${CurrencyHelper.format(limit.toInt())}",
                                     style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.w900,

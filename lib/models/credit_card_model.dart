@@ -5,6 +5,7 @@ class CreditCard {
   final int statementBalance;
   final int minDue;
   final String dueDate;
+  final String generationDate;
 
   CreditCard({
     required this.id,
@@ -13,6 +14,7 @@ class CreditCard {
     required this.statementBalance,
     required this.minDue,
     required this.dueDate,
+    required this.generationDate,
   });
 
   factory CreditCard.fromMap(Map<String, dynamic> map) {
@@ -23,6 +25,7 @@ class CreditCard {
       statementBalance: map['statement_balance'] as int,
       minDue: map['min_due'] as int,
       dueDate: map['due_date'] as String,
+      generationDate: map['generation_date'] as String? ?? '',
     );
   }
 
@@ -34,6 +37,7 @@ class CreditCard {
       'statement_balance': statementBalance,
       'min_due': minDue,
       'due_date': dueDate,
+      'generation_date': generationDate,
     };
   }
 }

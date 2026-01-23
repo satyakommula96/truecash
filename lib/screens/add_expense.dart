@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
 class AddExpense extends StatefulWidget {
-  const AddExpense({super.key});
+  final String? initialType;
+  const AddExpense({super.key, this.initialType});
 
   @override
   State<AddExpense> createState() => _AddExpenseState();
@@ -16,10 +18,19 @@ class _AddExpenseState extends State<AddExpense> {
   String selectedCategory = 'General';
   String type = 'Variable';
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialType != null && categoryMap.containsKey(widget.initialType)) {
+      type = widget.initialType!;
+      selectedCategory = categoryMap[type]!.first;
+    }
+  }
+
   final Map<String, List<String>> categoryMap = {
     'Variable': ['Food', 'Transport', 'Shopping', 'Entertainment', 'Others'],
     'Fixed': ['Rent', 'Utility', 'Insurance', 'EMI'],
-    'Investment': ['Stocks', 'Mutual Funds', 'SIP', 'Crypto', 'Gold'],
+    'Investment': ['Stocks', 'Mutual Funds', 'SIP', 'Crypto', 'Gold', 'Lending'],
     'Income': ['Salary', 'Freelance', 'Dividends'],
     'Subscription': ['OTT', 'Software', 'Gym'],
   };
@@ -99,7 +110,7 @@ class _AddExpenseState extends State<AddExpense> {
                       ? semantic.income
                       : colorScheme.onSurface),
               decoration: InputDecoration(
-                  prefixText: "₹ ",
+                  prefixText: "${CurrencyHelper.symbol} ",
                   border: InputBorder.none,
                   hintText: "0",
                   hintStyle: TextStyle(

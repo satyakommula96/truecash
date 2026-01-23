@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 
 class AddGoalScreen extends StatefulWidget {
   const AddGoalScreen({super.key});
@@ -30,7 +31,10 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
             TextField(
               controller: targetCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Target Amount (₹)"),
+              decoration: InputDecoration(
+                labelText: "Target Amount",
+                prefixText: "${CurrencyHelper.symbol} ",
+              ),
             ),
             const SizedBox(height: 40),
             SizedBox(

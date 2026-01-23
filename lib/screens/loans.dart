@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
 import '../models/models.dart';
+import '../logic/currency_helper.dart';
+import '../logic/date_helper.dart';
 import '../theme/theme.dart';
 import 'add_loan.dart';
 import 'edit_loan.dart';
@@ -102,7 +105,7 @@ class _LoansScreenState extends State<LoansScreen> {
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
-                                        l.loanType == 'Person'
+                                        l.loanType == 'Individual'
                                             ? Icons.person_rounded
                                             : Icons.account_balance_rounded,
                                         size: 16,
@@ -126,9 +129,10 @@ class _LoansScreenState extends State<LoansScreen> {
                                     ),
                                   ],
                                 ),
-                                Text("${l.dueDate.toUpperCase()} DUE",
+                                Text(
+                                    DateHelper.formatDue(l.dueDate, prefix: l.loanType == 'Individual' ? "DUE" : "NEXT EMI"),
                                     style: TextStyle(
-                                        fontSize: 8,
+                                        fontSize: 9,
                                         fontWeight: FontWeight.w900,
                                         color: semantic.secondaryText)),
                               ],
@@ -144,13 +148,13 @@ class _LoansScreenState extends State<LoansScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("₹${remaining.toInt()}",
+                                    Text(CurrencyHelper.format(remaining.toInt()),
                                         style: const TextStyle(
                                             fontSize: 24,
                                             fontWeight: FontWeight.w800,
                                             letterSpacing: -0.5)),
                                     Text(
-                                        l.loanType == 'Person'
+                                        l.loanType == 'Individual'
                                             ? "Borrowed Amount"
                                             : "Remaining Balance",
                                         style: TextStyle(
@@ -159,11 +163,11 @@ class _LoansScreenState extends State<LoansScreen> {
                                             fontWeight: FontWeight.w500)),
                                   ],
                                 ),
-                                if (l.loanType != 'Person')
+                                if (l.loanType != 'Individual')
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text("₹${emi.toInt()}",
+                                      Text(CurrencyHelper.format(emi.toInt()),
                                           style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w800)),
@@ -190,13 +194,13 @@ class _LoansScreenState extends State<LoansScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                if (l.loanType != 'Person')
+                                if (l.loanType != 'Individual')
                                   Text("${l.interestRate}% APR",
                                       style: TextStyle(
                                           fontSize: 9,
                                           fontWeight: FontWeight.w900,
                                           color: semantic.secondaryText)),
-                                Text("TOTAL: ₹${total.toInt()}",
+                                Text("TOTAL: ${CurrencyHelper.format(total.toInt())}",
                                     style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.w900,

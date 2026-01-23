@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/theme.dart';
+import '../../logic/currency_helper.dart';
+import '../../logic/date_helper.dart';
 
 class UpcomingBills extends StatelessWidget {
   final List<Map<String, dynamic>> bills;
@@ -46,10 +48,10 @@ class UpcomingBills extends StatelessWidget {
                                   fontWeight: FontWeight.bold, fontSize: 13),
                               overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 12),
-                          Text("₹${b['amount']}",
+                          Text(CurrencyHelper.format(b['amount']),
                               style: const TextStyle(
                                   fontWeight: FontWeight.w900, fontSize: 15)),
-                          Text(b['due'].toString(),
+                          Text(DateHelper.formatDue(b['due'].toString()),
                               style: TextStyle(
                                   fontSize: 9, color: semantic.secondaryText))
                         ])))

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 
 class EditEntryScreen extends StatefulWidget {
   final LedgerItem entry;
@@ -59,8 +60,8 @@ class _EditEntryScreenState extends State<EditEntryScreen> {
               keyboardType: TextInputType.number,
               style: const TextStyle(
                   fontWeight: FontWeight.w900, fontSize: 48, letterSpacing: -2),
-              decoration: const InputDecoration(
-                  prefixText: "₹ ", border: InputBorder.none),
+              decoration: InputDecoration(
+                  prefixText: "${CurrencyHelper.symbol} ", border: InputBorder.none),
             ),
             const SizedBox(height: 48),
             Text(widget.entry.type == 'Income' ? "SOURCE" : "LABEL",

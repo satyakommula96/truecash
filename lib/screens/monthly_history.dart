@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 import 'month_detail.dart';
 
@@ -86,7 +87,7 @@ class _MonthlyHistoryScreenState extends State<MonthlyHistoryScreen> {
                                             fontSize: 18,
                                             letterSpacing: -0.5,
                                             color: colorScheme.onSurface)),
-                                    Text("₹${s['net']}",
+                                    Text(CurrencyHelper.format(s['net']),
                                         style: TextStyle(
                                             fontWeight: FontWeight.w800,
                                             color: positive
@@ -102,11 +103,11 @@ class _MonthlyHistoryScreenState extends State<MonthlyHistoryScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     _buildStatItem(
-                                        "INCOME", "₹${s['income']}", semantic),
+                                        "INCOME", CurrencyHelper.format(s['income']), semantic),
                                     _buildStatItem("EXPENDITURE",
-                                        "₹${s['expenses']}", semantic),
+                                        CurrencyHelper.format(s['expenses']), semantic),
                                     _buildStatItem("INVESTED",
-                                        "₹${s['invested']}", semantic),
+                                        CurrencyHelper.format(s['invested']), semantic),
                                   ]),
                             ],
                           ),

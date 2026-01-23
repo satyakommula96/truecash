@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/theme.dart';
+import '../../logic/currency_helper.dart';
 import '../edit_budget.dart';
 
 class BudgetSection extends StatelessWidget {
@@ -65,7 +66,7 @@ class BudgetSection extends StatelessWidget {
                   Text(b.category.toUpperCase(),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 12)),
-                  Text("₹${b.spent} / ₹${b.monthlyLimit}",
+                  Text("${CurrencyHelper.format(b.spent)} / ${CurrencyHelper.format(b.monthlyLimit)}",
                       style: TextStyle(
                           fontSize: 12,
                           color: isOver
@@ -75,14 +76,41 @@ class BudgetSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 6,
-                  backgroundColor: semantic.divider,
-                  color: isOver ? semantic.overspent : colorScheme.primary,
-                ),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Stack(
+                    children: [
+                      Container(
+                        height: 10,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: semantic.divider.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      Container(
+                        height: 10,
+                        width: constraints.maxWidth * progress,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isOver 
+                              ? [semantic.overspent, semantic.overspent.withValues(alpha: 0.7)]
+                              : [colorScheme.primary, colorScheme.primary.withValues(alpha: 0.7)],
+                          ),
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (isOver ? semantic.overspent : colorScheme.primary).withValues(alpha: 0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            )
+                          ]
+                        ),
+                      ),
+                    ],
+                  );
+                }
               ),
             ],
           ),

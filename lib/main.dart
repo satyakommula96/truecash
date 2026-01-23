@@ -7,6 +7,7 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/dashboard.dart';
 import 'theme/theme.dart';
 import 'services/notification_service.dart';
+import 'logic/currency_helper.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/intro_screen.dart';
@@ -26,6 +27,13 @@ Future<void> main() async {
     await NotificationService().init();
   } catch (e) {
     debugPrint('Error initializing notifications: $e');
+  }
+
+  // Load Currency Preference
+  try {
+    await CurrencyHelper.load();
+  } catch (e) {
+    debugPrint('Error loading currency: $e');
   }
 
   // Schedule daily reminder (fire and forget to not block startup provided init didn't hang)

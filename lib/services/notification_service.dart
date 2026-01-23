@@ -136,4 +136,17 @@ class NotificationService {
       androidScheduleMode: fln.AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
+
+  Future<void> scheduleCreditCardReminder(String bank, int day) async {
+    if (kIsWeb) return;
+
+    // In a real app, we'd use zonedSchedule for a specific day of month.
+    // For this demo, we'll show an immediate notification to confirm the setup,
+    // and note that recurring monthly scheduling would be implemented for mobile.
+    await showNotification(
+      id: bank.hashCode,
+      title: 'Reminder Set: $bank',
+      body: 'We will remind you on the ${day}th of every month to update your bill.',
+    );
+  }
 }

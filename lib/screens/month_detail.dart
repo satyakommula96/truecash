@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../logic/financial_repository.dart';
 import '../models/models.dart';
 import '../theme/theme.dart';
+import '../logic/currency_helper.dart';
 import 'edit_entry.dart';
 import 'month_detail_components/category_icon.dart';
 import 'month_detail_components/month_detail_header.dart';
@@ -149,7 +150,7 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                                       ],
                                     ),
                                   ),
-                                  Text("₹${item.amount}",
+                                  Text(CurrencyHelper.format(item.amount),
                                       style: TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 16,

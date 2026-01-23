@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../logic/financial_repository.dart';
+import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
 class EditLoanScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
   late TextEditingController rateCtrl;
   late TextEditingController dueCtrl;
   late String selectedType;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -31,6 +34,13 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
     rateCtrl = TextEditingController(text: widget.loan.interestRate.toString());
     dueCtrl = TextEditingController(text: widget.loan.dueDate);
     selectedType = widget.loan.loanType;
+    
+    // Try to parse existing date if it looks like a full date (e.g. 15 Feb 2026)
+    try {
+      _selectedDate = DateFormat('dd MMM yyyy').parse(widget.loan.dueDate);
+    } catch (_) {
+      // Ignore if parsing fails (e.g. just Day number)
+    }
   }
 
   @override
@@ -65,10 +75,10 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
               spacing: 8,
               runSpacing: 8,
               children: [
+                'Bank',
+                'Individual',
                 'Gold',
                 'Car',
-                'Personal',
-                'Person',
                 'Home',
                 'Education'
               ].map((t) {
@@ -98,20 +108,20 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
               children: [
                 Expanded(
                     child: _buildField("REMAINING BALANCE", remainingCtrl,
-                        type: TextInputType.number, prefix: "₹")),
+                        type: TextInputType.number, prefix: CurrencyHelper.symbol)),
                 const SizedBox(width: 16),
                 Expanded(
                     child: _buildField("TOTAL LOAN", totalCtrl,
-                        type: TextInputType.number, prefix: "₹")),
+                        type: TextInputType.number, prefix: CurrencyHelper.symbol)),
               ],
             ),
             const SizedBox(height: 24),
-            if (selectedType != 'Person') ...[
+            if (selectedType != 'Individual') ...[
               Row(
                 children: [
                   Expanded(
                       child: _buildField("MONTHLY EMI", emiCtrl,
-                          type: TextInputType.number, prefix: "₹")),
+                          type: TextInputType.number, prefix: CurrencyHelper.symbol)),
                   const SizedBox(width: 16),
                   Expanded(
                       child: _buildField("INTEREST RATE", rateCtrl,
@@ -120,14 +130,32 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
               ),
               const SizedBox(height: 24),
             ],
-            _buildField(
-                selectedType == 'Person'
-                    ? "EXPECTED REPAYMENT DATE"
-                    : "DUE DATE (DAY OF MONTH)",
-                dueCtrl,
-                type: TextInputType.text),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildField(
+                      selectedType == 'Individual'
+                          ? "EXPECTED REPAYMENT DATE"
+                          : "DUE DATE (DAY OF MONTH)",
+                      dueCtrl,
+                      type: TextInputType.text,
+                      readOnly: true,
+                      onTap: _pickDate),
+                ),
+                if (selectedType == 'Individual') ...[
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: TextButton(
+                      onPressed: () => setState(() => dueCtrl.text = "Flexible"),
+                      child: const Text("FLEXIBLE"),
+                    ),
+                  ),
+                ],
+              ],
+            ),
             const SizedBox(height: 48),
-            if (selectedType != 'Person') ...[
+            if (selectedType != 'Individual') ...[
               SizedBox(
                 width: double.infinity,
                 height: 60,
@@ -192,11 +220,11 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Emi Amount: ₹${emi.toInt()}"),
+            Text("Emi Amount: ${CurrencyHelper.format(emi.toInt())}"),
             const SizedBox(height: 8),
-            Text("Interest Component: ₹$interest",
+            Text("Interest Component: ${CurrencyHelper.format(interest)}",
                 style: const TextStyle(color: Colors.red)),
-            Text("Principal Reduction: ₹$principalComp",
+            Text("Principal Reduction: ${CurrencyHelper.format(principalComp)}",
                 style: const TextStyle(
                     color: Colors.green, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
@@ -237,7 +265,7 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl,
-      {TextInputType type = TextInputType.text, String? prefix}) {
+      {TextInputType type = TextInputType.text, String? prefix, bool readOnly = false, VoidCallback? onTap}) {
     final semantic = Theme.of(context).extension<AppColors>()!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,6 +280,8 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
         TextField(
           controller: ctrl,
           keyboardType: type,
+          readOnly: readOnly,
+          onTap: onTap,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             prefixText: prefix != null ? "$prefix " : null,
@@ -289,5 +319,22 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
     final repo = FinancialRepository();
     await repo.deleteItem('loans', widget.loan.id);
     if (mounted) Navigator.pop(context);
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: DateTime(now.year, now.month - 1),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        dueCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
   }
 }

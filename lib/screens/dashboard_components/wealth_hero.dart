@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../logic/monthly_calc.dart';
+import '../../theme/theme.dart';
+import '../../logic/currency_helper.dart';
 
 class WealthHero extends StatelessWidget {
   final MonthlySummary summary;
@@ -10,16 +11,18 @@ class WealthHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final appColors = Theme.of(context).extension<AppColors>();
+    final isNegative = summary.netWorth < 0;
+    final displayColor = isNegative
+        ? (appColors?.overspent ?? colorScheme.error)
+        : colorScheme.primary;
 
     return Container(
       width: double.infinity,
       height: 220,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            colorScheme.primary,
-            colorScheme.primary.withValues(alpha: 0.8)
-          ],
+          colors: [displayColor, displayColor.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -30,7 +33,7 @@ class WealthHero extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.3),
+              color: displayColor.withValues(alpha: 0.3),
               blurRadius: 24,
               offset: const Offset(0, 12)),
         ],
@@ -67,7 +70,7 @@ class WealthHero extends StatelessWidget {
                               color:
                                   colorScheme.onPrimary.withValues(alpha: 0.8)),
                           const SizedBox(width: 6),
-                          Text("TOTAL NET WORTH",
+                          Text("NET WORTH",
                               style: TextStyle(
                                   color: colorScheme.onPrimary
                                       .withValues(alpha: 0.9),
@@ -83,20 +86,14 @@ class WealthHero extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        "₹${NumberFormat.decimalPattern('en_IN').format(summary.netWorth)}",
+                        CurrencyHelper.format(summary.netWorth, compact: false),
                         style: TextStyle(
                             color: colorScheme.onPrimary,
                             fontSize: 42,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1.5,
                             height: 1.0)),
-                    const SizedBox(height: 8),
-                    Text("AFTER LIABILITIES",
-                        style: TextStyle(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5)),
+
                   ],
                 ),
               ],

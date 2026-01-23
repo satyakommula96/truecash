@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../logic/monthly_calc.dart';
 import '../../theme/theme.dart';
 import '../loans.dart';
+import '../../logic/currency_helper.dart';
 
 class BorrowingSummary extends StatelessWidget {
   final MonthlySummary summary;
@@ -42,7 +43,7 @@ class BorrowingSummary extends StatelessWidget {
                         color: semantic.secondaryText,
                         letterSpacing: 1)),
                 const SizedBox(height: 8),
-                Text("₹${summary.loansTotal}",
+                Text(CurrencyHelper.format(summary.loansTotal),
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
