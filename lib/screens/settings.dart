@@ -11,6 +11,7 @@ import '../logic/financial_repository.dart';
 import '../db/database.dart';
 
 
+import '../config/version.dart';
 import '../main.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -373,7 +374,7 @@ class SettingsScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2,
                         color: Colors.grey)),
-                Text("Version 1.1.0",
+                Text("Version ${AppVersion.current}",
                     style: TextStyle(fontSize: 10, color: Colors.grey)),
               ],
             ),

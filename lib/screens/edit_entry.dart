@@ -43,7 +43,7 @@ class _EditEntryScreenState extends State<EditEntryScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.fromLTRB(32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

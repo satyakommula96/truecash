@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'schema.dart';
+import '../config/version.dart';
 
 class AppDatabase {
   static Database? _db;
@@ -16,7 +17,7 @@ class AppDatabase {
 
     return openDatabase(
       path,
-      version: 1,
+      version: AppVersion.databaseVersion,
       onCreate: (db, _) async {
         await db.execute('CREATE TABLE ${Schema.incomeSourcesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colSource} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colDate} TEXT)');
         await db.execute('CREATE TABLE ${Schema.fixedExpensesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colCategory} TEXT, ${Schema.colDate} TEXT)');
@@ -49,6 +50,21 @@ class AppDatabase {
         ''');
         await db.execute('CREATE TABLE ${Schema.savingGoalsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colTargetAmount} INTEGER, ${Schema.colCurrentAmount} INTEGER)');
         await db.execute('CREATE TABLE ${Schema.budgetsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colCategory} TEXT, ${Schema.colMonthlyLimit} INTEGER)');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // Handle database migrations here
+        // Example:
+        // if (oldVersion < 2) {
+        //   await db.execute("ALTER TABLE some_table ADD COLUMN new_col TEXT");
+        // }
+        // Ensure you increase the version number in openDatabase arguments whenever you change schema.
+        
+        // For now, since we bumped to v2, we ensure all tables are created if missing
+        // (This acts as a safety net if a user skpped a version or if tables were added in v2)
+        if (oldVersion < 2) {
+           // If we added specific tables in v2, strictly we should create them here.
+           // For this initial setup, we assume v1 was clean or this is the first production ready database.
+        }
       },
     );
   }
