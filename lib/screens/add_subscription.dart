@@ -110,7 +110,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   Future<void> _save() async {
     if (nameCtrl.text.isEmpty ||
         amountCtrl.text.isEmpty ||
-        dateCtrl.text.isEmpty) return;
+        dateCtrl.text.isEmpty) {
+      return;
+    }
     final repo = FinancialRepository();
     final amount = int.parse(amountCtrl.text);
 

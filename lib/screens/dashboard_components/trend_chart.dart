@@ -83,12 +83,13 @@ class TrendChart extends StatelessWidget {
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         int index = value.toInt();
-                        if (index == trendData.length)
+                        if (index == trendData.length) {
                           return const Text("FCST",
                               style: TextStyle(
                                   fontSize: 8,
                                   fontWeight:
                                       FontWeight.bold)); // Forecast Label
+                        }
                         if (index < 0 || index >= trendData.length) {
                           return const SizedBox();
                         }

@@ -1,4 +1,3 @@
-import 'dart:math';
 import '../models/models.dart';
 import '../logic/currency_helper.dart';
 import 'monthly_calc.dart';
@@ -157,10 +156,11 @@ class IntelligenceService {
     double liabilities =
         (summary.loansTotal + summary.creditCardDebt).toDouble();
     if (liabilities == 0) {
-      if (assets > 0)
+      if (assets > 0) {
         score += 20;
-      else
+      } else {
         score += 10; // Neutral
+      }
     } else {
       double ratio = assets / liabilities;
       score += (ratio * 10).clamp(0.0, 20.0);
@@ -178,8 +178,9 @@ class IntelligenceService {
 
     // 5. Net Worth / Solvency Penalty
     if (summary.netWorth < 0) {
-      if (score > 40)
+      if (score > 40) {
         score = 40; // Cap at 40 (At Risk boundary) immediately for insolvency
+      }
 
       // Further reduce if deeply in debt relative to income
       if (summary.totalIncome > 0 &&

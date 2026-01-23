@@ -110,6 +110,7 @@ class AppDatabase {
   }
 
   static Future<void> seedDummyData() async {
+    await clearData(); // Ensure fresh start
     final database = await db;
     final now = DateTime.now();
     final nowStr = now.toIso8601String();

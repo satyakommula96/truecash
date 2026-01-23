@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../logic/intelligence_service.dart';
-import '../../logic/currency_helper.dart';
+
 import '../../theme/theme.dart';
 
 class SmartInsightsCard extends StatelessWidget {

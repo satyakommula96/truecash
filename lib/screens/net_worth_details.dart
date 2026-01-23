@@ -153,8 +153,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (_bankLoans.isEmpty)
+                if (_bankLoans.isEmpty) {
                   return _buildEmptyState("No active loans");
+                }
                 final l = _bankLoans[index];
                 return _buildListItem(
                   l.name,
@@ -174,8 +175,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (_creditCards.isEmpty)
+                if (_creditCards.isEmpty) {
                   return _buildEmptyState("No credit cards");
+                }
                 final c = _creditCards[index];
                 return _buildListItem(
                   c.bank,
@@ -195,8 +197,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (_personalBorrowings.isEmpty)
+                if (_personalBorrowings.isEmpty) {
                   return _buildEmptyState("No personal borrowings");
+                }
                 final l = _personalBorrowings[index];
                 return _buildListItem(
                   l.name,
@@ -273,8 +276,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (equity.isEmpty)
+                if (equity.isEmpty) {
                   return _buildEmptyState("No equity investments");
+                }
                 final i = equity[index];
                 return _buildListItem(
                   i['name'] ?? 'Investment',
@@ -294,8 +298,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (gold.isEmpty)
+                if (gold.isEmpty) {
                   return _buildEmptyState("No gold investments");
+                }
                 final i = gold[index];
                 return _buildListItem(
                   i['name'] ?? 'Gold',
@@ -315,8 +320,9 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (retirement.isEmpty)
+                if (retirement.isEmpty) {
                   return _buildEmptyState("No retirement savings");
+                }
                 final i = retirement[index];
                 return _buildListItem(
                   i['name'] ?? 'Savings',
@@ -336,9 +342,10 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                if (lending.isEmpty)
+                if (lending.isEmpty) {
                   return _buildEmptyState("No lending records",
                       icon: Icons.handshake);
+                }
                 final i = lending[index];
                 return _buildListItem(
                   i['name'] ?? 'Lending',

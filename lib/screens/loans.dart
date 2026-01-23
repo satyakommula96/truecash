@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import '../logic/financial_repository.dart';
 import '../models/models.dart';
 import '../logic/currency_helper.dart';

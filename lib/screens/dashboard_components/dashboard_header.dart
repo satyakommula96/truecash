@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../theme/theme.dart';
-import '../../logic/currency_helper.dart';
+
 import '../settings.dart';
 
 class DashboardHeader extends StatelessWidget {

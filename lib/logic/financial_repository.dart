@@ -2,6 +2,7 @@ import '../db/database.dart';
 import '../models/models.dart';
 import 'monthly_calc.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/material.dart';
 
 class FinancialRepository {
   Future<MonthlySummary> getMonthlySummary() async {
@@ -212,7 +213,7 @@ class FinancialRepository {
             'category': 'Subscription',
             'date': now.toIso8601String()
           });
-          print("Auto-processed subscription: ${s['name']}");
+          debugPrint("Auto-processed subscription: ${s['name']}");
         }
       }
     }

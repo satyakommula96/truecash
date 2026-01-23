@@ -179,10 +179,12 @@ class _PaymentCalendarState extends State<PaymentCalendar> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: events.take(3).map((e) {
                             Color dotColor = widget.semantic.secondaryText;
-                            if (e['type'] == 'SUBSCRIPTION')
+                            if (e['type'] == 'SUBSCRIPTION') {
                               dotColor = widget.semantic.overspent;
-                            if (e['type'] == 'LOAN EMI')
+                            }
+                            if (e['type'] == 'LOAN EMI') {
                               dotColor = Colors.orange;
+                            }
 
                             return Container(
                               width: 4,

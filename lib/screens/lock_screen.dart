@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../theme/theme.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import '../main.dart';
+
 import '../screens/dashboard.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -210,7 +210,7 @@ class _LockScreenState extends State<LockScreen> {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
