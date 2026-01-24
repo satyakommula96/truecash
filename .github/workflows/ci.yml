@@ -54,14 +54,14 @@ jobs:
   slow_tests:
     name: Slow Test ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         target: [android, ios, linux, macos, windows]
         include:
           - target: android
-            os: macos-latest # macOS is often faster/stable for Android emulators on GHA
+            os: ubuntu-latest # KVM is reliable on Ubuntu runners
           - target: ios
             os: macos-latest
           - target: linux
@@ -86,6 +86,9 @@ jobs:
           channel: 'stable'
           cache: true
       
+      - name: Install Dependencies
+        run: flutter pub get
+      
       # Linux specifics
       - name: Install Linux Dependencies
         if: matrix.target == 'linux'
@@ -97,33 +100,47 @@ jobs:
       - name: Run Linux Integration Test
         if: matrix.target == 'linux'
         run: |
-          xvfb-run flutter test integration_test/app_test.dart -d linux
+          flutter clean
+          flutter pub get
+          xvfb-run flutter test integration_test/app_test.dart -d linux -v
 
       # Desktop Tests (macOS)
       - name: Run macOS Integration Test
         if: matrix.target == 'macos'
         run: |
-          flutter test integration_test/app_test.dart -d macos
+          flutter clean
+          flutter pub get
+          flutter test integration_test/app_test.dart -d macos -v
 
       # Desktop Tests (Windows)
       - name: Run Windows Integration Test
         if: matrix.target == 'windows'
-        run: flutter test integration_test/app_test.dart -d windows
+        run: |
+          flutter clean
+          flutter pub get
+          flutter test integration_test/app_test.dart -d windows -v
 
       # Mobile Tests (iOS)
       - name: Run iOS Integration Test
         if: matrix.target == 'ios'
         run: |
-          # Boot simulator
-          xcrun simctl list
-          UDID=$(xcrun simctl list devices available -j | jq -r '.devices."com.apple.CoreSimulator.SimRuntime.iOS-17-2"[0].udid // .devices | to_entries[] | .value[] | select(.isAvailable==true and .name=="iPhone 15") | .udid' | head -n 1)
-          if [ -z "$UDID" ]; then
-             echo "No device found, trying to create one or use existing"
+          # Boot simulator checks
+          echo "Finding available simulator..."
+          # Find any available iPhone (preferring newer ones)
+          UDID=$(xcrun simctl list devices available -j | jq -r '.devices | to_entries | map(.value) | flatten | map(select(.isAvailable == true and (.name | test("iPhone")))) | sort_by(.name) | reverse | .[0].udid')
+          
+          if [ -z "$UDID" ] || [ "$UDID" == "null" ]; then
+             echo "No device found, creating one..."
              xcrun simctl create "FlutterTester" "iPhone 15"
              UDID=$(xcrun simctl list devices available | grep "FlutterTester" | awk -F '[()]' '{print $2}' | head -n 1)
           fi
+          
+          echo "Using Simulator UDID: $UDID"
           xcrun simctl boot $UDID || true
-          flutter test integration_test/app_test.dart -d $UDID
+          
+          flutter clean
+          flutter pub get
+          flutter test integration_test/app_test.dart -d $UDID -v
 
       # Mobile Tests (Android)
       - name: Run Android Integration Test
