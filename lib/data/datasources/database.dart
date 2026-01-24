@@ -4,12 +4,11 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:path_provider/path_provider.dart'; // ADDED
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'schema.dart';
-import 'package:sqflite/sqflite.dart' as sqflite_core;
 import 'database_migrations.dart';
 import 'package:truecash/core/config/version.dart';
 

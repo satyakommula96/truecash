@@ -1,6 +1,4 @@
 import 'package:sqflite/sqflite.dart' as sqflite;
-import '../../core/error/failure.dart';
-import '../../core/utils/result.dart';
 
 abstract class Migration {
   final int version;

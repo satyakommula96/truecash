@@ -1,13 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:truecash/main.dart';
 import 'package:truecash/core/providers/shared_prefs_provider.dart';
-import 'package:truecash/presentation/screens/dashboard.dart';
 import 'package:truecash/presentation/screens/intro_screen.dart';
-import 'package:truecash/presentation/screens/startup_screen.dart';
 import 'package:truecash/presentation/providers/usecase_providers.dart';
 import 'package:truecash/domain/usecases/startup_usecase.dart';
 import 'package:truecash/core/utils/result.dart';

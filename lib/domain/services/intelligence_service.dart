@@ -1,6 +1,5 @@
 import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/core/utils/currency_helper.dart';
-import 'package:truecash/domain/models/models.dart';
 
 class AIInsight {
   final String title;

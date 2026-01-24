@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:truecash/main.dart';
-import 'package:truecash/presentation/screens/intro_screen.dart';
+
 import 'package:truecash/presentation/providers/usecase_providers.dart';
 import 'package:truecash/domain/usecases/startup_usecase.dart';
 import 'package:truecash/core/utils/result.dart';

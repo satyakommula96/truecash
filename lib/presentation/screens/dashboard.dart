@@ -40,7 +40,7 @@ class Dashboard extends ConsumerWidget {
         final trendData = data.trendData;
 
         Future<void> reload() async {
-          ref.refresh(dashboardProvider);
+          ref.invalidate(dashboardProvider);
         }
 
         return ValueListenableBuilder<String>(

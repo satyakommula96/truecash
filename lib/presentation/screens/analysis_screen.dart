@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/core/theme/theme.dart';
 
 import 'package:truecash/presentation/providers/analysis_provider.dart';
@@ -29,8 +28,8 @@ class AnalysisScreen extends ConsumerWidget {
         final trendData = data.trendData;
         final categoryData = data.categoryData;
 
-        Future<void> reload() async {
-          ref.refresh(analysisProvider);
+        void reload() {
+          ref.invalidate(analysisProvider);
         }
 
         return Scaffold(

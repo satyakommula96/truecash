@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
 import 'package:truecash/domain/usecases/add_transaction_usecase.dart';
 import 'package:truecash/domain/usecases/get_monthly_summary_usecase.dart';
 import 'package:truecash/domain/usecases/get_dashboard_data_usecase.dart';
