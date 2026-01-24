@@ -17,27 +17,41 @@ A privacy-first personal finance tracker with AI-powered insights.
 
 ## 📖 Documentation
 
-**📚 [View Live Documentation](https://satyakommula96.github.io/truecash/)**
+**📚 [View Live Documentation](https://satyakommula96.github.io/truecash/)** | **📂 [Browse docs/ folder](docs/)**
 
-Comprehensive documentation is available in the `docs/` folder and can be viewed using MkDocs:
+### Start Here
+
+**New to the project?** Read **[docs/architecture/overview.md](docs/architecture/overview.md)** first.
+
+This comprehensive guide covers:
+- Clean Architecture principles and layer boundaries
+- Data flow through the application
+- Non-negotiable architectural rules
+- State management with Riverpod
+- Key design patterns
+
+Then proceed to **[docs/development/adding-features.md](docs/development/adding-features.md)** to learn the development workflow.
+
+### Core Documentation
+
+- **[Installation Guide](docs/getting-started/installation.md)** - Setup for all platforms
+- **[Architecture Overview](docs/architecture/overview.md)** - System design and principles
+- **[Adding Features](docs/development/adding-features.md)** - Step-by-step development guide
+- **[Error Handling](docs/development/error-handling.md)** - Result pattern and failure types
+- **[Testing Guide](docs/development/testing.md)** - Testing strategy and patterns
+- **[Contributing Guidelines](docs/contributing/guidelines.md)** - How to contribute
+
+### Local Documentation Server
 
 ```bash
 # Install MkDocs
-pip install mkdocs-material mkdocs-git-revision-date-localized-plugin
+pip install -r requirements.txt
 
 # Serve documentation locally
 mkdocs serve
 
 # View at http://127.0.0.1:8000/
 ```
-
-### Quick Links
-
-- [Installation Guide](docs/getting-started/installation.md)
-- [Quick Start](docs/getting-started/quick-start.md)
-- [Architecture Overview](docs/architecture/overview.md)
-- [Adding Features](docs/development/adding-features.md)
-- [Contributing Guidelines](docs/contributing/guidelines.md)
 
 ## 🚀 Quick Start
 

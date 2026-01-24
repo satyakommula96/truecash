@@ -134,6 +134,209 @@ Presentation → Domain → Data → Core
 - ❌ Domain cannot depend on Presentation or Data
 - ❌ Data cannot depend on Presentation
 
+## Non-Negotiable Rules
+
+These rules **must never be violated**. They prevent architectural degradation and ensure long-term maintainability.
+
+### Rule 1: Domain Must Not Depend on Flutter
+
+**Why**: Domain layer contains business logic that should be framework-independent.
+
+```dart
+// ❌ WRONG - Domain depending on Flutter
+import 'package:flutter/material.dart';  // NO!
+
+class Budget {
+  final Color color;  // Flutter-specific type
+}
+```
+
+```dart
+// ✅ CORRECT - Pure Dart
+class Budget {
+  final int id;
+  final String category;
+  final int monthlyLimit;  // All pure Dart types
+}
+```
+
+**Enforcement**: Domain layer (`lib/domain/`) must only import:
+- `dart:core`, `dart:async`, `dart:collection`
+- Other domain files
+- Core utilities (pure Dart only)
+
+### Rule 2: UI Must Not Contain Business Logic
+
+**Why**: Business logic in UI makes it untestable and violates separation of concerns.
+
+```dart
+// ❌ WRONG - Business logic in widget
+class AddBudgetScreen extends StatelessWidget {
+  void saveBudget() {
+    if (amount > 0 && category.isNotEmpty) {  // Validation logic!
+      database.insert('budgets', {...});      // Database access!
+    }
+  }
+}
+```
+
+```dart
+// ✅ CORRECT - Delegate to use case
+class AddBudgetScreen extends ConsumerWidget {
+  void saveBudget(WidgetRef ref) {
+    final useCase = ref.read(addBudgetUseCaseProvider);
+    useCase(AddBudgetParams(amount: amount, category: category));
+  }
+}
+```
+
+**Enforcement**: Presentation layer must:
+- Only handle UI rendering and user input
+- Delegate all business operations to use cases
+- Never directly access data layer
+
+### Rule 3: Repositories Must Not Perform Validation
+
+**Why**: Validation is business logic and belongs in the domain layer.
+
+```dart
+// ❌ WRONG - Validation in repository
+class FinancialRepositoryImpl {
+  Future<void> addBudget(Budget budget) async {
+    if (budget.monthlyLimit <= 0) {  // NO! This is business logic
+      throw Exception('Invalid amount');
+    }
+    await db.insert('budgets', budget.toMap());
+  }
+}
+```
+
+```dart
+// ✅ CORRECT - Validation in use case
+class AddBudgetUseCase {
+  Future<Result<void>> call(AddBudgetParams params) async {
+    // Validation here (domain layer)
+    if (params.monthlyLimit <= 0) {
+      return Failure(ValidationFailure('Amount must be positive'));
+    }
+    
+    // Repository just persists
+    return await repository.addBudget(params.toBudget());
+  }
+}
+```
+
+**Enforcement**: Repositories must:
+- Only handle data persistence and retrieval
+- Never validate business rules
+- Never throw business exceptions
+
+### Rule 4: All Failures Must Be Modeled
+
+**Why**: Explicit error handling prevents runtime crashes and makes errors visible in the type system.
+
+```dart
+// ❌ WRONG - Throwing exceptions
+Future<List<Budget>> getBudgets() async {
+  final data = await db.query('budgets');
+  if (data.isEmpty) {
+    throw Exception('No budgets found');  // Invisible in type signature!
+  }
+  return data.map((e) => Budget.fromMap(e)).toList();
+}
+```
+
+```dart
+// ✅ CORRECT - Result type
+Future<Result<List<Budget>>> getBudgets() async {
+  try {
+    final data = await db.query('budgets');
+    final budgets = data.map((e) => Budget.fromMap(e)).toList();
+    return Success(budgets);
+  } catch (e) {
+    return Failure(DatabaseFailure(e.toString()));
+  }
+}
+```
+
+**Enforcement**: All use cases and repositories must:
+- Return `Result<T>` or `Future<Result<T>>`
+- Never throw exceptions for business errors
+- Model all failure cases explicitly
+
+### Rule 5: Use Absolute Imports Only
+
+**Why**: Relative imports break when files are moved and make refactoring difficult.
+
+```dart
+// ❌ WRONG - Relative imports
+import '../../domain/models/models.dart';
+import '../../../data/repositories/financial_repository_impl.dart';
+```
+
+```dart
+// ✅ CORRECT - Absolute package imports
+import 'package:truecash/domain/models/models.dart';
+import 'package:truecash/data/repositories/financial_repository_impl.dart';
+```
+
+**Enforcement**: All imports must use `package:truecash/...` format.
+
+### Rule 6: One Use Case Per Operation
+
+**Why**: Single Responsibility Principle - each use case should do one thing well.
+
+```dart
+// ❌ WRONG - Multiple operations in one use case
+class BudgetUseCase {
+  Future<List<Budget>> getAll() { ... }
+  Future<void> add(Budget budget) { ... }
+  Future<void> delete(int id) { ... }
+}
+```
+
+```dart
+// ✅ CORRECT - Separate use cases
+class GetBudgetsUseCase extends UseCase<List<Budget>, NoParams> { ... }
+class AddBudgetUseCase extends UseCase<void, AddBudgetParams> { ... }
+class DeleteBudgetUseCase extends UseCase<void, int> { ... }
+```
+
+**Enforcement**: Each use case must:
+- Extend `UseCase<T, Params>`
+- Implement exactly one `call()` method
+- Have a clear, single purpose
+
+## Violation Detection
+
+**How to check for violations**:
+
+```bash
+# Check for Flutter imports in domain layer
+grep -r "import 'package:flutter" lib/domain/
+
+# Check for database access in presentation layer
+grep -r "AppDatabase.db" lib/presentation/
+
+# Check for business logic in widgets
+# (Manual code review required)
+
+# Run analyzer
+flutter analyze
+```
+
+**These rules are enforced through**:
+- Code reviews
+- Automated linting (where possible)
+- Architecture documentation
+- Team discipline
+
+**Violating these rules will result in**:
+- Pull request rejection
+- Mandatory refactoring
+- Technical debt accumulation
+- Reduced testability and maintainability
+
 ## State Management
 
 TrueCash uses **Riverpod** for state management and dependency injection.

@@ -1,195 +1,108 @@
-# README
+# TrueCash Documentation
 
-This file provides instructions for setting up and using the MkDocs documentation.
+## 📖 Overview
 
-## Setup
+This folder contains the complete documentation for TrueCash, a privacy-first personal finance tracker built with Flutter and Clean Architecture.
 
-### Install MkDocs and Dependencies
+### Core Documentation
 
-You'll need Python 3 and pip installed. Then run:
+- **[architecture/overview.md](architecture/overview.md)** – App architecture, Clean Architecture principles, and layer boundaries
+- **[getting-started/installation.md](getting-started/installation.md)** – Local development setup and platform-specific requirements
+- **[database/schema.md](database/schema.md)** – Database schema, tables, and relationships
+- **[development/testing.md](development/testing.md)** – Testing strategy, patterns, and CI/CD
+- **[development/adding-features.md](development/adding-features.md)** – Step-by-step guide to adding new features
 
-```bash
-pip install mkdocs-material mkdocs-git-revision-date-localized-plugin
-```
+### Additional Resources
 
-Or using pip3:
+- **[getting-started/quick-start.md](getting-started/quick-start.md)** – 5-minute tutorial for new users
+- **[architecture/clean-architecture.md](architecture/clean-architecture.md)** – Deep dive into Clean Architecture
+- **[contributing/guidelines.md](contributing/guidelines.md)** – How to contribute to the project
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** – GitHub Pages deployment guide
 
-```bash
-pip3 install mkdocs-material mkdocs-git-revision-date-localized-plugin
-```
+## 🚀 Start Here
 
-### Verify Installation
+**If you are new to this project, read [architecture/overview.md](architecture/overview.md) first.**
 
-```bash
-mkdocs --version
-```
+This will give you a complete understanding of:
+- The Clean Architecture pattern used
+- Layer responsibilities and boundaries
+- Data flow through the application
+- Key design patterns
 
-## Local Development
+Then proceed to [development/adding-features.md](development/adding-features.md) to learn the development workflow.
 
-### Serve Documentation Locally
-
-```bash
-mkdocs serve
-```
-
-This will start a local server at `http://127.0.0.1:8000/` with live reload.
-
-### Build Documentation
-
-```bash
-mkdocs build
-```
-
-This generates static HTML files in the `site/` directory.
-
-## Documentation Structure
+## 📚 Documentation Structure
 
 ```
 docs/
-├── index.md                    # Homepage
-├── getting-started/
-│   ├── installation.md         # Installation guide
-│   ├── quick-start.md          # Quick start tutorial
-│   └── configuration.md        # Configuration options
-├── architecture/
-│   ├── overview.md             # Architecture overview
-│   ├── clean-architecture.md   # Clean Architecture deep dive
-│   ├── project-structure.md    # File organization
-│   ├── data-flow.md            # Data flow examples
-│   └── state-management.md     # Riverpod patterns
-├── development/
-│   ├── adding-features.md      # Feature development guide
-│   ├── testing.md              # Testing guide
-│   ├── design-patterns.md      # Design patterns
-│   └── code-style.md           # Code style guide
-├── features/
-│   ├── dashboard.md            # Dashboard feature
-│   ├── transactions.md         # Transactions feature
-│   ├── budgets.md              # Budgets feature
-│   ├── saving-goals.md         # Saving goals feature
-│   ├── ai-insights.md          # AI insights feature
-│   └── analytics.md            # Analytics feature
-├── database/
-│   ├── schema.md               # Database schema
-│   ├── migrations.md           # Migration guide
-│   └── performance.md          # Performance optimization
-├── platforms/
-│   ├── android.md              # Android-specific
-│   ├── ios.md                  # iOS-specific
-│   ├── linux.md                # Linux-specific
-│   ├── macos.md                # macOS-specific
-│   ├── windows.md              # Windows-specific
-│   └── web.md                  # Web-specific
-├── cicd/
-│   ├── pipeline.md             # CI/CD pipeline
-│   ├── testing.md              # Automated testing
-│   └── releases.md             # Release process
-├── contributing/
-│   ├── guidelines.md           # Contributing guidelines
-│   └── code-of-conduct.md      # Code of Conduct
-└── api/
-    └── index.md                # API reference
+├── getting-started/        # Installation and quick start
+├── architecture/           # Architecture and design
+├── development/            # Development guides
+├── features/               # Feature documentation
+├── database/               # Database schema and migrations
+├── platforms/              # Platform-specific guides
+├── cicd/                   # CI/CD and deployment
+├── contributing/           # Contributing guidelines
+└── api/                    # API reference
 ```
 
-## Writing Documentation
+## 🔧 Viewing Documentation
 
-### Markdown Extensions
+### Online (Recommended)
 
-The documentation supports:
+**Live Documentation**: https://satyakommula96.github.io/truecash/
 
-- **Admonitions**: `!!! note`, `!!! warning`, `!!! tip`
-- **Code Blocks**: With syntax highlighting
-- **Tabs**: For platform-specific content
-- **Tables**: Standard markdown tables
-- **Diagrams**: ASCII art diagrams
-
-### Example Admonition
-
-```markdown
-!!! note "Important"
-    This is an important note.
-
-!!! warning "Warning"
-    This is a warning.
-
-!!! tip "Tip"
-    This is a helpful tip.
-```
-
-### Example Tabs
-
-```markdown
-=== "Android"
-    Android-specific content
-
-=== "iOS"
-    iOS-specific content
-
-=== "Linux"
-    Linux-specific content
-```
-
-### Example Code Block
-
-````markdown
-```dart
-class MyClass {
-  void myMethod() {
-    print('Hello, world!');
-  }
-}
-```
-````
-
-## Deployment
-
-### GitHub Pages
-
-To deploy to GitHub Pages:
+### Locally with MkDocs
 
 ```bash
-mkdocs gh-deploy
+# Install dependencies
+pip install -r requirements.txt
+
+# Serve locally
+mkdocs serve
+
+# View at http://127.0.0.1:8000/
 ```
 
-This builds the documentation and pushes it to the `gh-pages` branch.
+### As Markdown
 
-### Custom Domain
+All documentation is written in Markdown and can be read directly in this folder.
 
-To use a custom domain, create a `docs/CNAME` file with your domain:
+## 🎯 Quick Links by Role
 
-```
-docs.truecash.app
-```
+### New Developers
+1. [Installation Guide](getting-started/installation.md)
+2. [Architecture Overview](architecture/overview.md)
+3. [Adding Features Guide](development/adding-features.md)
 
-## Configuration
+### Contributors
+1. [Contributing Guidelines](contributing/guidelines.md)
+2. [Code of Conduct](contributing/code-of-conduct.md)
+3. [Testing Guide](development/testing.md)
 
-The documentation is configured in `mkdocs.yml`. Key settings:
+### Users
+1. [Quick Start](getting-started/quick-start.md)
+2. [Configuration](getting-started/configuration.md)
+3. [Features Overview](features/dashboard.md)
 
-- **theme**: Material theme with dark/light mode
-- **nav**: Navigation structure
-- **markdown_extensions**: Enabled markdown features
-- **plugins**: Search, git revision dates
+## 📝 Documentation Standards
 
-## TODO
+- All code examples use Dart/Flutter
+- Follow the [Effective Dart](https://dart.dev/guides/language/effective-dart) style guide
+- Use absolute imports: `package:truecash/...`
+- Include practical examples for every concept
+- Keep pages focused and concise
 
-The following pages still need to be created:
+## 🤝 Contributing to Documentation
 
-- [ ] `architecture/project-structure.md`
-- [ ] `architecture/data-flow.md`
-- [ ] `architecture/state-management.md`
-- [ ] `development/testing.md`
-- [ ] `development/design-patterns.md`
-- [ ] `development/code-style.md`
-- [ ] `features/*.md` (all feature pages)
-- [ ] `database/*.md` (all database pages)
-- [ ] `platforms/*.md` (all platform pages)
-- [ ] `cicd/*.md` (all CI/CD pages)
-- [ ] `api/index.md`
+Found an error or want to improve the docs?
 
-You can extract content from `ARCHITECTURE.md` to populate these pages.
+1. Edit the relevant `.md` file in the `docs/` folder
+2. Test locally with `mkdocs serve`
+3. Submit a pull request
 
-## Resources
+See [Contributing Guidelines](contributing/guidelines.md) for details.
 
-- [MkDocs Documentation](https://www.mkdocs.org/)
-- [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
-- [Markdown Guide](https://www.markdownguide.org/)
+---
+
+**Need help?** Open an [issue](https://github.com/satyakommula96/truecash/issues) or start a [discussion](https://github.com/satyakommula96/truecash/discussions).

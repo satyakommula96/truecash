@@ -73,6 +73,7 @@ nav:
       - State Management: architecture/state-management.md
   - Development:
       - Adding Features: development/adding-features.md
+      - Error Handling: development/error-handling.md
       - Testing Guide: development/testing.md
       - Design Patterns: development/design-patterns.md
       - Code Style: development/code-style.md
