@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:truecash/domain/entities/monthly_summary.dart';
+import 'package:truecash/domain/models/models.dart';
 
 void main() {
   group('MonthlySummary Domain Entity', () {

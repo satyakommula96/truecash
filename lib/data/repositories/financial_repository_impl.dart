@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
-import '../../db/database.dart';
-import '../../models/models.dart';
-import '../../domain/entities/monthly_summary.dart';
+import 'package:truecash/data/datasources/database.dart';
+import 'package:truecash/domain/models/models.dart';
 import '../../domain/repositories/i_financial_repository.dart';
 
 class FinancialRepositoryImpl implements IFinancialRepository {
@@ -321,6 +320,11 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   @override
   Future<void> seedData() async {
     await AppDatabase.seedDummyData();
+  }
+
+  @override
+  Future<void> seedLargeData(int count) async {
+    await AppDatabase.seedLargeData(count: count);
   }
 
   @override

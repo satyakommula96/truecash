@@ -1,5 +1,4 @@
-import '../entities/monthly_summary.dart';
-import '../../models/models.dart';
+import 'package:truecash/domain/models/models.dart';
 
 abstract class IFinancialRepository {
   Future<MonthlySummary> getMonthlySummary();
@@ -20,6 +19,7 @@ abstract class IFinancialRepository {
   Future<void> updateBudget(int id, int monthlyLimit);
   Future<List<Map<String, dynamic>>> getAllValues(String table);
   Future<void> seedData();
+  Future<void> seedLargeData(int count);
   Future<void> clearData();
   Future<void> addCreditCard(String bank, int creditLimit, int statementBalance,
       int minDue, String dueDate, String generationDate);

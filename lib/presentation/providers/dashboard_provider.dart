@@ -1,44 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/monthly_summary.dart';
-import '../../models/models.dart';
-import 'repository_providers.dart';
-
-class DashboardData {
-  final MonthlySummary summary;
-  final List<Map<String, dynamic>> categorySpending;
-  final List<Budget> budgets;
-  final List<SavingGoal> savingGoals;
-  final List<Map<String, dynamic>> trendData;
-  final List<Map<String, dynamic>> upcomingBills;
-
-  DashboardData({
-    required this.summary,
-    required this.categorySpending,
-    required this.budgets,
-    required this.savingGoals,
-    required this.trendData,
-    required this.upcomingBills,
-  });
-}
+import 'package:truecash/domain/usecases/get_dashboard_data_usecase.dart';
+import 'package:truecash/domain/usecases/usecase_base.dart';
+import 'package:truecash/presentation/providers/usecase_providers.dart';
+// Re-exporting DashboardData to avoid breaking UI references if they imported it from here
+export 'package:truecash/domain/usecases/get_dashboard_data_usecase.dart'
+    show DashboardData;
 
 final dashboardProvider = FutureProvider<DashboardData>((ref) async {
-  final repo = ref.watch(financialRepositoryProvider);
+  final getDashboardData = ref.watch(getDashboardDataUseCaseProvider);
+  final result = await getDashboardData(NoParams());
 
-  final results = await Future.wait([
-    repo.getMonthlySummary(),
-    repo.getCategorySpending(),
-    repo.getBudgets(),
-    repo.getSavingGoals(),
-    repo.getSpendingTrend(),
-    repo.getUpcomingBills(),
-  ]);
-
-  return DashboardData(
-    summary: results[0] as MonthlySummary,
-    categorySpending: (results[1] as List).cast<Map<String, dynamic>>(),
-    budgets: (results[2] as List).cast<Budget>(),
-    savingGoals: (results[3] as List).cast<SavingGoal>(),
-    trendData: (results[4] as List).cast<Map<String, dynamic>>(),
-    upcomingBills: (results[5] as List).cast<Map<String, dynamic>>(),
-  );
+  if (result.isSuccess) {
+    return result.getOrThrow;
+  } else {
+    throw Exception(result.failureOrThrow.message);
+  }
 });

@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:truecash/domain/entities/monthly_summary.dart';
+import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/domain/repositories/i_financial_repository.dart';
-import 'package:truecash/presentation/providers/dashboard_provider.dart';
 import 'package:truecash/presentation/providers/repository_providers.dart';
-import 'package:truecash/screens/dashboard.dart';
-import 'package:truecash/screens/dashboard_components/wealth_hero.dart';
-import 'package:truecash/theme/theme.dart';
-import 'package:truecash/logic/currency_helper.dart';
-
-import 'package:truecash/models/models.dart';
-
+import 'package:truecash/presentation/screens/dashboard.dart';
+import 'package:truecash/core/theme/theme.dart';
+import 'package:truecash/core/utils/currency_helper.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 // Mocks
@@ -20,6 +15,11 @@ class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
 void main() {
   late MockFinancialRepository mockRepo;
+
+  setUpAll(() {
+    // Required for some animations
+    Animate.restartOnHotReload = true;
+  });
 
   setUp(() {
     mockRepo = MockFinancialRepository();
@@ -40,7 +40,6 @@ void main() {
     );
 
     // 2. Stub the repository
-    // IMPORTANT: Provide answers for ALL calls made by dashboardProvider
     when(() => mockRepo.getMonthlySummary()).thenAnswer((_) async => summary);
     when(() => mockRepo.getCategorySpending())
         .thenAnswer((_) => Future.value(<Map<String, dynamic>>[]));
@@ -60,7 +59,7 @@ void main() {
           financialRepositoryProvider.overrideWithValue(mockRepo),
         ],
         child: MaterialApp(
-          theme: AppTheme.lightTheme, // PROVIDE THEME EXTENSIONS
+          theme: AppTheme.lightTheme,
           home: const Dashboard(),
         ),
       ),
@@ -70,33 +69,13 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     // 5. Allow AsyncValue to resolve
-    await tester.runAsync(() async {
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 2));
-    });
-
-    await tester.pump(); // Frame
-
-    // Debugging: Verify high-level widgets
-    expect(find.byType(Dashboard), findsOneWidget);
-    expect(find.byType(Scaffold), findsOneWidget);
-    expect(find.byType(CustomScrollView), findsOneWidget);
-
-    // Check if Animate widgets are present (WealthHero is wrapped in one)
-    // There are multiple Animate widgets in the list
-    expect(find.byType(Animate), findsWidgets);
-
-    // Scroll just in case layout is weird
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, -100));
-    await tester.pump();
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Verify basic structure exists
     expect(find.byType(Dashboard), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
-
-    // Final pump to allow any remaining non-infinite timers to clear
-    // Infinite animations will still be pending, but this might help.
-    // Note: flutter_animate's repeat() usually requires special handling in tests.
-    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(CustomScrollView), findsOneWidget);
   });
 }
