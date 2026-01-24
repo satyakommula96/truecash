@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../theme/theme.dart';
 
@@ -65,9 +66,9 @@ class TrendChart extends StatelessWidget {
         padding: const EdgeInsets.only(right: 12),
         child: LineChart(
           LineChartData(
-            minX: 0,
 
-            maxX: (trendData.length).toDouble(), // +1 for forecast spot
+            minX: 0,
+            maxX: (trendData.length).toDouble(),
             gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
@@ -87,8 +88,7 @@ class TrendChart extends StatelessWidget {
                           return const Text("FCST",
                               style: TextStyle(
                                   fontSize: 8,
-                                  fontWeight:
-                                      FontWeight.bold)); // Forecast Label
+                                  fontWeight: FontWeight.bold));
                         }
                         if (index < 0 || index >= trendData.length) {
                           return const SizedBox();
@@ -147,7 +147,6 @@ class TrendChart extends StatelessWidget {
                   ),
                 ),
               ),
-              // Forecast Line
               LineChartBarData(
                 spots: [
                   FlSpot((trendData.length - 1).toDouble(),
@@ -166,8 +165,13 @@ class TrendChart extends StatelessWidget {
               ),
             ],
           ),
+          duration: const Duration(milliseconds: 1000), // Built-in FL Chart animation
+          curve: Curves.easeOutQuart,
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 800.ms).scale(
+        begin: const Offset(0.95, 0.95),
+        end: const Offset(1, 1),
+        curve: Curves.easeOutBack);
   }
 }

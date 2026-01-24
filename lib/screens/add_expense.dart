@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
-class AddExpense extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddExpense extends ConsumerStatefulWidget {
   final String? initialType;
   const AddExpense({super.key, this.initialType});
 
   @override
-  State<AddExpense> createState() => _AddExpenseState();
+  ConsumerState<AddExpense> createState() => _AddExpenseState();
 }
 
-class _AddExpenseState extends State<AddExpense> {
+class _AddExpenseState extends ConsumerState<AddExpense> {
   final amountCtrl = TextEditingController();
   final noteCtrl = TextEditingController();
   String selectedCategory = 'General';
@@ -206,7 +209,7 @@ class _AddExpenseState extends State<AddExpense> {
 
   Future<void> _save() async {
     if (amountCtrl.text.isEmpty) return;
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.addEntry(type, int.parse(amountCtrl.text), selectedCategory,
         noteCtrl.text, DateTime.now().toIso8601String());
     if (mounted) {

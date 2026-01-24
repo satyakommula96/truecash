@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 
-class AddBudgetScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddBudgetScreen extends ConsumerStatefulWidget {
   const AddBudgetScreen({super.key});
 
   @override
-  State<AddBudgetScreen> createState() => _AddBudgetScreenState();
+  ConsumerState<AddBudgetScreen> createState() => _AddBudgetScreenState();
 }
 
-class _AddBudgetScreenState extends State<AddBudgetScreen> {
+class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
   final categoryCtrl = TextEditingController();
   final limitCtrl = TextEditingController();
 
@@ -53,7 +56,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
 
   Future<void> _save() async {
     if (categoryCtrl.text.isEmpty || limitCtrl.text.isEmpty) return;
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.addBudget(categoryCtrl.text, int.parse(limitCtrl.text));
     if (mounted) Navigator.pop(context);
   }

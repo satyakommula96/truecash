@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../logic/monthly_calc.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../domain/entities/monthly_summary.dart';
 import '../../theme/theme.dart';
 import '../loans.dart';
 import '../../logic/currency_helper.dart';
@@ -55,6 +56,6 @@ class BorrowingSummary extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
   }
 }

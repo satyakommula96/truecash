@@ -10,8 +10,9 @@ import 'logic/currency_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/intro_screen.dart';
 import 'screens/lock_screen.dart';
-import 'logic/financial_repository.dart';
+import 'screens/lock_screen.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'data/repositories/financial_repository_impl.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> main() async {
@@ -66,7 +67,7 @@ Future<void> main() async {
 
   // Check Automation
   try {
-    final repo = FinancialRepository();
+    final repo = FinancialRepositoryImpl();
     // Fire and forget, don't block
     repo
         .checkAndProcessRecurring()

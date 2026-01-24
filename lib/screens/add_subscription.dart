@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../models/models.dart';
 
-class AddSubscriptionScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final Subscription? subscription;
   const AddSubscriptionScreen({super.key, this.subscription});
 
   @override
-  State<AddSubscriptionScreen> createState() => _AddSubscriptionScreenState();
+  ConsumerState<AddSubscriptionScreen> createState() => _AddSubscriptionScreenState();
 }
 
-class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
+class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   final nameCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   final dateCtrl = TextEditingController();
@@ -113,7 +116,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         dateCtrl.text.isEmpty) {
       return;
     }
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final amount = int.parse(amountCtrl.text);
 
     // Store ISO string if date selected, else raw text (legacy fallback)

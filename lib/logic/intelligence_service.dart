@@ -1,6 +1,6 @@
 import '../models/models.dart';
 import '../logic/currency_helper.dart';
-import 'monthly_calc.dart';
+import '../domain/entities/monthly_summary.dart';
 
 class AIInsight {
   final String title;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../theme/theme.dart';
 
 class SummaryCard extends StatelessWidget {
@@ -71,7 +72,7 @@ class SummaryCard extends StatelessWidget {
                   letterSpacing: -0.5)),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
   }
 }
 
@@ -148,6 +149,6 @@ class FullWidthSummaryCard extends StatelessWidget {
                   letterSpacing: -0.5)),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 600.ms).slideX(begin: 0.1, end: 0);
   }
 }

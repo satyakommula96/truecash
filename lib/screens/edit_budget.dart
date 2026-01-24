@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+
 import '../models/models.dart';
 import '../logic/currency_helper.dart';
 
-class EditBudgetScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class EditBudgetScreen extends ConsumerStatefulWidget {
   final Budget budget;
   const EditBudgetScreen({super.key, required this.budget});
 
   @override
-  State<EditBudgetScreen> createState() => _EditBudgetScreenState();
+  ConsumerState<EditBudgetScreen> createState() => _EditBudgetScreenState();
 }
 
-class _EditBudgetScreenState extends State<EditBudgetScreen> {
+class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
   late TextEditingController limitCtrl;
 
   @override
@@ -77,13 +80,13 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   }
 
   Future<void> _update() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.updateBudget(widget.budget.id, int.parse(limitCtrl.text));
     if (mounted) Navigator.pop(context);
   }
 
   Future<void> _delete() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.deleteItem('budgets', widget.budget.id);
     if (mounted) Navigator.pop(context);
   }

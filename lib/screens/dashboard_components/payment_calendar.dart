@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../theme/theme.dart';
@@ -199,12 +200,12 @@ class _PaymentCalendarState extends State<PaymentCalendar> {
                     ],
                   ),
                 ),
-              );
+              ).animate().fadeIn(delay: (index % 7 * 50).ms, duration: 400.ms).scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1), curve: Curves.easeOutBack);
             },
           )
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 800.ms);
   }
 
   void _showDayDetails(int day, List<Map<String, dynamic>> events) {

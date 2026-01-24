@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../logic/monthly_calc.dart';
+import '../../domain/entities/monthly_summary.dart';
 import '../../theme/theme.dart';
 import '../../logic/currency_helper.dart';
 

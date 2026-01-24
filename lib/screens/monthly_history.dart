@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 import 'month_detail.dart';
 
-class MonthlyHistoryScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+class MonthlyHistoryScreen extends ConsumerStatefulWidget {
   const MonthlyHistoryScreen({super.key});
 
   @override
-  State<MonthlyHistoryScreen> createState() => _MonthlyHistoryScreenState();
+  ConsumerState<MonthlyHistoryScreen> createState() => _MonthlyHistoryScreenState();
 }
 
-class _MonthlyHistoryScreenState extends State<MonthlyHistoryScreen> {
+class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
   List<Map<String, dynamic>> monthSummaries = [];
 
   bool _isLoading = true;
 
   Future<void> load() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final summaries = await repo.getMonthlyHistory();
     if (mounted) {
       setState(() {
@@ -119,7 +123,8 @@ class _MonthlyHistoryScreenState extends State<MonthlyHistoryScreen> {
                           ),
                         ),
                       ),
-                    );
+                    ).animate().fadeIn(delay: (100 * i).ms, duration: 600.ms).slideY(
+                        begin: 0.1, end: 0, curve: Curves.easeOutQuint);
                   },
                 ),
     );

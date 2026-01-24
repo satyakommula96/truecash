@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
-class EditLoanScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class EditLoanScreen extends ConsumerStatefulWidget {
   final Loan loan;
   const EditLoanScreen({super.key, required this.loan});
 
   @override
-  State<EditLoanScreen> createState() => _EditLoanScreenState();
+  ConsumerState<EditLoanScreen> createState() => _EditLoanScreenState();
 }
 
-class _EditLoanScreenState extends State<EditLoanScreen> {
+class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
   late TextEditingController nameCtrl;
   late TextEditingController totalCtrl;
   late TextEditingController remainingCtrl;
@@ -254,7 +257,7 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
         remainingCtrl.text = newBalance.toString();
       });
       // Record expense first to avoid context issues if _save pops
-      final repo = FinancialRepository();
+      final repo = ref.read(financialRepositoryProvider);
       await repo.addEntry('Fixed', emi.toInt(), 'EMI',
           'EMI Payment for ${nameCtrl.text}', DateTime.now().toIso8601String());
 
@@ -308,7 +311,7 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
   }
 
   Future<void> _save() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.updateLoan(
       widget.loan.id,
       nameCtrl.text,
@@ -323,7 +326,7 @@ class _EditLoanScreenState extends State<EditLoanScreen> {
   }
 
   Future<void> _delete() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.deleteItem('loans', widget.loan.id);
     if (mounted) Navigator.pop(context);
   }

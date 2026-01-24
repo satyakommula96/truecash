@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import '../utils/web_saver.dart';
-import '../logic/financial_repository.dart';
+
 import '../db/database.dart';
 
 import '../config/version.dart';

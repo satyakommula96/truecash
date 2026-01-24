@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../services/notification_service.dart';
 
-class AddCreditCardScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddCreditCardScreen extends ConsumerStatefulWidget {
   const AddCreditCardScreen({super.key});
 
   @override
-  State<AddCreditCardScreen> createState() => _AddCreditCardScreenState();
+  ConsumerState<AddCreditCardScreen> createState() => _AddCreditCardScreenState();
 }
 
-class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
+class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
   final bankCtrl = TextEditingController();
   final limitCtrl = TextEditingController();
   final stmtCtrl = TextEditingController();
@@ -129,7 +132,7 @@ class _AddCreditCardScreenState extends State<AddCreditCardScreen> {
 
   Future<void> _save() async {
     if (bankCtrl.text.isEmpty || limitCtrl.text.isEmpty) return;
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.addCreditCard(
         bankCtrl.text,
         int.tryParse(limitCtrl.text) ?? 0,

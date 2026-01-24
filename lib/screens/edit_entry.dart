@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 
-class EditEntryScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class EditEntryScreen extends ConsumerStatefulWidget {
   final LedgerItem entry;
 
   const EditEntryScreen({super.key, required this.entry});
 
   @override
-  State<EditEntryScreen> createState() => _EditEntryScreenState();
+  ConsumerState<EditEntryScreen> createState() => _EditEntryScreenState();
 }
 
-class _EditEntryScreenState extends State<EditEntryScreen> {
+class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
   late TextEditingController amountCtrl;
   late TextEditingController labelCtrl;
   late TextEditingController noteCtrl;
@@ -117,7 +120,7 @@ class _EditEntryScreenState extends State<EditEntryScreen> {
   }
 
   Future<void> _update() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final Map<String, dynamic> updates = {};
     final amount = int.tryParse(amountCtrl.text) ?? 0;
     if (widget.entry.type == 'Variable') {
@@ -157,7 +160,7 @@ class _EditEntryScreenState extends State<EditEntryScreen> {
               ],
             ));
     if (confirmed == true) {
-      final repo = FinancialRepository();
+      final repo = ref.read(financialRepositoryProvider);
       String table = "";
       switch (widget.entry.type) {
         case 'Variable':

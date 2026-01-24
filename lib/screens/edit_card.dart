@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../logic/financial_repository.dart';
+
 import '../models/models.dart';
 import '../logic/currency_helper.dart';
 import '../services/notification_service.dart';
 
-class EditCreditCardScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class EditCreditCardScreen extends ConsumerStatefulWidget {
   final CreditCard card;
   const EditCreditCardScreen({super.key, required this.card});
 
   @override
-  State<EditCreditCardScreen> createState() => _EditCreditCardScreenState();
+  ConsumerState<EditCreditCardScreen> createState() => _EditCreditCardScreenState();
 }
 
-class _EditCreditCardScreenState extends State<EditCreditCardScreen> {
+class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
   late TextEditingController bankCtrl;
   late TextEditingController limitCtrl;
   late TextEditingController stmtCtrl;
@@ -193,7 +196,7 @@ class _EditCreditCardScreenState extends State<EditCreditCardScreen> {
 
   Future<void> _update() async {
     if (bankCtrl.text.isEmpty || limitCtrl.text.isEmpty) return;
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.updateCreditCard(
         widget.card.id,
         bankCtrl.text,
@@ -237,7 +240,7 @@ class _EditCreditCardScreenState extends State<EditCreditCardScreen> {
     );
 
     if (confirmed == true) {
-      final repo = FinancialRepository();
+      final repo = ref.read(financialRepositoryProvider);
       await repo.deleteItem('credit_cards', widget.card.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

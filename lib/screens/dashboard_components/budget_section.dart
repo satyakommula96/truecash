@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/models.dart';
 import '../../theme/theme.dart';
 import '../../logic/currency_helper.dart';
@@ -25,7 +26,9 @@ class BudgetSection extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
-        children: budgets.map((b) {
+        children: budgets.asMap().entries.map((entry) {
+      final index = entry.key;
+      final b = entry.value;
       final double progress = (b.spent / b.monthlyLimit).clamp(0.0, 1.0);
       final bool isOver = b.spent > b.monthlyLimit;
 
@@ -77,7 +80,6 @@ class BudgetSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              const SizedBox(height: 12),
               LayoutBuilder(builder: (context, constraints) {
                 return Stack(
                   children: [
@@ -115,14 +117,27 @@ class BudgetSection extends StatelessWidget {
                               offset: const Offset(0, 2),
                             )
                           ]),
-                    ),
+                    )
+                        .animate()
+                        .shimmer(
+                            duration: 2.seconds,
+                            color: Colors.white.withValues(alpha: 0.2))
+                        .scaleX(
+                            begin: 0,
+                            end: 1,
+                            duration: 1.seconds,
+                            curve: Curves.easeOutQuint,
+                            alignment: Alignment.centerLeft),
                   ],
                 );
               }),
             ],
           ),
         ),
-      );
+      )
+          .animate()
+          .fadeIn(delay: (100 * index).ms, duration: 600.ms)
+          .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
     }).toList());
   }
 }

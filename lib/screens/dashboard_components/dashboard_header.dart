@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../theme/theme.dart';
@@ -34,7 +35,7 @@ class DashboardHeader extends StatelessWidget {
                   child: SvgPicture.asset(
                     'assets/icons/logo.svg',
                   ),
-                ),
+                ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +51,7 @@ class DashboardHeader extends StatelessWidget {
                             color: semantic.secondaryText,
                             fontWeight: FontWeight.w500)),
                   ],
-                ),
+                ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1, end: 0),
               ],
             ),
             Row(
@@ -67,7 +68,7 @@ class DashboardHeader extends StatelessWidget {
                   },
                 ),
               ],
-            ),
+            ).animate().fadeIn(delay: 400.ms),
           ],
         ),
       ),

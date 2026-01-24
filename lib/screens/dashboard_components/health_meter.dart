@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../theme/theme.dart';
 
 class HealthMeter extends StatelessWidget {
@@ -60,12 +61,17 @@ class HealthMeter extends StatelessWidget {
                   child: SizedBox(
                     height: 80,
                     width: 80,
-                    child: CircularProgressIndicator(
-                      value: score / 100,
-                      strokeWidth: 8,
-                      backgroundColor: semantic.divider.withValues(alpha: 0.2),
-                      valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
-                      strokeCap: StrokeCap.round,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: score / 100),
+                      duration: 1500.ms,
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) => CircularProgressIndicator(
+                        value: value,
+                        strokeWidth: 8,
+                        backgroundColor: semantic.divider.withValues(alpha: 0.2),
+                        valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+                        strokeCap: StrokeCap.round,
+                      ),
                     ),
                   ),
                 ),
@@ -77,7 +83,7 @@ class HealthMeter extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
-                  ),
+                  ).animate().scale(delay: 400.ms, duration: 400.ms, curve: Curves.easeOutBack),
                 ),
               ],
             ),
@@ -89,7 +95,7 @@ class HealthMeter extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(icon, size: 14, color: scoreColor),
+                    Icon(icon, size: 14, color: scoreColor).animate().fadeIn(delay: 600.ms),
                     const SizedBox(width: 6),
                     Text(
                       label,
@@ -99,7 +105,7 @@ class HealthMeter extends StatelessWidget {
                         color: scoreColor,
                         letterSpacing: 1.5,
                       ),
-                    ),
+                    ).animate().fadeIn(delay: 700.ms),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -110,7 +116,7 @@ class HealthMeter extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                ),
+                ).animate().fadeIn(delay: 800.ms),
                 const SizedBox(height: 4),
                 Text(
                   "Based on your savings, debt, and budget habits.",
@@ -119,12 +125,12 @@ class HealthMeter extends StatelessWidget {
                     color: semantic.secondaryText,
                     height: 1.3,
                   ),
-                ),
+                ).animate().fadeIn(delay: 900.ms),
               ],
             ),
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.1, end: 0);
   }
 }

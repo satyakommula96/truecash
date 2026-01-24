@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 
-class EditGoalScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class EditGoalScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> goal;
   const EditGoalScreen({super.key, required this.goal});
 
   @override
-  State<EditGoalScreen> createState() => _EditGoalScreenState();
+  ConsumerState<EditGoalScreen> createState() => _EditGoalScreenState();
 }
 
-class _EditGoalScreenState extends State<EditGoalScreen> {
+class _EditGoalScreenState extends ConsumerState<EditGoalScreen> {
   late TextEditingController nameCtrl;
   late TextEditingController targetCtrl;
   late TextEditingController currentCtrl;
@@ -91,7 +94,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
   }
 
   Future<void> _update() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.updateGoal(
       widget.goal['id'],
       nameCtrl.text,
@@ -102,7 +105,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
   }
 
   Future<void> _delete() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.deleteItem('saving_goals', widget.goal['id']);
     if (mounted) Navigator.pop(context);
   }

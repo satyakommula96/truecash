@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/theme.dart';
-import '../logic/financial_repository.dart';
+
 import 'dashboard_components/budget_section.dart';
 import 'dashboard_components/trend_chart.dart';
 import 'add_budget.dart';
 import '../logic/currency_helper.dart';
 
-class AnalysisScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+class AnalysisScreen extends ConsumerStatefulWidget {
   const AnalysisScreen({super.key});
 
   @override
-  State<AnalysisScreen> createState() => _AnalysisScreenState();
+  ConsumerState<AnalysisScreen> createState() => _AnalysisScreenState();
 }
 
-class _AnalysisScreenState extends State<AnalysisScreen> {
+class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
   List<Budget> budgets = [];
   List<Map<String, dynamic>> trendData = [];
   List<Map<String, dynamic>> categoryData = [];
@@ -27,7 +31,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   }
 
   Future<void> load() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final b = await repo.getBudgets();
     final t = await repo.getSpendingTrend();
     final c = await repo.getCategorySpending();
@@ -67,37 +71,50 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (trendData.length >= 2) ...[
-                    _buildInsightCard(trendData, semantic),
+                    _buildInsightCard(trendData, semantic)
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
                     const SizedBox(height: 32),
                   ],
                   Text("SPENDING TREND",
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          color: semantic.secondaryText)),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: semantic.secondaryText))
+                      .animate()
+                      .fadeIn(delay: 200.ms),
                   const SizedBox(height: 16),
-                  const SizedBox(height: 16),
-                  TrendChart(trendData: trendData, semantic: semantic),
+                  TrendChart(trendData: trendData, semantic: semantic)
+                      .animate()
+                      .fadeIn(delay: 400.ms, duration: 600.ms)
+                      .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuint),
                   const SizedBox(height: 32),
                   Text("SPENDING BY CATEGORY",
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          color: semantic.secondaryText)),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: semantic.secondaryText))
+                      .animate()
+                      .fadeIn(delay: 600.ms),
                   const SizedBox(height: 16),
                   _buildCategoryBreakdown(categoryData, semantic),
                   const SizedBox(height: 32),
                   Text("LIVE TRACKING",
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          color: semantic.secondaryText)),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: semantic.secondaryText))
+                      .animate()
+                      .fadeIn(delay: 800.ms),
                   const SizedBox(height: 24),
                   BudgetSection(
-                      budgets: budgets, semantic: semantic, onLoad: load),
+                          budgets: budgets, semantic: semantic, onLoad: load)
+                      .animate()
+                      .fadeIn(delay: 1000.ms),
                 ],
               ),
             ),
@@ -116,7 +133,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         (prev, e) => (e['total'] as int) > prev ? (e['total'] as int) : prev);
 
     return Column(
-      children: data.map((item) {
+      children: data.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
         final total = item['total'] as int;
         final progress = maxVal == 0 ? 0.0 : total / maxVal;
 
@@ -167,13 +186,26 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                               offset: const Offset(0, 2),
                             )
                           ]),
-                    ),
+                    )
+                        .animate()
+                        .shimmer(
+                            duration: 1200.ms,
+                            color: Colors.white.withValues(alpha: 0.2))
+                        .scaleX(
+                            begin: 0,
+                            end: 1,
+                            duration: 800.ms,
+                            curve: Curves.easeOutQuint,
+                            alignment: Alignment.centerLeft),
                   ],
                 );
               })
             ],
           ),
-        );
+        )
+            .animate()
+            .fadeIn(delay: (20 * index).ms, duration: 400.ms)
+            .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint);
       }).toList(),
     );
   }

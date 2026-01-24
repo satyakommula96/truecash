@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 import '../theme/theme.dart';
 
-class AddLoanScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddLoanScreen extends ConsumerStatefulWidget {
   const AddLoanScreen({super.key});
 
   @override
-  State<AddLoanScreen> createState() => _AddLoanScreenState();
+  ConsumerState<AddLoanScreen> createState() => _AddLoanScreenState();
 }
 
-class _AddLoanScreenState extends State<AddLoanScreen> {
+class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
   final nameCtrl = TextEditingController();
   final totalCtrl = TextEditingController();
   final remainingCtrl = TextEditingController();
@@ -218,7 +221,7 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
         ? total
         : (int.tryParse(remainingCtrl.text) ?? 0);
 
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.addLoan(
       nameCtrl.text,
       selectedType,

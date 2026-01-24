@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
 import '../models/models.dart';
 import '../theme/theme.dart';
 import '../logic/currency_helper.dart';
@@ -9,16 +12,16 @@ import 'loans.dart';
 
 enum NetWorthView { assets, liabilities }
 
-class NetWorthDetailsScreen extends StatefulWidget {
+class NetWorthDetailsScreen extends ConsumerStatefulWidget {
   final NetWorthView viewMode;
   const NetWorthDetailsScreen({super.key, required this.viewMode});
 
   @override
-  State<NetWorthDetailsScreen> createState() => _NetWorthDetailsScreenState();
+  ConsumerState<NetWorthDetailsScreen> createState() => _NetWorthDetailsScreenState();
 }
 
-class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
-  final _repo = FinancialRepository();
+class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
+  // final _repo = FinancialRepository(); // Removed
   bool _isLoading = true;
 
   // Liabilities
@@ -40,12 +43,13 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
   }
 
   Future<void> _loadData() async {
-    final cards = await _repo.getCreditCards();
-    final loans = await _repo.getLoans();
-    final investments = (await _repo.getAllValues('investments'))
+    final repo = ref.read(financialRepositoryProvider);
+    final cards = await repo.getCreditCards();
+    final loans = await repo.getLoans();
+    final investments = (await repo.getAllValues('investments'))
         .where((i) => i['active'] == 1)
         .toList();
-    final retirement = await _repo.getAllValues('retirement_contributions');
+    final retirement = await repo.getAllValues('retirement_contributions');
 
     // Categorize Liabilities
     final bankLoans = <Loan>[];
@@ -422,10 +426,10 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
               fontSize: 32,
               fontWeight: FontWeight.w900,
             ),
-          ),
+          ).animate().fadeIn(delay: 200.ms).scale(duration: 600.ms, curve: Curves.easeOutBack),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0);
   }
 
   Widget _buildEmptyState(String msg, {IconData? icon}) {
@@ -492,7 +496,7 @@ class _NetWorthDetailsScreenState extends State<NetWorthDetailsScreen> {
                   color: amountColor)),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint);
   }
 }
 

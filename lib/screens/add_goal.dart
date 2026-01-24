@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+
 import '../logic/currency_helper.dart';
 
-class AddGoalScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class AddGoalScreen extends ConsumerStatefulWidget {
   const AddGoalScreen({super.key});
 
   @override
-  State<AddGoalScreen> createState() => _AddGoalScreenState();
+  ConsumerState<AddGoalScreen> createState() => _AddGoalScreenState();
 }
 
-class _AddGoalScreenState extends State<AddGoalScreen> {
+class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
   final nameCtrl = TextEditingController();
   final targetCtrl = TextEditingController();
 
@@ -53,7 +56,7 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
 
   Future<void> _save() async {
     if (nameCtrl.text.isEmpty || targetCtrl.text.isEmpty) return;
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     await repo.addGoal(nameCtrl.text, int.parse(targetCtrl.text));
     if (mounted) Navigator.pop(context);
   }

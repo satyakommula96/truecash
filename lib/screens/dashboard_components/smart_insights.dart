@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../logic/intelligence_service.dart';
 
 import '../../theme/theme.dart';
@@ -60,7 +61,7 @@ class SmartInsightsCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
+        ).animate().fadeIn(duration: 600.ms),
         const SizedBox(height: 16),
         SizedBox(
           height: 180,
@@ -70,12 +71,15 @@ class SmartInsightsCard extends StatelessWidget {
             itemCount: insights.length,
             itemBuilder: (context, index) {
               final insight = insights[index];
-              return _buildInsightItem(context, insight);
+              return _buildInsightItem(context, insight)
+                  .animate()
+                  .fadeIn(delay: (100 * index).ms, duration: 600.ms)
+                  .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
             },
           ),
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 800.ms);
   }
 
   Widget _buildInsightItem(BuildContext context, AIInsight insight) {

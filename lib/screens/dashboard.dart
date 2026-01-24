@@ -131,7 +131,6 @@ class Dashboard extends ConsumerWidget {
                                       end: 0,
                                       curve: Curves.easeOutQuint),
                               const SizedBox(height: 32),
-                              const SizedBox(height: 32),
                               SectionHeader(
                                       title: "Payment Calendar",
                                       sub: "Month view",

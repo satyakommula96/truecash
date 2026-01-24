@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 
-import '../logic/financial_repository.dart';
+
 import '../models/models.dart';
 import '../logic/currency_helper.dart';
 import '../logic/date_helper.dart';
 import 'add_subscription.dart';
 
-class SubscriptionsScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class SubscriptionsScreen extends ConsumerStatefulWidget {
   const SubscriptionsScreen({super.key});
 
   @override
-  State<SubscriptionsScreen> createState() => _SubscriptionsScreenState();
+  ConsumerState<SubscriptionsScreen> createState() => _SubscriptionsScreenState();
 }
 
-class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
+class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
   List<Subscription> subs = [];
   bool _isLoading = true;
 
   Future<void> load() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final data = await repo.getSubscriptions();
     if (mounted) {
       setState(() {
@@ -189,7 +192,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               ],
             ));
     if (confirmed == true) {
-      final repo = FinancialRepository();
+      final repo = ref.read(financialRepositoryProvider);
       await repo.deleteItem('subscriptions', id);
       load();
     }

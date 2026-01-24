@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../logic/financial_repository.dart';
+
 import '../models/models.dart';
 import '../theme/theme.dart';
 import 'add_card.dart';
@@ -7,19 +7,22 @@ import 'edit_card.dart';
 import '../logic/currency_helper.dart';
 import '../logic/date_helper.dart';
 
-class CreditCardsScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../presentation/providers/repository_providers.dart';
+
+class CreditCardsScreen extends ConsumerStatefulWidget {
   const CreditCardsScreen({super.key});
 
   @override
-  State<CreditCardsScreen> createState() => _CreditCardsScreenState();
+  ConsumerState<CreditCardsScreen> createState() => _CreditCardsScreenState();
 }
 
-class _CreditCardsScreenState extends State<CreditCardsScreen> {
+class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
   List<CreditCard> cards = [];
   bool _isLoading = true;
 
   Future<void> load() async {
-    final repo = FinancialRepository();
+    final repo = ref.read(financialRepositoryProvider);
     final data = await repo.getCreditCards();
     if (mounted) {
       setState(() {
@@ -88,7 +91,7 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
 
               Navigator.pop(ctx);
               setState(() => _isLoading = true);
-              await FinancialRepository().payCreditCardBill(card.id, amount);
+              await ref.read(financialRepositoryProvider).payCreditCardBill(card.id, amount);
               load();
             },
             child: const Text("RECORD"),
