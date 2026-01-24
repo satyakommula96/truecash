@@ -86,6 +86,9 @@ jobs:
           channel: 'stable'
           cache: true
       
+      - name: Install Dependencies
+        run: flutter pub get
+      
       # Linux specifics
       - name: Install Linux Dependencies
         if: matrix.target == 'linux'
