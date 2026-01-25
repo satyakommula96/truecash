@@ -80,34 +80,178 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _showCurrencyPicker(BuildContext context) async {
-    showDialog(
+    String searchQuery = "";
+    showModalBottomSheet(
       context: context,
-      builder: (context) => ValueListenableBuilder<String>(
-        valueListenable: CurrencyFormatter.currencyNotifier,
-        builder: (context, currentCurrency, _) {
-          return AlertDialog(
-            title: const Text("Select Currency"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...CurrencyFormatter.currencies.entries.map((entry) {
-                  return ListTile(
-                    title: Text("${entry.key} (${entry.value})"),
-                    onTap: () {
-                      CurrencyFormatter.setCurrency(entry.key);
-                      Navigator.pop(context);
-                    },
-                    trailing: currentCurrency == entry.key
-                        ? const Icon(Icons.check, color: Colors.blue)
-                        : null,
-                  );
-                }),
-              ],
-            ),
-          );
-        },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        builder: (_, controller) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Select Currency",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StatefulBuilder(
+                  builder: (context, setModalState) {
+                    final currentCurrency =
+                        CurrencyFormatter.currencyNotifier.value;
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Search currency...",
+                              prefixIcon: const Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey[900]
+                                  : Colors.grey[100],
+                            ),
+                            onChanged: (val) {
+                              setModalState(() {
+                                searchQuery = val.toLowerCase();
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: ListView(
+                            controller: controller,
+                            children: CurrencyFormatter.currencies.entries
+                                .where((e) =>
+                                    e.key.toLowerCase().contains(searchQuery) ||
+                                    _getCurrencyName(e.key)
+                                        .toLowerCase()
+                                        .contains(searchQuery))
+                                .map((entry) {
+                              final isSelected = currentCurrency == entry.key;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest,
+                                  child: Text(
+                                    entry.value,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  entry.key,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                subtitle: Text(_getCurrencyName(
+                                    entry.key)), // Helper for full names
+                                trailing: isSelected
+                                    ? Icon(Icons.check_circle,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary)
+                                    : null,
+                                onTap: () {
+                                  CurrencyFormatter.setCurrency(entry.key);
+                                  Navigator.pop(context);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  String _getCurrencyName(String code) {
+    switch (code) {
+      case 'INR':
+        return 'Indian Rupee';
+      case 'USD':
+        return 'US Dollar';
+      case 'EUR':
+        return 'Euro';
+      case 'GBP':
+        return 'British Pound';
+      case 'JPY':
+        return 'Japanese Yen';
+      case 'CAD':
+        return 'Canadian Dollar';
+      case 'AUD':
+        return 'Australian Dollar';
+      case 'SGD':
+        return 'Singapore Dollar';
+      case 'AED':
+        return 'UAE Dirham';
+      case 'SAR':
+        return 'Saudi Riyal';
+      case 'CNY':
+        return 'Chinese Yuan';
+      case 'KRW':
+        return 'South Korean Won';
+      case 'BRL':
+        return 'Brazilian Real';
+      case 'MXN':
+        return 'Mexican Peso';
+      default:
+        return '';
+    }
   }
 
   Future<void> _exportToCSV(BuildContext context, WidgetRef ref) async {
@@ -480,6 +624,13 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
               actions: [
+                TextButton(
+                    onPressed: () {
+                      // ignore: deprecated_member_use
+                      Share.share(
+                          "TrueCash Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
+                    },
+                    child: const Text("SHARE SECURELY")),
                 TextButton(
                     onPressed: checked ? () => Navigator.pop(ctx) : null,
                     child: const Text("DONE"))

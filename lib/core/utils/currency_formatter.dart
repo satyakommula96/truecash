@@ -11,6 +11,15 @@ class CurrencyFormatter {
     'EUR': '€',
     'GBP': '£',
     'JPY': '¥',
+    'CAD': '\$',
+    'AUD': '\$',
+    'SGD': '\$',
+    'AED': 'د.إ',
+    'SAR': '﷼',
+    'CNY': '¥',
+    'KRW': '₩',
+    'BRL': 'R\$',
+    'MXN': '\$',
   };
 
   static Future<void> load() async {

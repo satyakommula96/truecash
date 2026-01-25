@@ -59,28 +59,36 @@ class DashboardHeader extends ConsumerWidget {
             Row(
               children: [
                 // Privacy Toggle
-                IconButton(
-                  icon: Icon(
-                    ref.watch(privacyProvider)
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    size: 22,
-                    color: colorScheme.onSurface,
+                Tooltip(
+                  message: ref.watch(privacyProvider)
+                      ? "Show amounts"
+                      : "Tap 👁 to hide amounts",
+                  child: IconButton(
+                    icon: Icon(
+                      ref.watch(privacyProvider)
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 22,
+                      color: colorScheme.onSurface,
+                    ),
+                    onPressed: () {
+                      ref.read(privacyProvider.notifier).toggle();
+                    },
                   ),
-                  onPressed: () {
-                    ref.read(privacyProvider.notifier).toggle();
-                  },
                 ),
-                IconButton(
-                  icon: Icon(Icons.settings_outlined,
-                      size: 22, color: colorScheme.onSurface),
-                  onPressed: () async {
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const SettingsScreen()));
-                    onLoad();
-                  },
+                Tooltip(
+                  message: "App Settings",
+                  child: IconButton(
+                    icon: Icon(Icons.settings_outlined,
+                        size: 22, color: colorScheme.onSurface),
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SettingsScreen()));
+                      onLoad();
+                    },
+                  ),
                 ),
               ],
             ).animate().fadeIn(delay: 400.ms),
