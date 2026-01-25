@@ -68,7 +68,10 @@ class AnalysisScreen extends ConsumerWidget {
                     .animate()
                     .fadeIn(delay: 200.ms),
                 const SizedBox(height: 16),
-                TrendChart(trendData: trendData, semantic: semantic)
+                TrendChart(
+                        trendData: trendData,
+                        semantic: semantic,
+                        isPrivate: isPrivate)
                     .animate()
                     .fadeIn(delay: 400.ms, duration: 600.ms)
                     .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuint),

@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:truecash/core/theme/theme.dart';
+import 'package:truecash/core/utils/currency_helper.dart';
 
 class TrendChart extends StatelessWidget {
   final List<Map<String, dynamic>> trendData;
   final AppColors semantic;
+  final bool isPrivate;
 
   const TrendChart({
     super.key,
     required this.trendData,
     required this.semantic,
+    required this.isPrivate,
   });
 
   double _forecastNext(List<double> values) {
@@ -68,6 +71,20 @@ class TrendChart extends StatelessWidget {
           LineChartData(
             minX: 0,
             maxX: (trendData.length).toDouble(),
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                getTooltipColor: (_) => Colors.blueGrey,
+                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                  return touchedBarSpots.map((barSpot) {
+                    return LineTooltipItem(
+                      CurrencyHelper.format(barSpot.y, isPrivate: isPrivate),
+                      const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    );
+                  }).toList();
+                },
+              ),
+            ),
             gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,

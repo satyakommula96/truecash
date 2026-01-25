@@ -11,6 +11,8 @@ import 'package:truecash/core/utils/result.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:truecash/domain/usecases/usecase_base.dart';
 
+import 'package:truecash/presentation/providers/boot_provider.dart';
+
 class MockStartupUseCase extends Mock implements StartupUseCase {}
 
 void main() {
@@ -35,6 +37,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           startupUseCaseProvider.overrideWithValue(mockStartup),
+          bootProvider.overrideWith((ref) => Future.value(null)),
         ],
         child: const TrueCashApp(),
       ),
