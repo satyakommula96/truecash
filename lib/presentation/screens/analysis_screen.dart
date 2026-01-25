@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:truecash/core/theme/theme.dart';
 
 import 'package:truecash/presentation/providers/analysis_provider.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 import 'package:truecash/presentation/screens/dashboard_components/budget_section.dart';
 import 'package:truecash/presentation/screens/dashboard_components/trend_chart.dart';
 import 'package:truecash/presentation/screens/add_budget.dart';
@@ -16,6 +17,7 @@ class AnalysisScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analysisAsync = ref.watch(analysisProvider);
+    final isPrivate = ref.watch(privacyProvider);
     final semantic = Theme.of(context).extension<AppColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -51,7 +53,7 @@ class AnalysisScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (trendData.length >= 2) ...[
-                  _buildInsightCard(context, trendData, semantic)
+                  _buildInsightCard(context, trendData, semantic, isPrivate)
                       .animate()
                       .fadeIn(duration: 600.ms)
                       .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
@@ -80,7 +82,8 @@ class AnalysisScreen extends ConsumerWidget {
                     .animate()
                     .fadeIn(delay: 600.ms),
                 const SizedBox(height: 16),
-                _buildCategoryBreakdown(context, categoryData, semantic),
+                _buildCategoryBreakdown(
+                    context, categoryData, semantic, isPrivate),
                 const SizedBox(height: 32),
                 Text("LIVE TRACKING",
                         style: TextStyle(
@@ -104,7 +107,7 @@ class AnalysisScreen extends ConsumerWidget {
   }
 
   Widget _buildCategoryBreakdown(BuildContext context,
-      List<Map<String, dynamic>> data, AppColors semantic) {
+      List<Map<String, dynamic>> data, AppColors semantic, bool isPrivate) {
     if (data.isEmpty) {
       return const Text("No spending data yet.",
           style: TextStyle(color: Colors.grey));
@@ -133,7 +136,7 @@ class AnalysisScreen extends ConsumerWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface)),
-                  Text(CurrencyHelper.format(total),
+                  Text(CurrencyHelper.format(total, isPrivate: isPrivate),
                       style: const TextStyle(
                           fontWeight: FontWeight.w900, fontSize: 13)),
                 ],
@@ -193,7 +196,7 @@ class AnalysisScreen extends ConsumerWidget {
   }
 
   Widget _buildInsightCard(BuildContext context,
-      List<Map<String, dynamic>> data, AppColors semantic) {
+      List<Map<String, dynamic>> data, AppColors semantic, bool isPrivate) {
     if (data.length < 2) return const SizedBox();
     final current = data[0]['total'] as int;
     final last = data[1]['total'] as int;
@@ -244,8 +247,8 @@ class AnalysisScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
               isIncrease
-                  ? "Spending is up by ${CurrencyHelper.format(diff.abs())} compared to last month."
-                  : "Great job! Spending decreased by ${CurrencyHelper.format(diff.abs())}.",
+                  ? "Spending is up by ${CurrencyHelper.format(diff.abs(), isPrivate: isPrivate)} compared to last month."
+                  : "Great job! Spending decreased by ${CurrencyHelper.format(diff.abs(), isPrivate: isPrivate)}.",
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
