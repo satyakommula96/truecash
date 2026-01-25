@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
@@ -386,6 +388,72 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
+  String _generateRecoveryKey() {
+    const chars =
+        'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking chars
+    final rnd = Random();
+    return List.generate(14, (index) {
+      if (index == 4 || index == 9) return '-';
+      return chars[rnd.nextInt(chars.length)];
+    }).join();
+  }
+
+  Future<void> _showRecoveryKeyDialog(BuildContext context, String key) async {
+    bool checked = false;
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (ctx) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Recovery Key Generated"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                      "SAVE THIS KEY SECURELY.\n\nIf you forget your PIN, this is the ONLY way to recover your data without resetting."),
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: key));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Copied to clipboard")));
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                            color: Colors.grey.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: Colors.grey.withValues(alpha: 0.3))),
+                        child: Text(key,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2))),
+                  ),
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text("I have safely saved this key",
+                          style: TextStyle(fontSize: 14)),
+                      value: checked,
+                      onChanged: (v) => setState(() => checked = v ?? false))
+                ],
+              ),
+              actions: [
+                TextButton(
+                    onPressed: checked ? () => Navigator.pop(ctx) : null,
+                    child: const Text("DONE"))
+              ],
+            );
+          });
+        });
+  }
+
   Future<void> _setupPin(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final currentPin = prefs.getString('app_pin');
@@ -408,6 +476,7 @@ class SettingsScreen extends ConsumerWidget {
 
       if (confirm == true) {
         await prefs.remove('app_pin');
+        await prefs.remove('recovery_key'); // Also remove key
         if (context.mounted) {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("PIN Removed")));
@@ -453,13 +522,27 @@ class SettingsScreen extends ConsumerWidget {
                       onPressed: () => Navigator.pop(ctx),
                       child: const Text("CANCEL")),
                   TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (newPin.length == targetLength) {
-                          prefs.setString('app_pin', newPin);
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("PIN Set Successfully")));
+                          // 1. Generate Key
+                          final key = _generateRecoveryKey();
+
+                          // 2. Save Both
+                          await prefs.setString('app_pin', newPin);
+                          await prefs.setString('recovery_key', key);
+
+                          // 3. Close PIN dialog
+                          if (ctx.mounted) Navigator.pop(ctx);
+
+                          // 4. Show Key Dialog
+                          if (context.mounted) {
+                            await _showRecoveryKeyDialog(context, key);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("PIN Enabled Securely")));
+                            }
+                          }
                         }
                       },
                       child: const Text("SAVE")),

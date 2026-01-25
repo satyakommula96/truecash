@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:truecash/core/utils/currency_helper.dart'; // Import CurrencyHelper
 import 'package:truecash/core/theme/theme.dart';
 
 import '../settings.dart';
@@ -56,6 +57,24 @@ class DashboardHeader extends StatelessWidget {
             ),
             Row(
               children: [
+                // Privacy Toggle
+                ValueListenableBuilder<bool>(
+                  valueListenable: CurrencyHelper.isPrivateModeNotifier,
+                  builder: (context, isPrivate, _) {
+                    return IconButton(
+                      icon: Icon(
+                        isPrivate
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 22,
+                        color: colorScheme.onSurface,
+                      ),
+                      onPressed: () {
+                        CurrencyHelper.togglePrivacy();
+                      },
+                    );
+                  },
+                ),
                 IconButton(
                   icon: Icon(Icons.settings_outlined,
                       size: 22, color: colorScheme.onSurface),

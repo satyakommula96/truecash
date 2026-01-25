@@ -43,7 +43,7 @@ class IntelligenceService {
           body:
               "Based on historical velocity, next month might see a 20% increase in outflows.",
           type: InsightType.warning,
-          value: "Forecast: ${forecast.toInt()}",
+          value: "Forecast: ${CurrencyHelper.format(forecast)}",
         ));
       } else {
         insights.add(AIInsight(
@@ -51,7 +51,7 @@ class IntelligenceService {
           body:
               "Your spending velocity is consistent. You are on track with your historical averages.",
           type: InsightType.success,
-          value: "Forecast: ${forecast.toInt()}",
+          value: "Forecast: ${CurrencyHelper.format(forecast)}",
         ));
       }
     }

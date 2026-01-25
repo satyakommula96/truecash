@@ -74,6 +74,132 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   }
 
   Future<void> _onForgotPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasKey = prefs.containsKey('recovery_key');
+
+    if (!mounted) return;
+
+    if (!hasKey) {
+      // If no key exists (legacy), just show reset dialog
+      _confirmReset();
+      return;
+    }
+
+    // Show Options
+    showModalBottomSheet(
+        context: context,
+        builder: (ctx) => SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Trouble logging in?",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: const Icon(Icons.key, color: Colors.blue),
+                        ),
+                        title: const Text("Use Recovery Key"),
+                        subtitle: const Text(
+                            "Enter your saved recovery key to unlock"),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _promptRecoveryKey();
+                        }),
+                    const SizedBox(height: 8),
+                    ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: const Icon(Icons.delete_forever,
+                              color: Colors.red),
+                        ),
+                        title: const Text("Reset Application"),
+                        subtitle: const Text("Wipe all data and start fresh"),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _confirmReset();
+                        })
+                  ],
+                ),
+              ),
+            ));
+  }
+
+  Future<void> _promptRecoveryKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedKey = prefs.getString('recovery_key');
+    String inputKey = "";
+
+    if (!mounted) return;
+
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+                title: const Text("Enter Recovery Key"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        "Enter the 12-character key you saved when setting up your PIN."),
+                    const SizedBox(height: 16),
+                    TextField(
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "XXXX-XXXX-XXXX",
+                          labelText: "Recovery Key"),
+                      onChanged: (v) => inputKey = v,
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text("CANCEL")),
+                  FilledButton(
+                      onPressed: () async {
+                        if (inputKey.trim() == storedKey) {
+                          Navigator.pop(ctx);
+
+                          // Success: Remove auth and enter
+                          await prefs.remove('app_pin');
+                          await prefs.remove('recovery_key');
+
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Identity Verified. PIN has been removed.")));
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const Dashboard()));
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Invalid Recovery Key"),
+                                  backgroundColor: Colors.red));
+                        }
+                      },
+                      child: const Text("VERIFY"))
+                ]));
+  }
+
+  Future<void> _confirmReset() async {
     final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
