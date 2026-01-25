@@ -312,13 +312,22 @@ class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
   }
 
   Future<void> _save() async {
+    final total = int.tryParse(totalCtrl.text) ?? 0;
+    final remaining = int.tryParse(remainingCtrl.text) ?? 0;
+
+    if (remaining > total) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Remaining balance cannot exceed total loan")));
+      return;
+    }
+
     final repo = ref.read(financialRepositoryProvider);
     await repo.updateLoan(
       widget.loan.id,
       nameCtrl.text,
       selectedType,
-      int.tryParse(totalCtrl.text) ?? 0,
-      int.tryParse(remainingCtrl.text) ?? 0,
+      total,
+      remaining,
       int.tryParse(emiCtrl.text) ?? 0,
       double.tryParse(rateCtrl.text) ?? 0.0,
       dueCtrl.text,

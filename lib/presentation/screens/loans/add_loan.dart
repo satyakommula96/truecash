@@ -278,6 +278,12 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
     final total = int.tryParse(totalCtrl.text) ?? 0;
     final remaining = int.tryParse(remainingCtrl.text) ?? 0;
 
+    if (remaining > total) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Remaining balance cannot exceed total loan")));
+      return;
+    }
+
     await repo.addLoan(
       nameCtrl.text,
       selectedType,

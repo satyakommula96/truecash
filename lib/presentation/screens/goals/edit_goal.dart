@@ -94,12 +94,21 @@ class _EditGoalScreenState extends ConsumerState<EditGoalScreen> {
   }
 
   Future<void> _update() async {
+    final target = int.tryParse(targetCtrl.text) ?? 0;
+    final current = int.tryParse(currentCtrl.text) ?? 0;
+
+    if (current > target) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Current saved cannot exceed target amount")));
+      return;
+    }
+
     final repo = ref.read(financialRepositoryProvider);
     await repo.updateGoal(
       widget.goal['id'],
       nameCtrl.text,
-      int.parse(targetCtrl.text),
-      int.parse(currentCtrl.text),
+      target,
+      current,
     );
     if (mounted) Navigator.pop(context);
   }

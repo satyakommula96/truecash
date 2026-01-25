@@ -194,13 +194,17 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
   Future<void> _update() async {
     if (bankCtrl.text.isEmpty || limitCtrl.text.isEmpty) return;
     final repo = ref.read(financialRepositoryProvider);
-    await repo.updateCreditCard(
-        widget.card.id,
-        bankCtrl.text,
-        int.tryParse(limitCtrl.text) ?? 0,
-        int.tryParse(stmtCtrl.text) ?? 0,
-        int.tryParse(minDueCtrl.text) ?? 0,
-        dueDateCtrl.text);
+    final limit = int.tryParse(limitCtrl.text) ?? 0;
+    final balance = int.tryParse(stmtCtrl.text) ?? 0;
+
+    if (balance > limit) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Statement balance cannot exceed credit limit")));
+      return;
+    }
+
+    await repo.updateCreditCard(widget.card.id, bankCtrl.text, limit, balance,
+        int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text);
 
     // Trigger notification
     if (_selectedGenDate != null) {
