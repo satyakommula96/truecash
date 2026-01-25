@@ -1,11 +1,11 @@
 import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/utils/currency_helper.dart';
 
 class AIInsight {
   final String title;
   final String body;
   final InsightType type;
   final String value;
+  final num? currencyValue; // Raw numeric value for formatting
   final double confidence;
 
   AIInsight({
@@ -13,6 +13,7 @@ class AIInsight {
     required this.body,
     required this.type,
     required this.value,
+    this.currencyValue,
     this.confidence = 0.85,
   });
 }
@@ -43,7 +44,8 @@ class IntelligenceService {
           body:
               "Based on historical velocity, next month might see a 20% increase in outflows.",
           type: InsightType.warning,
-          value: "Forecast: ${forecast.toInt()}",
+          value: "Forecast",
+          currencyValue: forecast,
         ));
       } else {
         insights.add(AIInsight(
@@ -51,7 +53,8 @@ class IntelligenceService {
           body:
               "Your spending velocity is consistent. You are on track with your historical averages.",
           type: InsightType.success,
-          value: "Forecast: ${forecast.toInt()}",
+          value: "Forecast",
+          currencyValue: forecast,
         ));
       }
     }
@@ -97,9 +100,10 @@ class IntelligenceService {
       insights.add(AIInsight(
         title: "WEALTH PROJECTION",
         body:
-            "At this rate, your net worth could increase by ${CurrencyHelper.format(projectedYearly)} in exactly 12 months.",
+            "At this rate, your net worth is projected to grow substantially in exactly 12 months.",
         type: InsightType.prediction,
-        value: CurrencyHelper.format(projectedYearly),
+        value: "Projected",
+        currencyValue: projectedYearly,
       ));
     }
 

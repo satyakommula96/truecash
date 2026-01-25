@@ -5,10 +5,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/domain/repositories/i_financial_repository.dart';
 import 'package:truecash/presentation/providers/repository_providers.dart';
-import 'package:truecash/presentation/screens/dashboard.dart';
+import 'package:truecash/presentation/screens/dashboard/dashboard.dart';
 import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_helper.dart';
+import 'package:truecash/core/utils/currency_formatter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:truecash/core/providers/shared_prefs_provider.dart';
 
 // Mocks
 class MockFinancialRepository extends Mock implements IFinancialRepository {}
@@ -24,12 +26,15 @@ void main() {
   setUp(() {
     mockRepo = MockFinancialRepository();
     // Initialize static notifier for test
-    CurrencyHelper.currencyNotifier.value = '₹';
+    CurrencyFormatter.currencyNotifier.value = '₹';
   });
 
   testWidgets('Dashboard renders loading state then data',
       (WidgetTester tester) async {
     // 1. Setup Data
+    SharedPreferences.setMockInitialValues({'is_private_mode': false});
+    final prefs = await SharedPreferences.getInstance();
+
     final summary = MonthlySummary(
       totalIncome: 5000,
       totalFixed: 1000,
@@ -57,6 +62,7 @@ void main() {
       ProviderScope(
         overrides: [
           financialRepositoryProvider.overrideWithValue(mockRepo),
+          sharedPreferencesProvider.overrideWithValue(prefs),
         ],
         child: MaterialApp(
           theme: AppTheme.lightTheme,

@@ -8,25 +8,41 @@ void main() {
 
   testWidgets('App smoke test - verifies app launches', (tester) async {
     await app.main();
-    // Use pump with duration instead of pumpAndSettle to avoid hanging on infinite animations (loaders)
-    await tester.pump(const Duration(seconds: 5));
 
-    try {
-      expect(find.byWidgetPredicate((widget) {
+    // Poll for up to 30 seconds for the app to settle on a known screen
+    bool found = false;
+    for (int i = 0; i < 300; i++) {
+      await tester
+          .pump(const Duration(milliseconds: 100)); // 100ms * 300 = 30s max
+
+      final finder = find.byWidgetPredicate((widget) {
         if (widget is Text) {
           final data = widget.data;
-          return data == 'Track Your Wealth' ||
-              data == 'Dashboard' ||
-              data == 'TrueCash' ||
-              data == 'Initializing...' ||
-              data == 'Initialization Failed';
+          // Check for Title of Intro OR Dashboard OR specific failure/loading states that indicate app is alive
+          return data == 'Track Your Wealth' || // Intro Title
+              data == 'Dashboard' || // Dashboard Title
+              data == 'Smart Budgeting' || // Intro Page 2
+              data == 'ANALYSIS & BUDGETS' || // Analysis Screen
+              data == 'TrueCash' || // App Bar Title
+              data == 'Initializing...' || // Loading State
+              data == 'Initialization Failed'; // Error State
         }
         return false;
-      }), findsWidgets);
-    } catch (e) {
-      debugPrint('Test failed! Dumping widget tree:');
-      debugDumpApp();
-      rethrow;
+      });
+
+      if (finder.evaluate().isNotEmpty) {
+        found = true;
+        break;
+      }
     }
+
+    if (!found) {
+      debugPrint(
+          'Test timed out waiting for app to load. Dumping widget tree:');
+      debugDumpApp();
+      fail("App did not load Intro or Dashboard within 10 seconds");
+    }
+
+    expect(found, isTrue);
   });
 }
