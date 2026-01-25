@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:sqflite_sqlcipher/sqflite.dart' as sqlcipher;
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,15 +44,8 @@ class AppDatabase {
   static Future<sqlcipher.Database> _initDb() async {
     // Use Application Documents Directory for reliable storage on Linux/Desktop
     final docsDir = await getApplicationDocumentsDirectory();
-    final path = join(docsDir.path, 'tracker_enc_v11.db');
-
-    // Ensure FFI is initialized for Desktop (safe to call multiple times)
-    if (kIsWeb) {
-      // Handle web factory if needed
-    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      sqfliteFfiInit();
-      sqflite.databaseFactory = databaseFactoryFfi;
-    }
+    final path =
+        join(docsDir.path, 'tracker_enc_v${AppVersion.databaseVersion}.db');
 
     final key = await _getOrGenerateKey();
 
@@ -72,13 +64,36 @@ class AppDatabase {
             }),
       );
     } else {
-      return sqlcipher.openDatabase(
-        path,
-        password: key, // ENCRYPTION ENABLED
-        version: AppVersion.databaseVersion,
-        onCreate: (db, _) => _createDb(db),
-        onUpgrade: (db, old, newV) => _upgradeDb(db, old, newV),
-      );
+      try {
+        return await sqlcipher.openDatabase(
+          path,
+          password: key, // ENCRYPTION ENABLED
+          version: AppVersion.databaseVersion,
+          onCreate: (db, _) => _createDb(db),
+          onUpgrade: (db, old, newV) => _upgradeDb(db, old, newV),
+        );
+      } catch (e) {
+        debugPrint(
+            'CRITICAL: Database open failed ($e). Attempting recovery by resetting database...');
+        try {
+          final file = File(path);
+          if (await file.exists()) {
+            await file.delete();
+            debugPrint('Corrupted database file deleted.');
+          }
+        } catch (delErr) {
+          debugPrint('Failed to delete database file: $delErr');
+        }
+
+        // Retry creating a fresh database
+        return await sqlcipher.openDatabase(
+          path,
+          password: key,
+          version: AppVersion.databaseVersion,
+          onCreate: (db, _) => _createDb(db),
+          onUpgrade: (db, old, newV) => _upgradeDb(db, old, newV),
+        );
+      }
     }
   }
 
