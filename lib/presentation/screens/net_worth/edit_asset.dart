@@ -93,12 +93,28 @@ class _EditAssetScreenState extends ConsumerState<EditAssetScreen> {
   }
 
   Future<void> _update() async {
-    if (nameCtrl.text.isEmpty || amountCtrl.text.isEmpty) return;
+    final name = nameCtrl.text.trim();
+    final amountText = amountCtrl.text.trim();
+
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Asset Name cannot be empty")),
+      );
+      return;
+    }
+
+    final amount = int.tryParse(amountText);
+    if (amount == null || amount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid non-negative value")),
+      );
+      return;
+    }
 
     final repo = ref.read(financialRepositoryProvider);
     final updates = {
-      'name': nameCtrl.text,
-      'amount': int.tryParse(amountCtrl.text) ?? 0,
+      'name': name,
+      'amount': amount,
       'type': typeCtrl.text,
     };
 

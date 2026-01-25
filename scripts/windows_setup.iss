@@ -1,8 +1,8 @@
 [Setup]
 AppId={{C0F22A12-B5D1-4F2B-9B5D-1F2B9B5D1F2B}}
 AppName=TrueCash
-AppVersion=1.1.0
-;AppVerName=True Cash 1.1.0
+AppVersion=1.0.0
+;AppVerName=True Cash 1.0.0
 AppPublisher=Satya Kommula
 AppPublisherURL=https://github.com/satyakommula/truecash
 DefaultDirName={autopf}\TrueCash

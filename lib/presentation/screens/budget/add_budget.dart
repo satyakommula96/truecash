@@ -55,9 +55,29 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
   }
 
   Future<void> _save() async {
-    if (categoryCtrl.text.isEmpty || limitCtrl.text.isEmpty) return;
+    final category = categoryCtrl.text.trim();
+    final limitText = limitCtrl.text.trim();
+
+    if (category.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Category cannot be empty")));
+      return;
+    }
+    if (limitText.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Limit cannot be empty")));
+      return;
+    }
+
+    final limit = int.tryParse(limitText);
+    if (limit == null || limit < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please enter a valid non-negative limit")));
+      return;
+    }
+
     final repo = ref.read(financialRepositoryProvider);
-    await repo.addBudget(categoryCtrl.text, int.parse(limitCtrl.text));
+    await repo.addBudget(category, limit);
     if (mounted) Navigator.pop(context);
   }
 }

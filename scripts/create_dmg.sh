@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="TrueCash"
-VERSION="1.1.0"
+VERSION="1.0.0"
 DMG_NAME="TrueCash.dmg"
 
 echo "Building macOS app..."

@@ -82,9 +82,9 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
 
   Future<void> _update() async {
     final limit = int.tryParse(limitCtrl.text);
-    if (limit == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Invalid limit format")));
+    if (limit == null || limit < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please enter a valid non-negative limit")));
       return;
     }
 

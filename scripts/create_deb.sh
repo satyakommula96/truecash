@@ -4,7 +4,7 @@
 set -e
 
 APP_NAME="truecash"
-VERSION="1.1.0" # Match the version in settings.dart/pubspec.yaml
+VERSION="1.0.0" # Match the version in settings.dart/pubspec.yaml
 ARCH="amd64"
 MAINTAINER="Satya Kommula"
 DESCRIPTION="True Cash: Premium Financial Management Application"

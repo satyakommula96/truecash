@@ -215,9 +215,9 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
     }
 
     final amount = int.tryParse(amountText);
-    if (amount == null) {
+    if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Invalid amount format")));
+          .showSnackBar(const SnackBar(content: Text("Please enter a valid positive amount")));
       return;
     }
 

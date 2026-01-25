@@ -33,7 +33,7 @@ jobs:
 
       - name: Update Script Version
         run: |
-          sed -i "s/VERSION=\"1.1.0\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_deb.sh
+          sed -i "s/VERSION=\"[0-9.]*\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_deb.sh
           cat scripts/create_deb.sh | grep VERSION
 
       - name: Build and Package
@@ -100,7 +100,7 @@ jobs:
       - name: Update Script Version
         shell: bash
         run: |
-          sed -i "s/AppVersion=1.1.0/AppVersion=${{ steps.version.outputs.VERSION }}/" scripts/windows_setup.iss
+          sed -i "s/AppVersion=[0-9.]*/AppVersion=${{ steps.version.outputs.VERSION }}/" scripts/windows_setup.iss
 
       - name: Build Flutter App
         run: flutter build windows --release
@@ -134,7 +134,7 @@ jobs:
 
       - name: Update Script Version
         run: |
-          sed -i '' "s/VERSION=\"1.1.0\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_dmg.sh
+          sed -i '' "s/VERSION=\"[0-9.]*\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_dmg.sh
 
       - name: Build and Package
         run: |
