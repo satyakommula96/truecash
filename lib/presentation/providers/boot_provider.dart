@@ -13,5 +13,10 @@ final bootProvider = FutureProvider<String?>((ref) async {
   }
 
   const storage = FlutterSecureStorage();
-  return await storage.read(key: 'app_pin');
+  try {
+    return await storage.read(key: 'app_pin');
+  } catch (e) {
+    // If secure storage fails (e.g. simulator/tests), return null
+    return null;
+  }
 });
