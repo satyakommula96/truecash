@@ -192,15 +192,6 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        if (c.generationDate.isNotEmpty)
-                                          Text(
-                                              "BILL DATE: ${c.generationDate.split(' ')[0]} ${c.generationDate.split(' ')[1]}"
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                  fontSize: 8,
-                                                  fontWeight: FontWeight.w700,
-                                                  color:
-                                                      semantic.secondaryText)),
                                         Text(DateHelper.formatDue(c.dueDate),
                                             style: TextStyle(
                                                 fontSize: 9,

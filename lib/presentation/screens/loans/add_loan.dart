@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import 'package:truecash/core/utils/currency_formatter.dart';
 import 'package:truecash/core/theme/theme.dart';
+import 'package:intl/intl.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:truecash/presentation/providers/repository_providers.dart';
@@ -168,7 +167,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
   }
 
   Widget _buildField(String label, TextEditingController ctrl,
-      {String hint = "",
+      {String? hint,
       TextInputType type = TextInputType.text,
       String? prefix,
       bool readOnly = false,
@@ -202,26 +201,83 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: semantic.divider)),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary, width: 2)),
           ),
         ),
       ],
     );
   }
 
-  Future<void> _save() async {
-    if (nameCtrl.text.isEmpty) return;
+  Future<void> _pickDate() async {
+    if (selectedType == 'Individual') {
+      final now = DateTime.now();
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: _selectedDate ?? now,
+        firstDate: now,
+        lastDate: DateTime(now.year + 5),
+      );
 
-    final total = int.tryParse(totalCtrl.text) ?? 0;
-    // If remaining is left empty, assume it's a new loan equal to the total amount
-    final remaining = remainingCtrl.text.isEmpty
-        ? total
-        : (int.tryParse(remainingCtrl.text) ?? 0);
+      if (picked != null) {
+        setState(() {
+          _selectedDate = picked;
+          dueCtrl.text = DateFormat('dd MMM yyyy').format(picked);
+        });
+      }
+    } else {
+      // Pick day of month
+      final picked = await showDialog<int>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("SELECT DUE DAY"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: GridView.builder(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7),
+              itemCount: 31,
+              itemBuilder: (context, index) {
+                final day = index + 1;
+                return InkWell(
+                  onTap: () => Navigator.pop(context, day),
+                  child: Center(
+                    child: Text(day.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      if (picked != null) {
+        setState(() {
+          dueCtrl.text = picked == 1
+              ? "1st"
+              : picked == 2
+                  ? "2nd"
+                  : picked == 3
+                      ? "3rd"
+                      : "${picked}th";
+        });
+      }
+    }
+  }
+
+  Future<void> _save() async {
+    if (nameCtrl.text.isEmpty ||
+        totalCtrl.text.isEmpty ||
+        remainingCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please fill required fields")));
+      return;
+    }
 
     final repo = ref.read(financialRepositoryProvider);
+    final total = int.tryParse(totalCtrl.text) ?? 0;
+    final remaining = int.tryParse(remainingCtrl.text) ?? 0;
+
     await repo.addLoan(
       nameCtrl.text,
       selectedType,
@@ -233,22 +289,5 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
       DateTime.now().toIso8601String(),
     );
     if (mounted) Navigator.pop(context);
-  }
-
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? now,
-      firstDate: DateTime(now.year, now.month - 1),
-      lastDate: DateTime(now.year + 5),
-    );
-
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-        dueCtrl.text = DateFormat('dd MMM yyyy').format(picked);
-      });
-    }
   }
 }

@@ -6,55 +6,25 @@ abstract class Migration {
 
   Future<void> up(sqflite.Database db);
   Future<void> down(sqflite.Database db);
+
+  Future<void> addColumnSafe(
+      sqflite.Database db, String table, String column, String type) async {
+    final results = await db.rawQuery("PRAGMA table_info($table)");
+    final columnExists = results.any((row) => row['name'] == column);
+    if (!columnExists) {
+      await db.execute("ALTER TABLE $table ADD COLUMN $column $type");
+    }
+  }
 }
 
 class MigrationV1 extends Migration {
   MigrationV1() : super(1);
 
   @override
-  Future<void> up(sqflite.Database db) async {
-    // Initial tables creation logic
-    // This is handled in onCreate, but shown here for structure
-  }
+  Future<void> up(sqflite.Database db) async {}
 
   @override
-  Future<void> down(sqflite.Database db) async {
-    // Drop tables if needed for rollback
-  }
+  Future<void> down(sqflite.Database db) async {}
 }
 
-class MigrationV3 extends Migration {
-  MigrationV3() : super(3);
-
-  @override
-  Future<void> up(sqflite.Database db) async {
-    await db
-        .execute("ALTER TABLE credit_cards ADD COLUMN generation_date TEXT");
-  }
-
-  @override
-  Future<void> down(sqflite.Database db) async {
-    // SQLite doesn't support DROP COLUMN easily, usually a table recreation is needed
-  }
-}
-
-class MigrationV4 extends Migration {
-  MigrationV4() : super(4);
-
-  @override
-  Future<void> up(sqflite.Database db) async {
-    await db.execute("ALTER TABLE variable_expenses ADD COLUMN tags TEXT");
-    await db.execute(
-        'CREATE TABLE IF NOT EXISTS sys_config (key TEXT PRIMARY KEY, value TEXT)');
-  }
-
-  @override
-  Future<void> down(sqflite.Database db) async {
-    // Drop table if needed
-  }
-}
-
-final List<Migration> appMigrations = [
-  MigrationV3(),
-  MigrationV4(),
-];
+final List<Migration> appMigrations = [];

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:truecash/data/datasources/database.dart';
 import 'package:truecash/domain/models/models.dart';
@@ -165,65 +164,14 @@ class FinancialRepositoryImpl implements IFinancialRepository {
           'date': date,
           'amount': amount,
           'category': category,
-          'note': note,
-          'tags': note.contains('#') ? _extractTags(note) : null
+          'note': note
         });
     }
   }
 
-  String _extractTags(String note) {
-    final regex = RegExp(r'\#\w+');
-    final matches = regex.allMatches(note);
-    if (matches.isEmpty) return "";
-    return matches.map((m) => m.group(0)).join(',');
-  }
-
   @override
   Future<void> checkAndProcessRecurring() async {
-    final db = await AppDatabase.db;
-    final now = DateTime.now();
-    final today = now.day;
-    final monthStr = now.toIso8601String().substring(0, 7); // YYYY-MM
-
-    // Check if we already processed today
-    final config =
-        await db.query('sys_config', where: 'key = ?', whereArgs: ['last_run']);
-    String lastRun = "";
-    if (config.isNotEmpty) {
-      lastRun = config.first['value'].toString();
-    }
-
-    final todayStr = now.toIso8601String().substring(0, 10);
-    if (lastRun == todayStr) return; // Already ran today
-
-    // Fetch active subscriptions
-    final subs = await db.query('subscriptions', where: 'active = 1');
-
-    for (var s in subs) {
-      int billingDay = int.tryParse(s['billing_date'].toString()) ?? 1;
-
-      // If billing day matches today OR we missed it (and haven't added it for this month)
-      if (today >= billingDay) {
-        // Check if this specific subscription has been added for this month
-        final existing = await db.rawQuery(
-            "SELECT id FROM fixed_expenses WHERE category = 'Subscription' AND name = ? AND substr(date, 1, 7) = ?",
-            [s['name'], monthStr]);
-
-        if (existing.isEmpty) {
-          await db.insert('fixed_expenses', {
-            'name': s['name'],
-            'amount': s['amount'],
-            'category': 'Subscription',
-            'date': now.toIso8601String()
-          });
-          debugPrint("Auto-processed subscription: ${s['name']}");
-        }
-      }
-    }
-
-    // Update last run
-    await db.insert('sys_config', {'key': 'last_run', 'value': todayStr},
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    // Reverted to empty for V1 start
   }
 
   @override
@@ -362,7 +310,7 @@ class FinancialRepositoryImpl implements IFinancialRepository {
 
   @override
   Future<void> addCreditCard(String bank, int creditLimit, int statementBalance,
-      int minDue, String dueDate, String generationDate) async {
+      int minDue, String dueDate) async {
     final db = await AppDatabase.db;
     await db.insert('credit_cards', {
       'bank': bank,
@@ -370,19 +318,12 @@ class FinancialRepositoryImpl implements IFinancialRepository {
       'statement_balance': statementBalance,
       'min_due': minDue,
       'due_date': dueDate,
-      'generation_date': generationDate,
     });
   }
 
   @override
-  Future<void> updateCreditCard(
-      int id,
-      String bank,
-      int creditLimit,
-      int statementBalance,
-      int minDue,
-      String dueDate,
-      String generationDate) async {
+  Future<void> updateCreditCard(int id, String bank, int creditLimit,
+      int statementBalance, int minDue, String dueDate) async {
     final db = await AppDatabase.db;
     await db.update(
       'credit_cards',
@@ -392,7 +333,6 @@ class FinancialRepositoryImpl implements IFinancialRepository {
         'statement_balance': statementBalance,
         'min_due': minDue,
         'due_date': dueDate,
-        'generation_date': generationDate,
       },
       where: 'id = ?',
       whereArgs: [id],

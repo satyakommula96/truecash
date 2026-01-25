@@ -704,6 +704,13 @@ class SettingsScreen extends ConsumerWidget {
                   TextButton(
                       onPressed: () async {
                         Navigator.pop(ctx);
+
+                        // Verify PIN first before removing
+                        bool verified = await _verifyPin(context, currentPin);
+                        if (!verified) return;
+
+                        if (!context.mounted) return;
+
                         final confirm = await showDialog<bool>(
                             context: context,
                             builder: (c) => AlertDialog(

@@ -30,7 +30,6 @@ class Schema {
   static const String colStatementBalance = 'statement_balance';
   static const String colMinDue = 'min_due';
   static const String colDueDate = 'due_date';
-  static const String colGenerationDate = 'generation_date';
 
   // Loans
   static const String colLoanType = 'loan_type';
@@ -45,8 +44,6 @@ class Schema {
 
   // Budgets
   static const String colMonthlyLimit = 'monthly_limit';
-  static const String colTags = 'tags'; // Comma separated tags
   static const String colPin =
       'app_pin'; // Stored in separate secure table or preferences but keeping simple
-  static const String colLastProcessed = 'last_processed'; // For automation
 }

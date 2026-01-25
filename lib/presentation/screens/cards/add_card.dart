@@ -139,8 +139,7 @@ class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
         int.tryParse(limitCtrl.text) ?? 0,
         int.tryParse(stmtCtrl.text) ?? 0,
         int.tryParse(minDueCtrl.text) ?? 0,
-        dueDateCtrl.text,
-        genDateCtrl.text);
+        dueDateCtrl.text);
 
     // Trigger notification
     if (_selectedGenDate != null) {

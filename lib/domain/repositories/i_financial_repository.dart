@@ -25,9 +25,9 @@ abstract class IFinancialRepository {
   Future<void> seedLargeData(int count);
   Future<void> clearData();
   Future<void> addCreditCard(String bank, int creditLimit, int statementBalance,
-      int minDue, String dueDate, String generationDate);
+      int minDue, String dueDate);
   Future<void> updateCreditCard(int id, String bank, int creditLimit,
-      int statementBalance, int minDue, String dueDate, String generationDate);
+      int statementBalance, int minDue, String dueDate);
   Future<void> payCreditCardBill(int id, int amount);
   Future<void> addGoal(String name, int targetAmount);
   Future<void> updateGoal(

@@ -8,7 +8,10 @@ import 'package:truecash/core/theme/theme.dart';
 import 'package:truecash/core/utils/currency_formatter.dart';
 import 'package:truecash/core/utils/date_helper.dart';
 import 'package:truecash/presentation/screens/transactions/add_expense.dart';
-import 'package:truecash/presentation/screens/loans/loans.dart';
+import 'package:truecash/presentation/screens/loans/add_loan.dart';
+import 'package:truecash/presentation/screens/loans/edit_loan.dart';
+import 'package:truecash/presentation/screens/cards/edit_card.dart';
+import 'package:truecash/presentation/screens/net_worth/edit_asset.dart';
 
 enum NetWorthView { assets, liabilities }
 
@@ -93,6 +96,16 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
     }
   }
 
+  Future<void> _openAssetEditor(Map<String, dynamic> i) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditAssetScreen(asset: Asset.fromMap(i)),
+      ),
+    );
+    _loadData();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -112,7 +125,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
         onPressed: () async {
           if (widget.viewMode == NetWorthView.liabilities) {
             await Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const LoansScreen()));
+                MaterialPageRoute(builder: (_) => const AddLoanScreen()));
           } else {
             await Navigator.push(
                 context,
@@ -123,7 +136,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
           _loadData();
         },
         label: Text(widget.viewMode == NetWorthView.liabilities
-            ? "ADD LOAN"
+            ? "ADD DEBT"
             : "ADD ASSET"),
         icon: const Icon(Icons.add),
         backgroundColor: widget.viewMode == NetWorthView.liabilities
@@ -167,6 +180,13 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(l.remainingAmount, compact: false),
                   l.loanType,
                   semantic.overspent,
+                  onTap: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => EditLoanScreen(loan: l)));
+                    _loadData();
+                  },
                 );
               },
               childCount: _bankLoans.isEmpty ? 1 : _bankLoans.length,
@@ -189,6 +209,13 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(c.statementBalance, compact: false),
                   DateHelper.formatDue(c.dueDate),
                   semantic.overspent,
+                  onTap: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => EditCreditCardScreen(card: c)));
+                    _loadData();
+                  },
                 );
               },
               childCount: _creditCards.isEmpty ? 1 : _creditCards.length,
@@ -211,6 +238,13 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(l.remainingAmount, compact: false),
                   "Individual",
                   semantic.overspent,
+                  onTap: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => EditLoanScreen(loan: l)));
+                    _loadData();
+                  },
                 );
               },
               childCount:
@@ -290,6 +324,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(i['amount'], compact: false),
                   i['type'] ?? 'Equity',
                   semantic.income,
+                  onTap: () => _openAssetEditor(i),
                 );
               },
               childCount: equity.isEmpty ? 1 : equity.length,
@@ -312,6 +347,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(i['amount'], compact: false),
                   i['type'] ?? 'Commodity',
                   semantic.income,
+                  onTap: () => _openAssetEditor(i),
                 );
               },
               childCount: gold.isEmpty ? 1 : gold.length,
@@ -357,6 +393,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                   CurrencyFormatter.format(i['amount'], compact: false),
                   "Individual",
                   semantic.income,
+                  onTap: () => _openAssetEditor(i),
                 );
               },
               childCount: lending.isEmpty ? 1 : lending.length,
@@ -377,6 +414,7 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
                     CurrencyFormatter.format(i['amount'], compact: false),
                     i['type'] ?? 'Other',
                     semantic.income,
+                    onTap: () => _openAssetEditor(i),
                   );
                 },
                 childCount: other.length,
@@ -459,51 +497,65 @@ class _NetWorthDetailsScreenState extends ConsumerState<NetWorthDetailsScreen> {
   }
 
   Widget _buildListItem(
-      String title, String amount, String subtitle, Color amountColor) {
+      String title, String amount, String subtitle, Color amountColor,
+      {VoidCallback? onTap}) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: colorScheme.onSurface)),
-              const SizedBox(height: 4),
-              Text(subtitle,
-                  style: TextStyle(
-                      color: Theme.of(context).hintColor, fontSize: 11)),
-            ],
-          ),
-          Text(amount,
-              style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 15,
-                  color: amountColor)),
-        ],
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 400.ms)
-        .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).dividerColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: colorScheme.onSurface)),
+                const SizedBox(height: 4),
+                Text(subtitle,
+                    style: TextStyle(
+                        color: Theme.of(context).hintColor, fontSize: 11)),
+              ],
+            ),
+            Row(
+              children: [
+                Text(amount,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: amountColor)),
+                if (onTap != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(Icons.chevron_right,
+                      size: 16, color: Theme.of(context).hintColor),
+                ],
+              ],
+            ),
+          ],
+        ),
+      )
+          .animate()
+          .fadeIn(duration: 400.ms)
+          .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint),
+    );
   }
 }
 

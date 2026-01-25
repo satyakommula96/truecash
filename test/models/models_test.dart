@@ -52,8 +52,7 @@ void main() {
           creditLimit: 50000,
           statementBalance: 12000,
           minDue: 600,
-          dueDate: '15th',
-          generationDate: '2023-01-01');
+          dueDate: '15th');
 
       final map = card.toMap();
       expect(map['bank'], 'HDFC');

@@ -88,7 +88,7 @@ class AppDatabase {
     await db.execute(
         'CREATE TABLE ${Schema.fixedExpensesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colCategory} TEXT, ${Schema.colDate} TEXT)');
     await db.execute(
-        'CREATE TABLE ${Schema.variableExpensesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colDate} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colCategory} TEXT, ${Schema.colNote} TEXT, ${Schema.colTags} TEXT)');
+        'CREATE TABLE ${Schema.variableExpensesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colDate} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colCategory} TEXT, ${Schema.colNote} TEXT)');
     await db.execute(
         'CREATE TABLE ${Schema.investmentsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colAmount} INTEGER, ${Schema.colActive} INTEGER, ${Schema.colType} TEXT, ${Schema.colDate} TEXT)');
     await db.execute(
@@ -102,8 +102,7 @@ class AppDatabase {
             ${Schema.colCreditLimit} INTEGER,
             ${Schema.colStatementBalance} INTEGER,
             ${Schema.colMinDue} INTEGER,
-            ${Schema.colDueDate} TEXT,
-            ${Schema.colGenerationDate} TEXT
+            ${Schema.colDueDate} TEXT
           )
         ''');
     await db.execute('''
@@ -123,10 +122,6 @@ class AppDatabase {
         'CREATE TABLE ${Schema.savingGoalsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colTargetAmount} INTEGER, ${Schema.colCurrentAmount} INTEGER)');
     await db.execute(
         'CREATE TABLE ${Schema.budgetsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colCategory} TEXT, ${Schema.colMonthlyLimit} INTEGER)');
-
-    // Automation & Settings Table (v4)
-    await db
-        .execute('CREATE TABLE sys_config (key TEXT PRIMARY KEY, value TEXT)');
   }
 
   static Future<void> _upgradeDb(
@@ -252,16 +247,14 @@ class AppDatabase {
       Schema.colCreditLimit: 1500000,
       Schema.colStatementBalance: 87000,
       Schema.colMinDue: 0,
-      Schema.colDueDate: '12 Feb 2026',
-      Schema.colGenerationDate: '23 Jan 2026'
+      Schema.colDueDate: '12 Feb 2026'
     });
     batch.insert(Schema.creditCardsTable, {
       Schema.colBank: 'Amex Platinum',
       Schema.colCreditLimit: 1000000,
       Schema.colStatementBalance: 12500,
       Schema.colMinDue: 0,
-      Schema.colDueDate: '24 Feb 2026',
-      Schema.colGenerationDate: '05 Jan 2026'
+      Schema.colDueDate: '24 Feb 2026'
     });
 
     // Subscriptions (Active List)
@@ -421,8 +414,7 @@ class AppDatabase {
           Schema.colDate: txDate.toIso8601String(),
           Schema.colAmount: (baseAmount * inflationFactor).toInt(),
           Schema.colCategory: cat,
-          Schema.colNote: '$cat at Place #${random.nextInt(99)}',
-          Schema.colTags: (j % 5 == 0) ? '#creditcard' : null
+          Schema.colNote: '$cat at Place #${random.nextInt(99)}'
         });
       }
     }
@@ -551,7 +543,6 @@ class AppDatabase {
       Schema.colStatementBalance: 195000, // Maxed out
       Schema.colMinDue: 15000,
       Schema.colDueDate: '15th',
-      Schema.colGenerationDate: now.toIso8601String()
     });
 
     await batch.commit(noResult: true);
@@ -594,7 +585,6 @@ class AppDatabase {
         Schema.colAmount: amount,
         Schema.colCategory: cat,
         Schema.colNote: 'Large scale entry #$i',
-        Schema.colTags: '#automated,#performance'
       });
 
       // Execute in chunks to avoid memory issues with batch

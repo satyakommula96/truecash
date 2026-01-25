@@ -70,13 +70,9 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
         TextEditingController(text: widget.card.statementBalance.toString());
     minDueCtrl = TextEditingController(text: widget.card.minDue.toString());
     dueDateCtrl = TextEditingController(text: widget.card.dueDate);
-    genDateCtrl = TextEditingController(text: widget.card.generationDate);
+    genDateCtrl = TextEditingController();
     try {
       _selectedDueDate = DateFormat('dd MMM yyyy').parse(widget.card.dueDate);
-    } catch (_) {}
-    try {
-      _selectedGenDate =
-          DateFormat('dd MMM yyyy').parse(widget.card.generationDate);
     } catch (_) {}
   }
 
@@ -204,8 +200,7 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
         int.tryParse(limitCtrl.text) ?? 0,
         int.tryParse(stmtCtrl.text) ?? 0,
         int.tryParse(minDueCtrl.text) ?? 0,
-        dueDateCtrl.text,
-        genDateCtrl.text);
+        dueDateCtrl.text);
 
     // Trigger notification
     if (_selectedGenDate != null) {
