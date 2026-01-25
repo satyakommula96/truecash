@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:truecash/domain/services/intelligence_service.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:truecash/core/utils/currency_helper.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 import 'package:truecash/core/theme/theme.dart';
 
-class SmartInsightsCard extends StatelessWidget {
+class SmartInsightsCard extends ConsumerWidget {
   final List<AIInsight> insights;
   final AppColors semantic;
 
@@ -15,7 +18,8 @@ class SmartInsightsCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPrivate = ref.watch(privacyProvider);
     if (insights.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -61,7 +65,7 @@ class SmartInsightsCard extends StatelessWidget {
             itemCount: insights.length,
             itemBuilder: (context, index) {
               final insight = insights[index];
-              return _buildInsightItem(context, insight)
+              return _buildInsightItem(context, insight, isPrivate)
                   .animate()
                   .fadeIn(delay: (100 * index).ms, duration: 600.ms)
                   .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
@@ -72,7 +76,8 @@ class SmartInsightsCard extends StatelessWidget {
     ).animate().fadeIn(duration: 800.ms);
   }
 
-  Widget _buildInsightItem(BuildContext context, AIInsight insight) {
+  Widget _buildInsightItem(
+      BuildContext context, AIInsight insight, bool isPrivate) {
     Color accentColor;
     IconData icon;
 
@@ -126,7 +131,9 @@ class SmartInsightsCard extends StatelessWidget {
                 child: Icon(icon, size: 18, color: accentColor),
               ),
               Text(
-                insight.value,
+                insight.currencyValue != null
+                    ? "${insight.value}: ${CurrencyHelper.format(insight.currencyValue!, isPrivate: isPrivate)}"
+                    : insight.value,
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 16,

@@ -3,14 +3,17 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/core/theme/theme.dart';
 import 'package:truecash/core/utils/currency_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 
-class WealthHero extends StatelessWidget {
+class WealthHero extends ConsumerWidget {
   final MonthlySummary summary;
 
   const WealthHero({super.key, required this.summary});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPrivate = ref.watch(privacyProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final appColors = Theme.of(context).extension<AppColors>();
     final isNegative = summary.netWorth < 0;
@@ -89,7 +92,8 @@ class WealthHero extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        CurrencyHelper.format(summary.netWorth, compact: false),
+                        CurrencyHelper.format(summary.netWorth,
+                            compact: false, isPrivate: isPrivate),
                         style: TextStyle(
                             color: colorScheme.onPrimary,
                             fontSize: 42,

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:truecash/core/utils/currency_helper.dart'; // Import CurrencyHelper
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 import 'package:truecash/core/theme/theme.dart';
 
 import '../settings.dart';
 
-class DashboardHeader extends StatelessWidget {
+class DashboardHeader extends ConsumerWidget {
   final bool isDark;
   final VoidCallback onLoad; // To reload dashboard when returning from settings
 
@@ -18,7 +19,7 @@ class DashboardHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppColors>()!;
 
@@ -58,21 +59,16 @@ class DashboardHeader extends StatelessWidget {
             Row(
               children: [
                 // Privacy Toggle
-                ValueListenableBuilder<bool>(
-                  valueListenable: CurrencyHelper.isPrivateModeNotifier,
-                  builder: (context, isPrivate, _) {
-                    return IconButton(
-                      icon: Icon(
-                        isPrivate
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        size: 22,
-                        color: colorScheme.onSurface,
-                      ),
-                      onPressed: () {
-                        CurrencyHelper.togglePrivacy();
-                      },
-                    );
+                IconButton(
+                  icon: Icon(
+                    ref.watch(privacyProvider)
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 22,
+                    color: colorScheme.onSurface,
+                  ),
+                  onPressed: () {
+                    ref.read(privacyProvider.notifier).toggle();
                   },
                 ),
                 IconButton(

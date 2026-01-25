@@ -3,9 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/core/theme/theme.dart';
 import 'package:truecash/core/utils/currency_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 import '../net_worth_details.dart';
 
-class AssetLiabilityCard extends StatelessWidget {
+class AssetLiabilityCard extends ConsumerWidget {
   final MonthlySummary summary;
   final AppColors semantic;
   final VoidCallback onLoad;
@@ -18,7 +20,8 @@ class AssetLiabilityCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPrivate = ref.watch(privacyProvider);
     return Row(
       children: [
         Expanded(
@@ -62,9 +65,11 @@ class AssetLiabilityCard extends StatelessWidget {
                           color: semantic.income.withValues(alpha: 0.1))),
                   _buildMiniStat(
                       "ASSETS",
-                      CurrencyHelper.format(summary.netWorth +
-                          summary.creditCardDebt +
-                          summary.loansTotal),
+                      CurrencyHelper.format(
+                          summary.netWorth +
+                              summary.creditCardDebt +
+                              summary.loansTotal,
+                          isPrivate: isPrivate),
                       semantic.income,
                       semantic),
                 ],
@@ -115,7 +120,8 @@ class AssetLiabilityCard extends StatelessWidget {
                   _buildMiniStat(
                       "LIABILITIES",
                       CurrencyHelper.format(
-                          summary.creditCardDebt + summary.loansTotal),
+                          summary.creditCardDebt + summary.loansTotal,
+                          isPrivate: isPrivate),
                       semantic.overspent,
                       semantic),
                 ],

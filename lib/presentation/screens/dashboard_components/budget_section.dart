@@ -3,9 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:truecash/domain/models/models.dart';
 import 'package:truecash/core/theme/theme.dart';
 import 'package:truecash/core/utils/currency_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:truecash/presentation/providers/privacy_provider.dart';
 import '../edit_budget.dart';
 
-class BudgetSection extends StatelessWidget {
+class BudgetSection extends ConsumerWidget {
   final List<Budget> budgets;
   final AppColors semantic;
   final VoidCallback onLoad;
@@ -18,7 +20,8 @@ class BudgetSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPrivate = ref.watch(privacyProvider);
     if (budgets.isEmpty) {
       return const Text("No active budgets",
           style: TextStyle(color: Colors.grey));
@@ -70,7 +73,7 @@ class BudgetSection extends StatelessWidget {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 12)),
                   Text(
-                      "${CurrencyHelper.format(b.spent)} / ${CurrencyHelper.format(b.monthlyLimit)}",
+                      "${CurrencyHelper.format(b.spent, isPrivate: isPrivate)} / ${CurrencyHelper.format(b.monthlyLimit, isPrivate: isPrivate)}",
                       style: TextStyle(
                           fontSize: 12,
                           color: isOver
