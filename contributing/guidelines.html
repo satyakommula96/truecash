@@ -12,11 +12,13 @@
         <meta name="author" content="TrueCash Team">
       
       
-        <link rel="canonical" href="https://satyakommula96.github.io/truecash/api/index.html">
+        <link rel="canonical" href="https://satyakommula96.github.io/truecash/contributing/guidelines.html">
       
       
-        <link rel="prev" href="../contributing/code-of-conduct.html">
+        <link rel="prev" href="../cicd/releases.html">
       
+      
+        <link rel="next" href="code-of-conduct.html">
       
       
         
@@ -27,7 +29,7 @@
     
     
       
-        <title>API Reference - TrueCash Documentation</title>
+        <title>Guidelines - TrueCash Documentation</title>
       
     
     
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#contributing-guidelines" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Reference
+              Guidelines
             
           </span>
         </div>
@@ -382,11 +384,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../contributing/guidelines.html" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="guidelines.html" class="md-tabs__link">
           
   
   
@@ -402,11 +406,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="index.html" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../api/index.html" class="md-tabs__link">
         
   
   
@@ -1818,28 +1820,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
-        
-          
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
             
   
   
@@ -1857,7 +1862,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1872,10 +1877,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../contributing/guidelines.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guidelines
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="guidelines.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1891,6 +1923,331 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#code-of-conduct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code of Conduct
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-make-your-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Make Your Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-write-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Write Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-run-code-quality-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Run Code Quality Checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-commit-your-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Commit Your Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-push-and-create-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Push and Create Pull Request
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-request-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull Request Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Request Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pr-title" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Style
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Code Style">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dartflutter-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dart/Flutter Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#widget-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Widget Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#review-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Review Process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1903,7 +2260,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/code-of-conduct.html" class="md-nav__link">
+      <a href="code-of-conduct.html" class="md-nav__link">
         
   
   
@@ -1935,37 +2292,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Reference
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="index.html" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../api/index.html" class="md-nav__link">
         
   
   
@@ -1981,171 +2311,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#domain-layer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Domain Layer
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Domain Layer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#models" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Models
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Models">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#transaction" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Transaction
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#savinggoal" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SavingGoal
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use Cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#repository-interfaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Repository Interfaces
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#presentation-layer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Presentation Layer
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Presentation Layer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#providers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Providers
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-layer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data Layer
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Data Layer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#database-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database Schema
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2177,34 +2342,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#domain-layer" class="md-nav__link">
+  <a href="#code-of-conduct" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Domain Layer
+        Code of Conduct
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Domain Layer">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Development Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Workflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#models" class="md-nav__link">
+  <a href="#1-make-your-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Models
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Models">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget
+        1. Make Your Changes
       
     </span>
   </a>
@@ -2212,10 +2387,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#transaction" class="md-nav__link">
+  <a href="#2-write-tests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Transaction
+        2. Write Tests
       
     </span>
   </a>
@@ -2223,26 +2398,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#savinggoal" class="md-nav__link">
+  <a href="#3-run-code-quality-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SavingGoal
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use Cases
+        3. Run Code Quality Checks
       
     </span>
   </a>
@@ -2250,10 +2409,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#repository-interfaces" class="md-nav__link">
+  <a href="#4-commit-your-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Repository Interfaces
+        4. Commit Your Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-push-and-create-pull-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Push and Create Pull Request
       
     </span>
   </a>
@@ -2266,22 +2436,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#presentation-layer" class="md-nav__link">
+  <a href="#pull-request-guidelines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Presentation Layer
+        Pull Request Guidelines
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Presentation Layer">
+    <nav class="md-nav" aria-label="Pull Request Guidelines">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#providers" class="md-nav__link">
+  <a href="#pr-title" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Providers
+        PR Title
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pr-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PR Checklist
       
     </span>
   </a>
@@ -2294,22 +2486,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-layer" class="md-nav__link">
+  <a href="#code-style" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Layer
+        Code Style
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Data Layer">
+    <nav class="md-nav" aria-label="Code Style">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#database-schema" class="md-nav__link">
+  <a href="#dartflutter-conventions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Database Schema
+        Dart/Flutter Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Conventions
       
     </span>
   </a>
@@ -2318,6 +2521,128 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#widget-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Widget Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#code-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#review-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Review Process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Questions?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2341,47 +2666,238 @@
   
 
 
-<h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
-<p>API documentation for TrueCash.</p>
-<h2 id="domain-layer">Domain Layer<a class="headerlink" href="#domain-layer" title="Permanent link">&para;</a></h2>
-<h3 id="models">Models<a class="headerlink" href="#models" title="Permanent link">&para;</a></h3>
-<h4 id="budget">Budget<a class="headerlink" href="#budget" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Budget</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">category</span><span class="p">;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">monthlyLimit</span><span class="p">;</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
+<h1 id="contributing-guidelines">Contributing Guidelines<a class="headerlink" href="#contributing-guidelines" title="Permanent link">&para;</a></h1>
+<p>Thank you for your interest in contributing to TrueCash! This document provides guidelines for contributing to the project.</p>
+<h2 id="code-of-conduct">Code of Conduct<a class="headerlink" href="#code-of-conduct" title="Permanent link">&para;</a></h2>
+<p>Please read and follow our <a href="code-of-conduct.html">Code of Conduct</a>.</p>
+<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Fork the repository</strong> on GitHub</li>
+<li><strong>Clone your fork</strong> locally:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YOUR_USERNAME/truecash.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>truecash
+</code></pre></div></li>
+<li><strong>Install dependencies</strong>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>flutter<span class="w"> </span>pub<span class="w"> </span>get
+</code></pre></div></li>
+<li><strong>Create a branch</strong> for your feature:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/my-new-feature
+</code></pre></div></li>
+</ol>
+<h2 id="development-workflow">Development Workflow<a class="headerlink" href="#development-workflow" title="Permanent link">&para;</a></h2>
+<h3 id="1-make-your-changes">1. Make Your Changes<a class="headerlink" href="#1-make-your-changes" title="Permanent link">&para;</a></h3>
+<p>Follow the <a href="../development/adding-features.html">Adding Features</a> guide for implementing new features.</p>
+<h3 id="2-write-tests">2. Write Tests<a class="headerlink" href="#2-write-tests" title="Permanent link">&para;</a></h3>
+<p>All new code must include tests:
+- Unit tests for use cases and business logic
+- Widget tests for UI components
+- Integration tests for user flows (if applicable)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>flutter<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
-<h4 id="transaction">Transaction<a class="headerlink" href="#transaction" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Transaction</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">category</span><span class="p">;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="n">date</span><span class="p">;</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">note</span><span class="p">;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">tags</span><span class="p">;</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+<h3 id="3-run-code-quality-checks">3. Run Code Quality Checks<a class="headerlink" href="#3-run-code-quality-checks" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Format code</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dart<span class="w"> </span>format<span class="w"> </span>.
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Analyze code</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>flutter<span class="w"> </span>analyze
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Run tests</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>flutter<span class="w"> </span><span class="nb">test</span>
 </code></pre></div>
-<h4 id="savinggoal">SavingGoal<a class="headerlink" href="#savinggoal" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SavingGoal</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">targetAmount</span><span class="p">;</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">currentAmount</span><span class="p">;</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
+<p>All checks must pass before submitting a PR.</p>
+<h3 id="4-commit-your-changes">4. Commit Your Changes<a class="headerlink" href="#4-commit-your-changes" title="Permanent link">&para;</a></h3>
+<p>Use conventional commit messages:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>feat: add recurring transactions feature
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>fix: resolve budget calculation error
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>docs: update architecture documentation
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>test: add tests for dashboard provider
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>refactor: simplify analysis screen logic
 </code></pre></div>
-<h3 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h3>
-<p>See individual use case files in <code>lib/domain/usecases/</code> for detailed API documentation.</p>
-<h3 id="repository-interfaces">Repository Interfaces<a class="headerlink" href="#repository-interfaces" title="Permanent link">&para;</a></h3>
-<p>See <code>lib/domain/repositories/i_financial_repository.dart</code> for the complete repository interface.</p>
-<h2 id="presentation-layer">Presentation Layer<a class="headerlink" href="#presentation-layer" title="Permanent link">&para;</a></h2>
-<h3 id="providers">Providers<a class="headerlink" href="#providers" title="Permanent link">&para;</a></h3>
-<p>See individual provider files in <code>lib/presentation/providers/</code> for provider documentation.</p>
-<h2 id="data-layer">Data Layer<a class="headerlink" href="#data-layer" title="Permanent link">&para;</a></h2>
-<h3 id="database-schema">Database Schema<a class="headerlink" href="#database-schema" title="Permanent link">&para;</a></h3>
-<p>See <a href="../database/schema.html">Database Schema</a> for complete schema documentation.</p>
-<hr />
-<p><strong>Note</strong>: This is a placeholder. Complete API reference documentation will be generated automatically in the future using tools like <code>dartdoc</code>.</p>
+<h3 id="5-push-and-create-pull-request">5. Push and Create Pull Request<a class="headerlink" href="#5-push-and-create-pull-request" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>feature/my-new-feature
+</code></pre></div>
+<p>Then create a pull request on GitHub.</p>
+<h2 id="pull-request-guidelines">Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permanent link">&para;</a></h2>
+<h3 id="pr-title">PR Title<a class="headerlink" href="#pr-title" title="Permanent link">&para;</a></h3>
+<p>Use conventional commit format:
+- <code>feat: description</code> - New feature
+- <code>fix: description</code> - Bug fix
+- <code>docs: description</code> - Documentation
+- <code>test: description</code> - Tests
+- <code>refactor: description</code> - Code refactoring
+- <code>chore: description</code> - Maintenance</p>
+<h3 id="pr-description">PR Description<a class="headerlink" href="#pr-description" title="Permanent link">&para;</a></h3>
+<p>Include:
+1. <strong>What</strong>: What does this PR do?
+2. <strong>Why</strong>: Why is this change needed?
+3. <strong>How</strong>: How does it work?
+4. <strong>Testing</strong>: How was it tested?
+5. <strong>Screenshots</strong>: For UI changes</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="gu">## What</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Adds recurring transactions feature
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="gu">## Why</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Users requested ability to track recurring expenses like subscriptions
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="gu">## How</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">-</span><span class="w"> </span>Added RecurringTransaction entity
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">-</span><span class="w"> </span>Implemented CRUD operations in repository
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">-</span><span class="w"> </span>Created use cases and providers
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">-</span><span class="w"> </span>Built UI screen
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="gu">## Testing</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">-</span><span class="w"> </span>Added unit tests for use cases
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="k">-</span><span class="w"> </span>Added widget tests for UI
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="k">-</span><span class="w"> </span>Manually tested on Android and Linux
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="gu">## Screenshots</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>[Screenshot of recurring transactions screen]
+</code></pre></div></p>
+<h3 id="pr-checklist">PR Checklist<a class="headerlink" href="#pr-checklist" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Code follows Clean Architecture principles</li>
+<li>[ ] All tests passing</li>
+<li>[ ] No analyzer warnings</li>
+<li>[ ] Code formatted with <code>dart format</code></li>
+<li>[ ] Documentation updated</li>
+<li>[ ] Commit messages follow conventions</li>
+<li>[ ] PR description is complete</li>
+</ul>
+<h2 id="code-style">Code Style<a class="headerlink" href="#code-style" title="Permanent link">&para;</a></h2>
+<h3 id="dartflutter-conventions">Dart/Flutter Conventions<a class="headerlink" href="#dartflutter-conventions" title="Permanent link">&para;</a></h3>
+<p>Follow the <a href="https://dart.dev/guides/language/effective-dart">Effective Dart</a> guidelines:</p>
+<ul>
+<li>Use <code>lowerCamelCase</code> for variables and methods</li>
+<li>Use <code>UpperCamelCase</code> for classes and types</li>
+<li>Use <code>lowercase_with_underscores</code> for file names</li>
+<li>Prefer <code>const</code> constructors when possible</li>
+<li>Use trailing commas for better formatting</li>
+</ul>
+<h3 id="project-conventions">Project Conventions<a class="headerlink" href="#project-conventions" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>Absolute Imports</strong>: Always use package imports
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// ✅ DO</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">&#39;package:truecash/domain/models/models.dart&#39;</span><span class="p">;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1">// ❌ DON&#39;T</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">&#39;../../domain/models/models.dart&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>File Organization</strong>: Follow the layer structure
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lib/
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>├── core/
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>├── data/
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>├── domain/
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>└── presentation/
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Naming</strong>: Use descriptive names
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// ✅ DO</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">final</span><span class="w"> </span><span class="n">getDashboardDataUseCase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1">// ❌ DON&#39;T</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kd">final</span><span class="w"> </span><span class="n">useCase1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+</code></pre></div></p>
+</li>
+</ol>
+<h2 id="testing-guidelines">Testing Guidelines<a class="headerlink" href="#testing-guidelines" title="Permanent link">&para;</a></h2>
+<h3 id="unit-tests">Unit Tests<a class="headerlink" href="#unit-tests" title="Permanent link">&para;</a></h3>
+<p>Test business logic in isolation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">test</span><span class="p">(</span><span class="s1">&#39;GetBudgetsUseCase returns budgets&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="c1">// Arrange</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">mockRepo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MockFinancialRepository</span><span class="p">();</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">useCase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetBudgetsUseCase</span><span class="p">(</span><span class="n">mockRepo</span><span class="p">);</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">when</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">mockRepo</span><span class="p">.</span><span class="n">getBudgets</span><span class="p">())</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">      </span><span class="p">.</span><span class="n">thenAnswer</span><span class="p">((</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">[</span><span class="n">Budget</span><span class="p">(...)]);</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="c1">// Act</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">useCase</span><span class="p">(</span><span class="n">NoParams</span><span class="p">());</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="c1">// Assert</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">isSuccess</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="n">verify</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">mockRepo</span><span class="p">.</span><span class="n">getBudgets</span><span class="p">()).</span><span class="n">called</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="p">});</span>
+</code></pre></div>
+<h3 id="widget-tests">Widget Tests<a class="headerlink" href="#widget-tests" title="Permanent link">&para;</a></h3>
+<p>Test UI components:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">testWidgets</span><span class="p">(</span><span class="s1">&#39;Dashboard renders correctly&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">tester</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpWidget</span><span class="p">(</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">ProviderScope</span><span class="p">(</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nl">overrides:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">        </span><span class="n">financialRepositoryProvider</span><span class="p">.</span><span class="n">overrideWithValue</span><span class="p">(</span><span class="n">mockRepo</span><span class="p">),</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">      </span><span class="p">],</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">      </span><span class="nl">child:</span><span class="w"> </span><span class="n">MaterialApp</span><span class="p">(</span><span class="nl">home:</span><span class="w"> </span><span class="n">Dashboard</span><span class="p">()),</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="p">),</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span><span class="p">);</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpAndSettle</span><span class="p">();</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">byType</span><span class="p">(</span><span class="n">Dashboard</span><span class="p">),</span><span class="w"> </span><span class="n">findsOneWidget</span><span class="p">);</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="p">});</span>
+</code></pre></div>
+<h3 id="integration-tests">Integration Tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
+<p>Test complete user flows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">testWidgets</span><span class="p">(</span><span class="s1">&#39;User can add a budget&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">tester</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpWidget</span><span class="p">(</span><span class="n">ProviderScope</span><span class="p">(</span><span class="nl">child:</span><span class="w"> </span><span class="n">TrueCashApp</span><span class="p">()));</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="c1">// Navigate to budgets</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">tap</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Budgets&#39;</span><span class="p">));</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpAndSettle</span><span class="p">();</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="c1">// Add budget</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">tap</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">byIcon</span><span class="p">(</span><span class="n">Icons</span><span class="p">.</span><span class="n">add</span><span class="p">));</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpAndSettle</span><span class="p">();</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">  </span><span class="c1">// Fill form</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">enterText</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">byType</span><span class="p">(</span><span class="n">TextField</span><span class="p">).</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Groceries&#39;</span><span class="p">);</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">enterText</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">byType</span><span class="p">(</span><span class="n">TextField</span><span class="p">).</span><span class="n">last</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;500&#39;</span><span class="p">);</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="w">  </span><span class="c1">// Save</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">tap</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Save&#39;</span><span class="p">));</span>
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">tester</span><span class="p">.</span><span class="n">pumpAndSettle</span><span class="p">();</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="w">  </span><span class="c1">// Verify</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">find</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;Groceries&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">findsOneWidget</span><span class="p">);</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="p">});</span>
+</code></pre></div>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<h3 id="code-documentation">Code Documentation<a class="headerlink" href="#code-documentation" title="Permanent link">&para;</a></h3>
+<p>Document public APIs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">/// Retrieves all budgets for the current month.</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1">///</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1">/// Returns a [Result] containing a list of [Budget] objects on success,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">/// or a [Failure] if an error occurs.</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Budget</span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">getBudgets</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="architecture-documentation">Architecture Documentation<a class="headerlink" href="#architecture-documentation" title="Permanent link">&para;</a></h3>
+<p>Update <code>docs/</code> when adding significant features:</p>
+<ul>
+<li>Update architecture diagrams if structure changes</li>
+<li>Add new pages for major features</li>
+<li>Update API reference</li>
+</ul>
+<h2 id="review-process">Review Process<a class="headerlink" href="#review-process" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Automated Checks</strong>: CI runs tests and analysis</li>
+<li><strong>Code Review</strong>: Maintainer reviews code</li>
+<li><strong>Feedback</strong>: Address review comments</li>
+<li><strong>Approval</strong>: Once approved, PR is merged</li>
+</ol>
+<h2 id="questions">Questions?<a class="headerlink" href="#questions" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Check the <a href="../architecture/overview.html">Architecture Documentation</a></li>
+<li>Read the <a href="../development/adding-features.html">Adding Features Guide</a></li>
+<li>Open a <a href="https://github.com/satyakommula96/truecash/discussions">GitHub Discussion</a></li>
+<li>Create an <a href="https://github.com/satyakommula96/truecash/issues">Issue</a></li>
+</ul>
+<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
+<p>By contributing, you agree that your contributions will be licensed under the same license as the project.</p>
+<p>Thank you for contributing to TrueCash! 🎉</p>
 
 
 
