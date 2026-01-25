@@ -60,6 +60,9 @@ class CategoryIcon extends StatelessWidget {
         l.contains('mutual')) {
       return Icons.trending_up;
     }
+    if (type == 'Subscription') {
+      return Icons.subscriptions;
+    }
     return type == 'Fixed' ? Icons.calendar_today : Icons.category;
   }
 
@@ -79,6 +82,44 @@ class CategoryIcon extends StatelessWidget {
   Color _getIconColor() {
     if (type == 'Income') return semantic.income;
     if (type == 'Investment') return semantic.warning;
+
+    final l = label.toLowerCase();
+    if (l.contains('food') ||
+        l.contains('grocer') ||
+        l.contains('restaurant')) {
+      return Colors.orange;
+    }
+    if (l.contains('travel') ||
+        l.contains('transport') ||
+        l.contains('fuel') ||
+        l.contains('gas')) {
+      return Colors.blue;
+    }
+    if (l.contains('shop') || l.contains('clothes')) {
+      return Colors.purple;
+    }
+    if (l.contains('bill') || l.contains('utilit')) {
+      return Colors.red;
+    }
+    if (l.contains('entert') || l.contains('movie')) {
+      return Colors.indigo;
+    }
+    if (l.contains('health') || l.contains('doctor') || l.contains('medic')) {
+      return Colors.teal;
+    }
+    if (l.contains('educ') || l.contains('school') || l.contains('fee')) {
+      return Colors.cyan;
+    }
+    if (l.contains('rent') || l.contains('home')) {
+      return Colors.brown;
+    }
+    if (l.contains('salary') || l.contains('wage')) {
+      return semantic.income;
+    }
+
+    if (type == 'Subscription') return Colors.pink;
+    if (type == 'Fixed') return Colors.blueGrey;
+
     return semantic.secondaryText;
   }
 }
