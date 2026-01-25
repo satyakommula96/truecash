@@ -3,11 +3,12 @@ name: TrueCash CI/CD
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
     paths-ignore:
       - 'docs/**'
       - '**.md'
       - '.gitignore'
+  push:
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
     paths-ignore:
