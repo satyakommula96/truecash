@@ -62,7 +62,7 @@ class DashboardHeader extends ConsumerWidget {
                 Tooltip(
                   message: ref.watch(privacyProvider)
                       ? "Show amounts"
-                      : "Tap 👁 to hide amounts",
+                      : "Tap to hide amounts",
                   child: IconButton(
                     icon: Icon(
                       ref.watch(privacyProvider)
