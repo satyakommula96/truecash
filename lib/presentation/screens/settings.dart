@@ -12,6 +12,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:truecash/core/utils/web_saver.dart';
 
 import 'package:truecash/data/datasources/database.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:truecash/core/config/version.dart';
 import 'package:truecash/main.dart';
@@ -180,9 +181,9 @@ class SettingsScreen extends ConsumerWidget {
       if (option == 'standard') {
         await repo.seedData();
       } else if (option == 'positive') {
-        await repo.seedPositiveData();
+        await repo.seedHealthyProfile();
       } else if (option == 'negative') {
-        await repo.seedNegativeData();
+        await repo.seedAtRiskProfile();
       }
 
       // Refresh providers
@@ -506,8 +507,8 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _setupPin(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    final currentPin = prefs.getString('app_pin');
+    const storage = FlutterSecureStorage();
+    final currentPin = await storage.read(key: 'app_pin');
 
     if (!context.mounted) return;
 
@@ -529,9 +530,11 @@ class SettingsScreen extends ConsumerWidget {
                         // Verify PIN first
                         bool verified = await _verifyPin(context, currentPin);
                         if (verified && context.mounted) {
-                          final key = prefs.getString('recovery_key') ??
+                          final key = await storage.read(key: 'recovery_key') ??
                               "No key found (Legacy)";
-                          _showRecoveryKeyDialog(context, key);
+                          if (context.mounted) {
+                            _showRecoveryKeyDialog(context, key);
+                          }
                         }
                       },
                       child: const Text("VIEW RECOVERY KEY",
@@ -557,8 +560,8 @@ class SettingsScreen extends ConsumerWidget {
                                     ]));
 
                         if (confirm == true) {
-                          await prefs.remove('app_pin');
-                          await prefs.remove('recovery_key');
+                          await storage.delete(key: 'app_pin');
+                          await storage.delete(key: 'recovery_key');
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text("PIN Removed")));
@@ -615,8 +618,8 @@ class SettingsScreen extends ConsumerWidget {
                           final key = _generateRecoveryKey();
 
                           // 2. Save Both
-                          await prefs.setString('app_pin', newPin);
-                          await prefs.setString('recovery_key', key);
+                          await storage.write(key: 'app_pin', value: newPin);
+                          await storage.write(key: 'recovery_key', value: key);
 
                           // 3. Close PIN dialog
                           if (ctx.mounted) Navigator.pop(ctx);

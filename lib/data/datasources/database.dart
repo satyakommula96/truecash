@@ -431,7 +431,7 @@ class AppDatabase {
     debugPrint("Seeded 2 years of financial data successfully.");
   }
 
-  static Future<void> seedPositiveData() async {
+  static Future<void> seedHealthyProfile() async {
     await clearData();
     final database = await db;
     final now = DateTime.now();
@@ -494,7 +494,7 @@ class AppDatabase {
     await batch.commit(noResult: true);
   }
 
-  static Future<void> seedNegativeData() async {
+  static Future<void> seedAtRiskProfile() async {
     await clearData();
     final database = await db;
     final now = DateTime.now();

@@ -14,10 +14,10 @@ class StartupScreen extends ConsumerWidget {
     final bootState = ref.watch(bootProvider);
 
     return bootState.when(
-      data: (_) {
+      data: (pin) {
         final prefs = ref.watch(sharedPreferencesProvider);
         final bool seen = prefs.getBool('intro_seen') ?? false;
-        final String? pin = prefs.getString('app_pin');
+        // pin is already loaded from secure storage via provider
 
         if (!seen) {
           return const IntroScreen();
