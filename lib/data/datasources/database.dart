@@ -103,8 +103,7 @@ class AppDatabase {
     }
   }
 
-  static Future<common.Database> _handleDatabaseReset(
-      String path, String key,
+  static Future<common.Database> _handleDatabaseReset(String path, String key,
       {required bool isDesktop}) async {
     try {
       final file = File(path);
