@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -51,8 +51,10 @@ jobs:
         run: flutter test
 
   # Slow Integration Tests
-  slow_tests:
-    name: Slow Test ${{ matrix.target }}
+  # Cross-Platform Integration Tests
+  integration_tests:
+    name: Integration Test (${{ matrix.target }})
+    needs: test
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -61,7 +63,7 @@ jobs:
         target: [android, ios, linux, macos, windows]
         include:
           - target: android
-            os: ubuntu-latest # KVM is reliable on Ubuntu runners
+            os: ubuntu-latest
           - target: ios
             os: macos-latest
           - target: linux
@@ -70,79 +72,44 @@ jobs:
             os: macos-latest
           - target: windows
             os: windows-latest
-    
     steps:
       - uses: actions/checkout@v4
-      
-      # Setup Java (all needs this for toolchains)
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
-
-      # Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
+      - run: flutter pub get
       
-      - name: Install Dependencies
-        run: flutter pub get
-      
-      # Linux specifics
+      # Linux Dependencies
       - name: Install Linux Dependencies
         if: matrix.target == 'linux'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libsecret-1-dev libjsoncpp-dev libsqlite3-dev xvfb
 
-      # Desktop Tests (Linux)
+      # Linux Test
       - name: Run Linux Integration Test
         if: matrix.target == 'linux'
-        run: |
-          flutter clean
-          flutter pub get
-          xvfb-run flutter test integration_test/app_test.dart -d linux -v
+        run: xvfb-run flutter test integration_test/app_test.dart -d linux -v
 
-      # Desktop Tests (macOS)
-      - name: Run macOS Integration Test
-        if: matrix.target == 'macos'
-        run: |
-          flutter clean
-          flutter pub get
-          flutter test integration_test/app_test.dart -d macos -v
-
-      # Desktop Tests (Windows)
-      - name: Run Windows Integration Test
-        if: matrix.target == 'windows'
-        run: |
-          flutter clean
-          flutter pub get
-          flutter test integration_test/app_test.dart -d windows -v
-
-      # Mobile Tests (iOS)
+      # iOS Test
       - name: Run iOS Integration Test
         if: matrix.target == 'ios'
         run: |
-          # Boot simulator checks
-          echo "Finding available simulator..."
-          # Find any available iPhone (preferring newer ones)
-          UDID=$(xcrun simctl list devices available -j | jq -r '.devices | to_entries | map(.value) | flatten | map(select(.isAvailable == true and (.name | test("iPhone")))) | sort_by(.name) | reverse | .[0].udid')
-          
-          if [ -z "$UDID" ] || [ "$UDID" == "null" ]; then
-             echo "No device found, creating one..."
-             xcrun simctl create "FlutterTester" "iPhone 15"
-             UDID=$(xcrun simctl list devices available | grep "FlutterTester" | awk -F '[()]' '{print $2}' | head -n 1)
-          fi
-          
-          echo "Using Simulator UDID: $UDID"
-          xcrun simctl boot $UDID || true
-          
-          flutter clean
-          flutter pub get
-          flutter test integration_test/app_test.dart -d $UDID -v
+           echo "Finding available simulator..."
+           UDID=$(xcrun simctl list devices available -j | jq -r '.devices | to_entries | map(.value) | flatten | map(select(.isAvailable == true and (.name | test("iPhone")))) | sort_by(.name) | reverse | .[0].udid')
+           if [ -z "$UDID" ] || [ "$UDID" == "null" ]; then
+              xcrun simctl create "FlutterTester" "iPhone 15"
+              UDID=$(xcrun simctl list devices available | grep "FlutterTester" | awk -F '[()]' '{print $2}' | head -n 1)
+           fi
+           xcrun simctl boot $UDID || true
+           flutter test integration_test/app_test.dart -d $UDID -v
 
-      # Mobile Tests (Android)
+      # Android Test
       - name: Run Android Integration Test
         if: matrix.target == 'android'
         uses: reactivecircus/android-emulator-runner@v2
@@ -153,10 +120,20 @@ jobs:
           profile: Nexus 6
           script: flutter test integration_test/app_test.dart
 
+      # macOS Test
+      - name: Run macOS Integration Test
+        if: matrix.target == 'macos'
+        run: flutter test integration_test/app_test.dart -d macos -v
+
+      # Windows Test
+      - name: Run Windows Integration Test
+        if: matrix.target == 'windows'
+        run: flutter test integration_test/app_test.dart -d windows -v
+
   # Build Android APK
   build_android:
     name: Build Android APK
-    needs: [test, slow_tests]
+    needs: [test, integration_tests]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -183,7 +160,7 @@ jobs:
   # Build iOS IPA
   build_ios:
     name: Build iOS IPA (No-Sign)
-    needs: [test, slow_tests]
+    needs: [test, integration_tests]
     runs-on: macos-latest
     timeout-minutes: 30
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -210,7 +187,7 @@ jobs:
   # Build Linux
   build_linux:
     name: Build Linux
-    needs: [test, slow_tests]
+    needs: [test, integration_tests]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -238,7 +215,7 @@ jobs:
   # Build macOS
   build_macos:
     name: Build macOS
-    needs: [test, slow_tests]
+    needs: [test, integration_tests]
     runs-on: macos-latest
     timeout-minutes: 30
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -263,7 +240,7 @@ jobs:
   # Build Windows
   build_windows:
     name: Build Windows Installer
-    needs: [test, slow_tests]
+    needs: [test, integration_tests]
     runs-on: windows-latest
     timeout-minutes: 30
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
