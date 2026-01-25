@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:truecash/core/utils/web_saver.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:truecash/data/datasources/database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -146,7 +147,17 @@ class SettingsScreen extends ConsumerWidget {
     final option = await showDialog<String>(
         context: context,
         builder: (context) => SimpleDialog(
-              title: const Text("Select Data Scenario"),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Select Data Scenario"),
+                  const SizedBox(height: 4),
+                  Text(
+                    "This is sample data for demonstration purposes only.",
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
               children: [
                 SimpleDialogOption(
                   onPressed: () => Navigator.pop(context, 'standard'),
@@ -435,7 +446,7 @@ class SettingsScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                      "SAVE THIS KEY SECURELY.\n\nIf you forget your PIN, this is the ONLY way to recover your data without resetting."),
+                      "SAVE THIS KEY SECURELY.\n\nIf you forget your PIN, this is the ONLY way to recover your data without resetting.\n\nIf you lose this key, your data cannot be recovered."),
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: () {
@@ -725,19 +736,32 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 48), // ... rest of build
 
-          const Center(
+          Center(
             child: Column(
               children: [
-                Text("TRUECASH",
+                const Text("TRUECASH",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2,
                         color: Colors.grey)),
-                Text("Version ${AppVersion.current}",
+                const Text("Version ${AppVersion.current}",
                     style: TextStyle(fontSize: 10, color: Colors.grey)),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () =>
+                      launchUrl(Uri.parse("https://truecash.app/privacy")),
+                  child: const Text(
+                    "Privacy Policy",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
