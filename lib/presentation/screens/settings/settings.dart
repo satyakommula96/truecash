@@ -297,7 +297,7 @@ class SettingsScreen extends ConsumerWidget {
                   const Text("Select Data Scenario"),
                   const SizedBox(height: 4),
                   Text(
-                    "This is sample data for demonstration purposes only.",
+                    "This data is fictional and for demonstration only.",
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
@@ -898,9 +898,15 @@ class SettingsScreen extends ConsumerWidget {
                 const Text("Version ${AppVersion.current}",
                     style: TextStyle(fontSize: 10, color: Colors.grey)),
                 const SizedBox(height: 12),
+                const Text(
+                  "TrueCash stores all data locally on your device.\nNo data is transmitted or stored on external servers.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
                 InkWell(
-                  onTap: () =>
-                      launchUrl(Uri.parse("https://truecash.app/privacy")),
+                  onTap: () => launchUrl(Uri.parse(
+                      "https://satyakommula.github.io/truecash/privacy")),
                   child: const Text(
                     "Privacy Policy",
                     style: TextStyle(

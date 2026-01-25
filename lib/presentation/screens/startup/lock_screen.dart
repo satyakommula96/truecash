@@ -154,7 +154,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                        "Enter the 12-character key you saved when setting up your PIN."),
+                        "Enter the 14-character key you saved when setting up your PIN."),
                     const SizedBox(height: 16),
                     TextField(
                       textCapitalization: TextCapitalization.characters,

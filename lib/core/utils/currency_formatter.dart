@@ -38,6 +38,7 @@ class CurrencyFormatter {
 
   static String format(num value,
       {bool compact = true, bool isPrivate = false}) {
+    // Safety check: ensure privacy is respected
     if (isPrivate) return '****';
 
     final sym = symbol;
