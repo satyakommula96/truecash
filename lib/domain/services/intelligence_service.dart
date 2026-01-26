@@ -1,4 +1,4 @@
-import 'package:truecash/domain/models/models.dart';
+import 'package:trueledger/domain/models/models.dart';
 
 class AIInsight {
   final String title;

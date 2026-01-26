@@ -1,17 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/main.dart';
+import 'package:trueledger/main.dart';
 
-import 'package:truecash/presentation/providers/usecase_providers.dart';
-import 'package:truecash/domain/usecases/startup_usecase.dart';
-import 'package:truecash/core/utils/result.dart';
+import 'package:trueledger/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/domain/usecases/startup_usecase.dart';
+import 'package:trueledger/core/utils/result.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:truecash/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'package:truecash/presentation/providers/boot_provider.dart';
+import 'package:trueledger/presentation/providers/boot_provider.dart';
 
 class MockStartupUseCase extends Mock implements StartupUseCase {}
 
@@ -37,7 +37,7 @@ void main() {
           startupUseCaseProvider.overrideWithValue(mockStartup),
           bootProvider.overrideWith((ref) => Future.value(null)), // No PIN
         ],
-        child: const TrueCashApp(),
+        child: const TrueLedgerApp(),
       ),
     );
 

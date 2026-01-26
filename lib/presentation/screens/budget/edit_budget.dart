@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/usecase_providers.dart';
-import 'package:truecash/domain/usecases/budget_usecases.dart';
+import 'package:trueledger/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/domain/usecases/budget_usecases.dart';
 
 class EditBudgetScreen extends ConsumerStatefulWidget {
   final Budget budget;

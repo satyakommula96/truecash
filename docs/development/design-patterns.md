@@ -1,6 +1,6 @@
 # Design Patterns
 
-TrueCash leverages several design patterns to maintain clean, testable, and maintainable code.
+TrueLedger leverages several design patterns to maintain clean, testable, and maintainable code.
 
 ## Repository Pattern
 
@@ -244,7 +244,7 @@ class BudgetsScreen extends ConsumerWidget {
 
 ## Summary
 
-TrueCash uses these patterns to achieve:
+TrueLedger uses these patterns to achieve:
 
 - **Clean Architecture**: Repository, Use Case, Result patterns
 - **Dependency Injection**: Provider pattern

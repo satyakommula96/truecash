@@ -1,10 +1,10 @@
 # Quick Start Guide
 
-Get started with TrueCash in 5 minutes!
+Get started with TrueLedger in 5 minutes!
 
 ## First Launch
 
-When you first launch TrueCash, you'll see the **Intro Screen** with a brief overview of the app's features.
+When you first launch TrueLedger, you'll see the **Intro Screen** with a brief overview of the app's features.
 
 1. **Swipe through** the intro slides or tap **SKIP** to go directly to the dashboard
 2. **Grant notification permissions** (optional) to receive reminders for bills and budgets
@@ -151,5 +151,5 @@ The dashboard displays **Smart Insights** powered by AI:
 ## Need Help?
 
 - Check the [Troubleshooting Guide](installation.md#troubleshooting)
-- Visit [GitHub Issues](https://github.com/satyakommula96/truecash/issues)
+- Visit [GitHub Issues](https://github.com/satyakommula96/trueledger/issues)
 - Read the [Architecture Documentation](../architecture/overview.md)

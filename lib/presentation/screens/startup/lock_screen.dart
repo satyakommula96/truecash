@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
-import 'package:truecash/presentation/providers/dashboard_provider.dart';
-import 'package:truecash/presentation/providers/analysis_provider.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/analysis_provider.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
   final int? expectedPinLength;

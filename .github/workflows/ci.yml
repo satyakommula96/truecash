@@ -1,4 +1,4 @@
-name: TrueCash CI/CD
+name: TrueLedger CI/CD
 
 on:
   push:

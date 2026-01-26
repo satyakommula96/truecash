@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
-import 'package:truecash/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
+import 'package:trueledger/presentation/providers/usecase_providers.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

@@ -31,21 +31,16 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Update Script Version
-        run: |
-          sed -i "s/VERSION=\"[0-9.]*\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_deb.sh
-          cat scripts/create_deb.sh | grep VERSION
-
       - name: Build and Package
         run: |
           chmod +x scripts/create_deb.sh
-          ./scripts/create_deb.sh
+          VERSION=${{ steps.version.outputs.VERSION }} ./scripts/create_deb.sh
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueCash-Linux-deb
-          path: TrueCash.deb
+          name: TrueLedger-Linux-deb
+          path: TrueLedger.deb
 
   build-android:
     name: Build Android (APK)
@@ -72,7 +67,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueCash-Android-apk
+          name: TrueLedger-Android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
   build-windows:
@@ -97,23 +92,15 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Update Script Version
-        shell: bash
-        run: |
-          sed -i "s/AppVersion=[0-9.]*/AppVersion=${{ steps.version.outputs.VERSION }}/" scripts/windows_setup.iss
-
-      - name: Build Flutter App
-        run: flutter build windows --release
-
       - name: Package with Inno Setup
         run: |
-          iscc scripts/windows_setup.iss
+          iscc /DAppVersion=${{ steps.version.outputs.VERSION }} scripts/windows_setup.iss
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueCash-Windows-exe
-          path: build/windows/x64/installer/TrueCash.exe
+          name: TrueLedger-Windows-exe
+          path: build/windows/x64/installer/TrueLedger.exe
 
   build-macos:
     name: Build macOS (DMG)
@@ -136,20 +123,16 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Update Script Version
-        run: |
-          sed -i '' "s/VERSION=\"[0-9.]*\"/VERSION=\"${{ steps.version.outputs.VERSION }}\"/" scripts/create_dmg.sh
-
       - name: Build and Package
         run: |
           chmod +x scripts/create_dmg.sh
-          ./scripts/create_dmg.sh
+          VERSION=${{ steps.version.outputs.VERSION }} ./scripts/create_dmg.sh
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueCash-macOS-dmg
-          path: TrueCash.dmg
+          name: TrueLedger-macOS-dmg
+          path: TrueLedger.dmg
 
   release:
     name: Create Release
@@ -164,33 +147,33 @@ jobs:
       - name: Download Linux Artifact
         uses: actions/download-artifact@v4
         with:
-          name: TrueCash-Linux-deb
+          name: TrueLedger-Linux-deb
 
       - name: Download Android Artifact
         uses: actions/download-artifact@v4
         with:
-          name: TrueCash-Android-apk
+          name: TrueLedger-Android-apk
 
       - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
-          name: TrueCash-Windows-exe
+          name: TrueLedger-Windows-exe
 
       - name: Download macOS Artifact
         uses: actions/download-artifact@v4
         with:
-          name: TrueCash-macOS-dmg
+          name: TrueLedger-macOS-dmg
 
       - name: Rename APK
-        run: mv app-release.apk TrueCash.apk
+        run: mv app-release.apk TrueLedger.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            TrueCash.deb
-            TrueCash.apk
-            TrueCash.exe
-            TrueCash.dmg
+            TrueLedger.deb
+            TrueLedger.apk
+            TrueLedger.exe
+            TrueLedger.dmg
           generate_release_notes: true

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/presentation/screens/loans/loans.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/screens/loans/loans.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 class BorrowingSummary extends StatelessWidget {
   final MonthlySummary summary;

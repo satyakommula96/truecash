@@ -1,6 +1,6 @@
 {
-    "name": "TrueCash",
-    "short_name": "TrueCash",
+    "name": "TrueLedger",
+    "short_name": "TrueLedger",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

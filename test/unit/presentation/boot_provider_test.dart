@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/core/error/failure.dart';
-import 'package:truecash/core/utils/result.dart';
-import 'package:truecash/domain/usecases/startup_usecase.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
-import 'package:truecash/presentation/providers/boot_provider.dart';
-import 'package:truecash/presentation/providers/usecase_providers.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/core/error/failure.dart';
+import 'package:trueledger/core/utils/result.dart';
+import 'package:trueledger/domain/usecases/startup_usecase.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
+import 'package:trueledger/presentation/providers/boot_provider.dart';
+import 'package:trueledger/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockRepo extends Mock implements IFinancialRepository {}

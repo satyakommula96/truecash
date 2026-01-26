@@ -1,9 +1,9 @@
-# TrueCash
+# TrueLedger
 
 A privacy-first personal finance tracker with AI-powered insights.
 
-[![CI](https://github.com/satyakommula96/truecash/actions/workflows/ci.yml/badge.svg)](https://github.com/satyakommula96/truecash/actions/workflows/ci.yml)
-[![Documentation](https://github.com/satyakommula96/truecash/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/satyakommula96/truecash/actions/workflows/deploy-docs.yml)
+[![CI](https://github.com/satyakommula96/trueledger/actions/workflows/ci.yml/badge.svg)](https://github.com/satyakommula96/trueledger/actions/workflows/ci.yml)
+[![Documentation](https://github.com/satyakommula96/trueledger/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/satyakommula96/trueledger/actions/workflows/deploy-docs.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## 🌟 Features
@@ -17,7 +17,7 @@ A privacy-first personal finance tracker with AI-powered insights.
 
 ## 📖 Documentation
 
-**📚 [View Live Documentation](https://satyakommula96.github.io/truecash/)** | **📂 [Browse docs/ folder](docs/)**
+**📚 [View Live Documentation](https://satyakommula96.github.io/trueledger/)** | **📂 [Browse docs/ folder](docs/)**
 
 ### Start Here
 
@@ -64,8 +64,8 @@ mkdocs serve
 
 ```bash
 # Clone the repository
-git clone https://github.com/satyakommula96/truecash.git
-cd truecash
+git clone https://github.com/satyakommula96/trueledger.git
+cd trueledger
 
 # Install dependencies
 flutter pub get
@@ -99,7 +99,7 @@ brew install sqlcipher
 
 ## 🏗️ Architecture
 
-TrueCash follows **Clean Architecture** principles with four distinct layers:
+TrueLedger follows **Clean Architecture** principles with four distinct layers:
 
 ```
 ┌─────────────────────────────────────┐
@@ -169,7 +169,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 - GitHub: [@satyakommula96](https://github.com/satyakommula96)
-- Issues: [GitHub Issues](https://github.com/satyakommula96/truecash/issues)
+- Issues: [GitHub Issues](https://github.com/satyakommula96/trueledger/issues)
 
 ---
 

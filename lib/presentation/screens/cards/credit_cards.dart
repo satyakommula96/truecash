@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/presentation/screens/cards/add_card.dart';
-import 'package:truecash/presentation/screens/cards/edit_card.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/utils/date_helper.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/screens/cards/add_card.dart';
+import 'package:trueledger/presentation/screens/cards/edit_card.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/utils/date_helper.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 class CreditCardsScreen extends ConsumerStatefulWidget {
   const CreditCardsScreen({super.key});

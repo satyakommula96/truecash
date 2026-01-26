@@ -11,7 +11,7 @@ import 'dart:convert';
 
 import 'schema.dart';
 import 'database_migrations.dart';
-import 'package:truecash/core/config/version.dart';
+import 'package:trueledger/core/config/version.dart';
 
 class AppDatabase {
   static common.Database? _db;

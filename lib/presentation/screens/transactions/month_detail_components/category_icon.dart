@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truecash/core/theme/theme.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
 class CategoryIcon extends StatelessWidget {
   final String type;

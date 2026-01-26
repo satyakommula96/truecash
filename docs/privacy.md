@@ -1,10 +1,10 @@
 # Privacy Policy
 
-TrueCash is designed with a **privacy-first, offline-only** architecture. Your financial data remains entirely on your device and under your control at all times.
+TrueLedger is designed with a **privacy-first, offline-only** architecture. Your financial data remains entirely on your device and under your control at all times.
 
 ## 1. Data Collection and Use
 
-TrueCash **does not collect, transmit, or store any personal or financial data on external servers**.
+TrueLedger **does not collect, transmit, or store any personal or financial data on external servers**.
 
 All data entered into the app is processed and stored locally on your device only.
 
@@ -14,13 +14,13 @@ All data entered into the app is processed and stored locally on your device onl
 * **App Preferences**: Theme selection, currency preference, and UI settings.
 * **Security Data**: Encrypted PIN and recovery key stored using platform-secure storage (Android Keystore / iOS Keychain).
 
-TrueCash does not require user accounts and does not associate data with any identity.
+TrueLedger does not require user accounts and does not associate data with any identity.
 
 ---
 
 ## 2. No Data Sharing or Tracking
 
-TrueCash does **not**:
+TrueLedger does **not**:
 
 * Use analytics or telemetry services
 * Use advertising SDKs
@@ -45,13 +45,13 @@ Encryption keys are managed by the operating system’s secure key storage.
 * Optional biometric authentication uses device APIs only.
 * A recovery key is generated when PIN protection is enabled.
 
-If both the PIN and recovery key are lost, **data cannot be recovered**. TrueCash has no backdoor access.
+If both the PIN and recovery key are lost, **data cannot be recovered**. TrueLedger has no backdoor access.
 
 ---
 
 ## 4. Permissions
 
-TrueCash requests permissions **only when required for user-initiated features**:
+TrueLedger requests permissions **only when required for user-initiated features**:
 
 * **Notifications**: Bill reminders and alerts (optional).
 * **Storage / Files**: Only when exporting or backing up data at the user’s request.
@@ -78,7 +78,7 @@ No data is transmitted externally.
 
 ## 7. Contact and Transparency
 
-TrueCash is an open-source application.
+TrueLedger is an open-source application.
 For privacy-related questions or concerns, issues can be raised via the project’s GitHub repository.
 
 ---

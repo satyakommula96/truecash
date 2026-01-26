@@ -1,6 +1,6 @@
 # Adding New Features
 
-This guide walks you through adding new features to TrueCash following Clean Architecture principles.
+This guide walks you through adding new features to TrueLedger following Clean Architecture principles.
 
 ## Development Workflow
 
@@ -200,10 +200,10 @@ final migrations = [
 **File**: `lib/domain/usecases/recurring_transaction_usecases.dart`
 
 ```dart
-import 'package:truecash/core/utils/result.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
+import 'package:trueledger/core/utils/result.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
 
 // Get all recurring transactions
 class GetRecurringTransactionsUseCase 
@@ -284,10 +284,10 @@ class ToggleRecurringTransactionParams {
 
 ```dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/domain/usecases/recurring_transaction_usecases.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/usecases/recurring_transaction_usecases.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 // Use case providers
 final getRecurringTransactionsUseCaseProvider = 
@@ -327,8 +327,8 @@ final recurringTransactionsProvider =
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/presentation/providers/recurring_providers.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/presentation/providers/recurring_providers.dart';
 
 class RecurringTransactionsScreen extends ConsumerWidget {
   const RecurringTransactionsScreen({Key? key}) : super(key: key);
@@ -437,10 +437,10 @@ class _RecurringTransactionTile extends ConsumerWidget {
 ```dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
-import 'package:truecash/domain/usecases/recurring_transaction_usecases.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/domain/usecases/recurring_transaction_usecases.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
 
 class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
@@ -560,7 +560,7 @@ Future<List<Transaction>> getTransactions() async {
 
 ✅ **DO**: Use package imports
 ```dart
-import 'package:truecash/domain/models/models.dart';
+import 'package:trueledger/domain/models/models.dart';
 ```
 
 ❌ **DON'T**: Use relative imports

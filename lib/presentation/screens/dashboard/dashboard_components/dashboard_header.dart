@@ -3,10 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/privacy_provider.dart';
-import 'package:truecash/core/theme/theme.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
-import 'package:truecash/presentation/screens/settings/settings.dart';
+import 'package:trueledger/presentation/screens/settings/settings.dart';
 
 class DashboardHeader extends ConsumerWidget {
   final bool isDark;
@@ -35,14 +35,14 @@ class DashboardHeader extends ConsumerWidget {
                   width: 44,
                   height: 44,
                   child: SvgPicture.asset(
-                    'assets/icons/logo.svg',
+                    'assets/icon/trueledger_icon.svg',
                   ),
                 ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("TrueCash",
+                    Text("TrueLedger",
                         style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,

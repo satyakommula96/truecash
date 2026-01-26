@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
 
 class PrivacyNotifier extends Notifier<bool> {
   @override

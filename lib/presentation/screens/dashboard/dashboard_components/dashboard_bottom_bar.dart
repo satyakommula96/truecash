@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/presentation/screens/loans/loans.dart';
-import 'package:truecash/presentation/screens/cards/credit_cards.dart';
-import 'package:truecash/presentation/screens/transactions/add_expense.dart';
-import 'package:truecash/presentation/screens/transactions/monthly_history.dart';
-import 'package:truecash/presentation/screens/analysis/analysis_screen.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/screens/loans/loans.dart';
+import 'package:trueledger/presentation/screens/cards/credit_cards.dart';
+import 'package:trueledger/presentation/screens/transactions/add_expense.dart';
+import 'package:trueledger/presentation/screens/transactions/monthly_history.dart';
+import 'package:trueledger/presentation/screens/analysis/analysis_screen.dart';
 
 class DashboardBottomBar extends StatelessWidget {
   final VoidCallback onLoad;

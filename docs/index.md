@@ -1,6 +1,6 @@
-# TrueCash Documentation
+# TrueLedger Documentation
 
-Welcome to the **TrueCash** documentation! TrueCash is a privacy-first, offline-first personal finance tracker with AI-powered insights.
+Welcome to the **TrueLedger** documentation! TrueLedger is a privacy-first, offline-first personal finance tracker with AI-powered insights.
 
 ## 🌟 Key Features
 
@@ -19,7 +19,7 @@ Welcome to the **TrueCash** documentation! TrueCash is a privacy-first, offline-
 
     ---
 
-    Install TrueCash and start tracking your finances in minutes
+    Install TrueLedger and start tracking your finances in minutes
 
     [:octicons-arrow-right-24: Installation Guide](getting-started/installation.md)
 
@@ -35,7 +35,7 @@ Welcome to the **TrueCash** documentation! TrueCash is a privacy-first, offline-
 
     ---
 
-    Contribute to TrueCash and add new features
+    Contribute to TrueLedger and add new features
 
     [:octicons-arrow-right-24: Development Guide](development/adding-features.md)
 
@@ -63,7 +63,7 @@ This documentation covers:
 
 ## 🏗️ Architecture at a Glance
 
-TrueCash follows **Clean Architecture** principles with four distinct layers:
+TrueLedger follows **Clean Architecture** principles with four distinct layers:
 
 ```
 ┌─────────────────────────────────────────┐
@@ -91,7 +91,7 @@ TrueCash follows **Clean Architecture** principles with four distinct layers:
 
 ## 🎯 Philosophy
 
-TrueCash is built with these core principles:
+TrueLedger is built with these core principles:
 
 1. **Privacy First**: Your financial data never leaves your device
 2. **Offline First**: Full functionality without internet connection
@@ -105,7 +105,7 @@ We welcome contributions! Check out our [Contributing Guidelines](contributing/g
 
 ## 📄 License
 
-TrueCash is open source software. See the repository for license details.
+TrueLedger is open source software. See the repository for license details.
 
 ---
 

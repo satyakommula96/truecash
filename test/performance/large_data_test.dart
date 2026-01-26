@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:truecash/data/repositories/financial_repository_impl.dart';
+import 'package:trueledger/data/repositories/financial_repository_impl.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:flutter/foundation.dart';

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/privacy_provider.dart';
-import 'package:truecash/presentation/screens/net_worth/net_worth_details.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
+import 'package:trueledger/presentation/screens/net_worth/net_worth_details.dart';
 
 class AssetLiabilityCard extends ConsumerWidget {
   final MonthlySummary summary;

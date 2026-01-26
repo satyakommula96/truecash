@@ -1,6 +1,6 @@
 # GitHub Pages Deployment Guide
 
-This guide explains how to deploy the TrueCash documentation to GitHub Pages.
+This guide explains how to deploy the TrueLedger documentation to GitHub Pages.
 
 ## 🚀 Automatic Deployment (Recommended)
 
@@ -11,7 +11,7 @@ The documentation is automatically deployed to GitHub Pages whenever changes are
 1. **Trigger**: Push to `main` branch with changes to `docs/` or `mkdocs.yml`
 2. **Build**: GitHub Actions builds the documentation using MkDocs
 3. **Deploy**: The built site is deployed to the `gh-pages` branch
-4. **Live**: Documentation is available at https://satyakommula96.github.io/truecash/
+4. **Live**: Documentation is available at https://satyakommula96.github.io/trueledger/
 
 ### Workflow File
 
@@ -97,7 +97,7 @@ mkdocs gh-deploy -m "docs: update documentation"
 This will:
 1. Build the documentation
 2. Push to `gh-pages` branch
-3. Make it live at https://satyakommula96.github.io/truecash/
+3. Make it live at https://satyakommula96.github.io/trueledger/
 
 ## 🔍 Verify Deployment
 
@@ -109,7 +109,7 @@ This will:
 
 ### View Live Site
 
-Visit: https://satyakommula96.github.io/truecash/
+Visit: https://satyakommula96.github.io/trueledger/
 
 ### Check gh-pages Branch
 
@@ -161,11 +161,11 @@ git checkout main
 
 ### Custom Domain
 
-To use a custom domain (e.g., `docs.truecash.app`):
+To use a custom domain (e.g., `docs.trueledger.app`):
 
 1. Create `docs/CNAME` file:
    ```
-   docs.truecash.app
+   docs.trueledger.app
    ```
 
 2. Configure DNS:
@@ -173,7 +173,7 @@ To use a custom domain (e.g., `docs.truecash.app`):
 
 3. Update `mkdocs.yml`:
    ```yaml
-   site_url: https://docs.truecash.app/
+   site_url: https://docs.trueledger.app/
    ```
 
 4. In GitHub **Settings** → **Pages**, add custom domain

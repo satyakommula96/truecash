@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 class TrendChart extends StatelessWidget {
   final List<Map<String, dynamic>> trendData;

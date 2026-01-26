@@ -5,13 +5,13 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
-        android:label="TrueCash"
+        android:label="TrueLedger"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
         android:fullBackupContent="false">
         <activity
-            android:name="com.truecash.MainActivity"
+            android:name="com.satyakommula.TrueLedger.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""

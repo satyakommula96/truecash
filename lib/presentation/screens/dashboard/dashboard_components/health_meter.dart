@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:truecash/core/theme/theme.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
 class HealthMeter extends StatelessWidget {
   final int score;

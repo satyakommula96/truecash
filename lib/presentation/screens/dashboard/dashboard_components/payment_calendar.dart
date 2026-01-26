@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/utils/date_helper.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/utils/date_helper.dart';
 
 class PaymentCalendar extends StatefulWidget {
   final List<Map<String, dynamic>> bills;
@@ -315,7 +315,7 @@ class _PaymentCalendarState extends State<PaymentCalendar> {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     final linux = LinuxInitializationSettings(
       defaultActionName: 'Open notification',
-      defaultIcon: AssetsLinuxIcon('assets/images/logo.png'),
+      defaultIcon: AssetsLinuxIcon('assets/icon/trueledger_icon.png'),
     );
     final initSettings = InitializationSettings(android: android, linux: linux);
     await flutterLocalNotificationsPlugin.initialize(initSettings);

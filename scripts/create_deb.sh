@@ -3,11 +3,12 @@
 # Exit on error
 set -e
 
-APP_NAME="truecash"
-VERSION="1.0.0" # Match the version in settings.dart/pubspec.yaml
+APP_NAME="trueledger"
+# Extract version from pubspec.yaml (e.g., 1.0.0 from 1.0.0+1)
+VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //; s/+.*//')
 ARCH="amd64"
 MAINTAINER="Satya Kommula"
-DESCRIPTION="True Cash: Premium Financial Management Application"
+DESCRIPTION="TrueLedger: Premium Financial Management Application"
 
 echo "Building Flutter application..."
 flutter build linux --release
@@ -41,10 +42,10 @@ chmod +x "$BIN_DIR/$APP_NAME"
 echo "Copying icon..."
 # Assuming we have a logo.png. If not, this step might fail or need adjustment.
 # Based on pubspec, it's at assets/images/logo.png
-if [ -f "assets/images/logo.png" ]; then
-    cp "assets/images/logo.png" "$ICON_DIR/$APP_NAME.png"
+if [ -f "assets/icon/trueledger_icon.png" ]; then
+    cp "assets/icon/trueledger_icon.png" "$ICON_DIR/$APP_NAME.png"
 else
-    echo "Warning: Icon not found at assets/images/logo.png"
+    echo "Warning: Icon not found at assets/icon/trueledger_icon.png"
 fi
 
 echo "Creating desktop entry..."
@@ -52,7 +53,7 @@ cat > "$DESKTOP_DIR/$APP_NAME.desktop" << EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=TrueCash
+Name=TrueLedger
 Comment=$DESCRIPTION
 Exec=$APP_NAME
 Icon=$APP_NAME
@@ -72,6 +73,6 @@ Depends: libgtk-3-0, libblkid1, liblzma5
 EOF
 
 echo "Building .deb package..."
-dpkg-deb --build "$DEB_DIR" "TrueCash.deb"
+dpkg-deb --build "$DEB_DIR" "TrueLedger.deb"
 
-echo "Done! Package saved as TrueCash.deb"
+echo "Done! Package saved as TrueLedger.deb"

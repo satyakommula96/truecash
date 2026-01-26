@@ -1,6 +1,6 @@
 # Configuration Guide
 
-Customize TrueCash to fit your needs.
+Customize TrueLedger to fit your needs.
 
 ## App Settings
 
@@ -74,7 +74,7 @@ bool pinEnabled = prefs.getBool('pin_enabled') ?? false;
 
 **Location**: Settings → Security → View Recovery Key
 
-Never lose access to your data. When setting a PIN, TrueCash generates a unique 14-character **Recovery Key** (e.g., `ABCD-1234-WX99`).
+Never lose access to your data. When setting a PIN, TrueLedger generates a unique 14-character **Recovery Key** (e.g., `ABCD-1234-WX99`).
 
 - **Setup**: You must save this key when creating a PIN.
 - **Usage**: If you forget your PIN, tap "Forgot PIN?" on the lock screen and enter your key to reset security without data loss.
@@ -127,7 +127,7 @@ Export all your financial data to a JSON file:
 
 1. Tap **Export Data**
 2. Choose save location
-3. File is saved as `truecash_backup_YYYY-MM-DD.json`
+3. File is saved as `trueledger_backup_YYYY-MM-DD.json`
 
 **Export Format**:
 ```json
@@ -173,18 +173,18 @@ Permanently delete all financial data:
 
 **Default Paths**:
 
-- **Android**: `/data/data/com.truecash.app/databases/truecash.db`
-- **iOS**: `~/Library/Application Support/truecash.db`
-- **Linux**: `~/.local/share/truecash/truecash.db`
-- **macOS**: `~/Library/Application Support/truecash/truecash.db`
-- **Windows**: `%APPDATA%\truecash\truecash.db`
+- **Android**: `/data/data/com.satyakommula.TrueLedger.app/databases/trueledger.db`
+- **iOS**: `~/Library/Application Support/trueledger.db`
+- **Linux**: `~/.local/share/trueledger/trueledger.db`
+- **macOS**: `~/Library/Application Support/trueledger/trueledger.db`
+- **Windows**: `%APPDATA%\trueledger\trueledger.db`
 - **Web**: IndexedDB (browser storage)
 
 ### Shared Preferences
 
 **Location**: Platform-specific
 
-- **Android**: `/data/data/com.truecash.app/shared_prefs/`
+- **Android**: `/data/data/com.satyakommula.TrueLedger.app/shared_prefs/`
 - **iOS**: `~/Library/Preferences/`
 - **Desktop**: Platform-specific preferences directory
 
@@ -206,13 +206,13 @@ For development and testing:
 
 ```bash
 # Enable debug logging
-export TRUECASH_DEBUG=true
+export TRUELEDGER_DEBUG=true
 
 # Use custom database path
-export TRUECASH_DB_PATH=/path/to/custom/db
+export TRUELEDGER_DB_PATH=/path/to/custom/db
 
 # Disable encryption (testing only)
-export TRUECASH_DISABLE_ENCRYPTION=true
+export TRUELEDGER_DISABLE_ENCRYPTION=true
 ```
 
 ## Performance Tuning
@@ -267,4 +267,4 @@ If database corruption is suspected:
 
 - [Features Overview](../features/dashboard.md) - Explore all features
 - [Architecture](../architecture/overview.md) - Understand the codebase
-- [Development Guide](../development/adding-features.md) - Contribute to TrueCash
+- [Development Guide](../development/adding-features.md) - Contribute to TrueLedger

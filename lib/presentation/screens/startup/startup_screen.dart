@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/boot_provider.dart';
-import 'package:truecash/core/providers/shared_prefs_provider.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard.dart';
-import 'package:truecash/presentation/screens/startup/intro_screen.dart';
-import 'package:truecash/presentation/screens/startup/lock_screen.dart';
+import 'package:trueledger/presentation/providers/boot_provider.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard.dart';
+import 'package:trueledger/presentation/screens/startup/intro_screen.dart';
+import 'package:trueledger/presentation/screens/startup/lock_screen.dart';
 
 class StartupScreen extends ConsumerWidget {
   const StartupScreen({super.key});

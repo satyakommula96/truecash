@@ -1,16 +1,21 @@
+#define MyAppExeName "trueledger.exe"
+#ifndef AppVersion
+  #define AppVersion GetFileVersion("..\build\windows\x64\runner\Release\" + MyAppExeName)
+#endif
+
 [Setup]
 AppId={{C0F22A12-B5D1-4F2B-9B5D-1F2B9B5D1F2B}}
-AppName=TrueCash
-AppVersion=1.0.0
-;AppVerName=True Cash 1.0.0
+AppName=TrueLedger
+AppVersion={#AppVersion}
+;AppVerName=TrueLedger {#MyAppVersion}
 AppPublisher=Satya Kommula
-AppPublisherURL=https://github.com/satyakommula/truecash
-DefaultDirName={autopf}\TrueCash
+AppPublisherURL=https://github.com.satyakommula.TrueLedger
+DefaultDirName={autopf}\TrueLedger
 DisableProgramGroupPage=yes
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=..\build\windows\x64\installer
-OutputBaseFilename=TrueCash
+OutputBaseFilename=TrueLedger
 SetupIconFile=..\windows\runner\resources\app_icon.ico
 Compression=lzma
 SolidCompression=yes
@@ -23,14 +28,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\build\windows\x64\runner\Release\truecash.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\build\windows\x64\runner\Release\trueledger.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\build\windows\x64\runner\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\build\windows\x64\runner\Release\data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\TrueCash"; Filename: "{app}\truecash.exe"
-Name: "{autodesktop}\TrueCash"; Filename: "{app}\truecash.exe"; Tasks: desktopicon
+Name: "{autoprograms}\TrueLedger"; Filename: "{app}\trueledger.exe"
+Name: "{autodesktop}\TrueLedger"; Filename: "{app}\trueledger.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\truecash.exe"; Description: "{cm:LaunchProgram,TrueCash}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\trueledger.exe"; Description: "{cm:LaunchProgram,TrueLedger}"; Flags: nowait postinstall skipifsilent

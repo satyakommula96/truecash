@@ -1,10 +1,10 @@
 # Error & Failure Handling
 
-This guide explains how TrueCash handles errors using the **Result Pattern** for type-safe, explicit error handling.
+This guide explains how TrueLedger handles errors using the **Result Pattern** for type-safe, explicit error handling.
 
 ## Overview
 
-TrueCash uses a `Result<T>` type instead of throwing exceptions. This makes errors:
+TrueLedger uses a `Result<T>` type instead of throwing exceptions. This makes errors:
 - **Visible** in the type signature
 - **Explicit** and impossible to ignore
 - **Type-safe** and caught at compile time
@@ -77,7 +77,7 @@ if (result.isSuccess) {
 
 ## AppFailure Types
 
-All failures in TrueCash extend `AppFailure`:
+All failures in TrueLedger extend `AppFailure`:
 
 ```dart
 // lib/core/error/failure.dart

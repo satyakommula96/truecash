@@ -1,7 +1,7 @@
-import 'package:truecash/core/error/failure.dart';
-import 'package:truecash/core/utils/result.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/core/error/failure.dart';
+import 'package:trueledger/core/utils/result.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'usecase_base.dart';
 
 class GetMonthlySummaryUseCase extends UseCase<MonthlySummary, NoParams> {

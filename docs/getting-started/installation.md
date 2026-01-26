@@ -1,6 +1,6 @@
 # Installation Guide
 
-Get TrueCash up and running on your platform of choice.
+Get TrueLedger up and running on your platform of choice.
 
 ## Prerequisites
 
@@ -19,8 +19,8 @@ Get TrueCash up and running on your platform of choice.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/satyakommula96/truecash.git
-cd truecash
+git clone https://github.com/satyakommula96/trueledger.git
+cd trueledger
 ```
 
 ### 2. Install Dependencies
@@ -133,7 +133,7 @@ Output: `build/linux/x64/release/bundle/`
 flutter build macos --release
 ```
 
-Output: `build/macos/Build/Products/Release/truecash.app`
+Output: `build/macos/Build/Products/Release/trueledger.app`
 
 ### Windows
 
@@ -179,7 +179,7 @@ sudo apt-get install libsecret-1-dev
 ### Still Having Issues?
 
 1. Run `flutter doctor` to diagnose problems
-2. Check the [GitHub Issues](https://github.com/satyakommula96/truecash/issues)
+2. Check the [GitHub Issues](https://github.com/satyakommula96/trueledger/issues)
 3. Review platform-specific guides in the [Platforms](../platforms/android.md) section
 
 ## Next Steps

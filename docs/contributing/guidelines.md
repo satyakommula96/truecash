@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for your interest in contributing to TrueCash! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to TrueLedger! This document provides guidelines for contributing to the project.
 
 ## Code of Conduct
 
@@ -11,8 +11,8 @@ Please read and follow our [Code of Conduct](code-of-conduct.md).
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/truecash.git
-   cd truecash
+   git clone https://github.com/YOUR_USERNAME/trueledger.git
+   cd trueledger
    ```
 3. **Install dependencies**:
    ```bash
@@ -146,7 +146,7 @@ Follow the [Effective Dart](https://dart.dev/guides/language/effective-dart) gui
 1. **Absolute Imports**: Always use package imports
    ```dart
    // ✅ DO
-   import 'package:truecash/domain/models/models.dart';
+   import 'package:trueledger/domain/models/models.dart';
    
    // ❌ DON'T
    import '../../domain/models/models.dart';
@@ -221,7 +221,7 @@ Test complete user flows:
 
 ```dart
 testWidgets('User can add a budget', (tester) async {
-  await tester.pumpWidget(ProviderScope(child: TrueCashApp()));
+  await tester.pumpWidget(ProviderScope(child: TrueLedgerApp()));
   
   // Navigate to budgets
   await tester.tap(find.text('Budgets'));
@@ -277,11 +277,11 @@ Update `docs/` when adding significant features:
 
 - Check the [Architecture Documentation](../architecture/overview.md)
 - Read the [Adding Features Guide](../development/adding-features.md)
-- Open a [GitHub Discussion](https://github.com/satyakommula96/truecash/discussions)
-- Create an [Issue](https://github.com/satyakommula96/truecash/issues)
+- Open a [GitHub Discussion](https://github.com/satyakommula96/trueledger/discussions)
+- Create an [Issue](https://github.com/satyakommula96/trueledger/issues)
 
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same license as the project.
 
-Thank you for contributing to TrueCash! 🎉
+Thank you for contributing to TrueLedger! 🎉

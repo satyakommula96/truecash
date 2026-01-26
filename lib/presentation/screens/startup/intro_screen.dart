@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard.dart';
-import 'package:truecash/core/services/notification_service.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard.dart';
+import 'package:trueledger/core/services/notification_service.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});

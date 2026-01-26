@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:truecash/core/theme/theme.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
-import 'package:truecash/presentation/providers/analysis_provider.dart';
-import 'package:truecash/presentation/providers/privacy_provider.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/budget_section.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/trend_chart.dart';
-import 'package:truecash/presentation/screens/budget/add_budget.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/presentation/providers/analysis_provider.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/budget_section.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/trend_chart.dart';
+import 'package:trueledger/presentation/screens/budget/add_budget.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';

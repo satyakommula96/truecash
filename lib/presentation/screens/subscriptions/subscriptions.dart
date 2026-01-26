@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/utils/date_helper.dart';
-import 'package:truecash/presentation/screens/subscriptions/add_subscription.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/utils/date_helper.dart';
+import 'package:trueledger/presentation/screens/subscriptions/add_subscription.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 class SubscriptionsScreen extends ConsumerStatefulWidget {
   const SubscriptionsScreen({super.key});

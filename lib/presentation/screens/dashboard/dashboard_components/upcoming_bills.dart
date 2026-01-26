@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/utils/date_helper.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/utils/date_helper.dart';
 
 class UpcomingBills extends StatelessWidget {
   final List<Map<String, dynamic>> bills;

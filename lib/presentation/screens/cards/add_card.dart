@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/services/notification_service.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/services/notification_service.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 class AddCreditCardScreen extends ConsumerStatefulWidget {
   const AddCreditCardScreen({super.key});

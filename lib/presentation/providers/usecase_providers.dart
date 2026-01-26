@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/usecases/add_transaction_usecase.dart';
-import 'package:truecash/domain/usecases/get_monthly_summary_usecase.dart';
-import 'package:truecash/domain/usecases/get_dashboard_data_usecase.dart';
-import 'package:truecash/domain/usecases/get_analysis_data_usecase.dart';
-import 'package:truecash/domain/usecases/startup_usecase.dart';
-import 'package:truecash/domain/usecases/budget_usecases.dart';
+import 'package:trueledger/domain/usecases/add_transaction_usecase.dart';
+import 'package:trueledger/domain/usecases/get_monthly_summary_usecase.dart';
+import 'package:trueledger/domain/usecases/get_dashboard_data_usecase.dart';
+import 'package:trueledger/domain/usecases/get_analysis_data_usecase.dart';
+import 'package:trueledger/domain/usecases/startup_usecase.dart';
+import 'package:trueledger/domain/usecases/budget_usecases.dart';
 import 'repository_providers.dart';
 
 final addTransactionUseCaseProvider = Provider<AddTransactionUseCase>((ref) {

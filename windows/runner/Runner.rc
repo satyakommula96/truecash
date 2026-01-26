@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.satyakommula" "\0"
-            VALUE "FileDescription", "truecash" "\0"
+            VALUE "FileDescription", "trueledger" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "truecash" "\0"
+            VALUE "InternalName", "trueledger" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.satyakommula. All rights reserved." "\0"
-            VALUE "OriginalFilename", "truecash.exe" "\0"
-            VALUE "ProductName", "truecash" "\0"
+            VALUE "OriginalFilename", "trueledger.exe" "\0"
+            VALUE "ProductName", "trueledger" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

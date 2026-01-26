@@ -1,6 +1,6 @@
 import 'package:sqflite_sqlcipher/sqflite.dart';
-import 'package:truecash/data/datasources/database.dart';
-import 'package:truecash/domain/models/models.dart';
+import 'package:trueledger/data/datasources/database.dart';
+import 'package:trueledger/domain/models/models.dart';
 import '../../domain/repositories/i_financial_repository.dart';
 
 class FinancialRepositoryImpl implements IFinancialRepository {

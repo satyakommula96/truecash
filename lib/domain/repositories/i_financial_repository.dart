@@ -1,4 +1,4 @@
-import 'package:truecash/domain/models/models.dart';
+import 'package:trueledger/domain/models/models.dart';
 
 abstract class IFinancialRepository {
   Future<MonthlySummary> getMonthlySummary();

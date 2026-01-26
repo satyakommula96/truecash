@@ -5,9 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:ui';
 
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/providers/shared_prefs_provider.dart';
-import 'package:truecash/presentation/screens/startup/startup_screen.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/presentation/screens/startup/startup_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +38,7 @@ Future<void> main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      child: const TrueCashApp(),
+      child: const TrueLedgerApp(),
     ),
   );
 }
@@ -46,8 +46,8 @@ Future<void> main() async {
 // Global theme notifier (Keeping for now to avoid breaking existing toggle logic)
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
-class TrueCashApp extends StatelessWidget {
-  const TrueCashApp({super.key});
+class TrueLedgerApp extends StatelessWidget {
+  const TrueLedgerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class TrueCashApp extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (_, mode, __) {
         return MaterialApp(
-          title: 'TrueCash',
+          title: 'TrueLedger',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

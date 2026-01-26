@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 class AddBudgetScreen extends ConsumerStatefulWidget {
   const AddBudgetScreen({super.key});

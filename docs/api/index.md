@@ -1,6 +1,6 @@
 # API Reference
 
-API documentation for TrueCash.
+API documentation for TrueLedger.
 
 ## Domain Layer
 

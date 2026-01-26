@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/domain/usecases/get_analysis_data_usecase.dart';
-import 'package:truecash/domain/usecases/usecase_base.dart';
+import 'package:trueledger/domain/usecases/get_analysis_data_usecase.dart';
+import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'usecase_providers.dart';
 
 final analysisProvider = FutureProvider<AnalysisData>((ref) async {

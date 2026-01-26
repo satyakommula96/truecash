@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import 'package:truecash/presentation/providers/dashboard_provider.dart';
-import 'package:truecash/presentation/providers/privacy_provider.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/asset_liability_card.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/dashboard_bottom_bar.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/dashboard_header.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/section_header.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/summary_card.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/payment_calendar.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/wealth_hero.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/smart_insights.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard_components/health_meter.dart';
-import 'package:truecash/domain/services/intelligence_service.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/asset_liability_card.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/dashboard_bottom_bar.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/dashboard_header.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/section_header.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/summary_card.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/payment_calendar.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/wealth_hero.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/smart_insights.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard_components/health_meter.dart';
+import 'package:trueledger/domain/services/intelligence_service.dart';
 
 class Dashboard extends ConsumerWidget {
   const Dashboard({super.key});

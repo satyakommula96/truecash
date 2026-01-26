@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
-import 'package:truecash/presentation/screens/dashboard/dashboard.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/screens/dashboard/dashboard.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:truecash/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
 
 // Mocks
 class MockFinancialRepository extends Mock implements IFinancialRepository {}

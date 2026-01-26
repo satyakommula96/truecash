@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:truecash/main.dart' as app;
+import 'package:trueledger/main.dart' as app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ void main() {
               data == 'Dashboard' || // Dashboard Title
               data == 'Smart Budgeting' || // Intro Page 2
               data == 'ANALYSIS & BUDGETS' || // Analysis Screen
-              data == 'TrueCash' || // App Bar Title
+              data == 'TrueLedger' || // App Bar Title
               data == 'Initializing...' || // Loading State
               data == 'Initialization Failed'; // Error State
         }

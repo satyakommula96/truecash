@@ -1,10 +1,10 @@
 # Architecture Overview
 
-TrueCash is built using **Clean Architecture** principles, ensuring a scalable, testable, and maintainable codebase.
+TrueLedger is built using **Clean Architecture** principles, ensuring a scalable, testable, and maintainable codebase.
 
 ## Core Principles
 
-TrueCash is designed around these fundamental principles:
+TrueLedger is designed around these fundamental principles:
 
 - ✅ **Privacy First**: All data stored locally with encryption (mobile) or secure storage (desktop)
 - ✅ **Offline First**: No cloud dependencies, works completely offline
@@ -25,7 +25,7 @@ Clean Architecture, introduced by Robert C. Martin (Uncle Bob), is a software de
 
 ## Architecture Layers
 
-TrueCash implements Clean Architecture with four distinct layers:
+TrueLedger implements Clean Architecture with four distinct layers:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -276,11 +276,11 @@ import '../../../data/repositories/financial_repository_impl.dart';
 
 ```dart
 // ✅ CORRECT - Absolute package imports
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/data/repositories/financial_repository_impl.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/data/repositories/financial_repository_impl.dart';
 ```
 
-**Enforcement**: All imports must use `package:truecash/...` format.
+**Enforcement**: All imports must use `package:trueledger/...` format.
 
 ### Rule 6: One Use Case Per Operation
 
@@ -339,7 +339,7 @@ flutter analyze
 
 ## State Management
 
-TrueCash uses **Riverpod** for state management and dependency injection.
+TrueLedger uses **Riverpod** for state management and dependency injection.
 
 ### Why Riverpod?
 
@@ -454,7 +454,7 @@ class FinancialRepositoryImpl implements IFinancialRepository {
 
 ## Key Design Patterns
 
-TrueCash leverages several design patterns:
+TrueLedger leverages several design patterns:
 
 1. **[Repository Pattern](../development/design-patterns.md#repository-pattern)**: Abstracts data access
 2. **[Use Case Pattern](../development/design-patterns.md#use-case-pattern)**: Encapsulates business operations

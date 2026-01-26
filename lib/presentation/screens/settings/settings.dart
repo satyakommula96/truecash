@@ -9,20 +9,20 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:truecash/core/utils/web_saver.dart';
+import 'package:trueledger/core/utils/web_saver.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:truecash/data/datasources/database.dart';
+import 'package:trueledger/data/datasources/database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:truecash/core/config/version.dart';
-import 'package:truecash/main.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/config/version.dart';
+import 'package:trueledger/main.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/dashboard_provider.dart';
-import 'package:truecash/presentation/providers/analysis_provider.dart';
-import 'package:truecash/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/analysis_provider.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -380,7 +380,7 @@ class SettingsScreen extends ConsumerWidget {
 
     final jsonString = jsonEncode(data);
     final fileName =
-        "truecash_backup_${DateTime.now().millisecondsSinceEpoch}.json";
+        "trueledger_backup_${DateTime.now().millisecondsSinceEpoch}.json";
 
     if (kIsWeb) {
       // Web: Create XFile from bytes and "share" it (triggers download)
@@ -420,7 +420,8 @@ class SettingsScreen extends ConsumerWidget {
 
     if (context.mounted) {
       // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(file.path)], text: 'TrueCash Backup File');
+      await Share.shareXFiles([XFile(file.path)],
+          text: 'TrueLedger Backup File');
     }
   }
 
@@ -628,7 +629,7 @@ class SettingsScreen extends ConsumerWidget {
                     onPressed: () {
                       // ignore: deprecated_member_use
                       Share.share(
-                          "TrueCash Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
+                          "TrueLedger Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
                     },
                     child: const Text("SHARE SECURELY")),
                 TextButton(
@@ -897,7 +898,7 @@ class SettingsScreen extends ConsumerWidget {
           Center(
             child: Column(
               children: [
-                const Text("TRUECASH",
+                const Text("TRUELEDGER",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2,
@@ -906,14 +907,14 @@ class SettingsScreen extends ConsumerWidget {
                     style: TextStyle(fontSize: 10, color: Colors.grey)),
                 const SizedBox(height: 12),
                 const Text(
-                  "TrueCash stores all data locally on your device.\nNo data is transmitted or stored on external servers.",
+                  "TrueLedger stores all data locally on your device.\nNo data is transmitted or stored on external servers.",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 10, color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
                 InkWell(
                   onTap: () => launchUrl(Uri.parse(
-                      "https://satyakommula96.github.io/truecash/privacy/")),
+                      "https://satyakommula96.github.io/trueledger/privacy/")),
                   child: const Text(
                     "Privacy Policy",
                     style: TextStyle(

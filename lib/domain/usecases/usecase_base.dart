@@ -1,4 +1,4 @@
-import 'package:truecash/core/utils/result.dart';
+import 'package:trueledger/core/utils/result.dart';
 
 abstract class UseCase<T, Params> {
   Future<Result<T>> call(Params params);

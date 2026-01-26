@@ -1,4 +1,4 @@
-package com.truecash
+package com.satyakommula.TrueLedger
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

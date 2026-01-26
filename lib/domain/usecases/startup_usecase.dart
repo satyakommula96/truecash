@@ -1,9 +1,9 @@
-import 'package:truecash/core/error/failure.dart';
-import 'package:truecash/core/utils/result.dart';
-import 'package:truecash/data/datasources/database.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/services/notification_service.dart';
-import 'package:truecash/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/core/error/failure.dart';
+import 'package:trueledger/core/utils/result.dart';
+import 'package:trueledger/data/datasources/database.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/services/notification_service.dart';
+import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'usecase_base.dart';
 
 class StartupUseCase extends UseCase<void, NoParams> {

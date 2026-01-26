@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:truecash/core/utils/currency_formatter.dart';
-import 'package:truecash/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
+import 'package:trueledger/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/usecase_providers.dart';
-import 'package:truecash/domain/usecases/add_transaction_usecase.dart';
+import 'package:trueledger/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/domain/usecases/add_transaction_usecase.dart';
 
 class AddExpense extends ConsumerStatefulWidget {
   final String? initialType;

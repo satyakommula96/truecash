@@ -1,6 +1,6 @@
 # Clean Architecture
 
-A deep dive into Clean Architecture principles as implemented in TrueCash.
+A deep dive into Clean Architecture principles as implemented in TrueLedger.
 
 ## What is Clean Architecture?
 

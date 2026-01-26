@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:truecash/domain/models/models.dart';
-import 'package:truecash/core/theme/theme.dart';
-import 'package:truecash/core/utils/currency_formatter.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:truecash/presentation/providers/privacy_provider.dart';
-import 'package:truecash/presentation/screens/budget/edit_budget.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
+import 'package:trueledger/presentation/screens/budget/edit_budget.dart';
 
 class BudgetSection extends ConsumerWidget {
   final List<Budget> budgets;
