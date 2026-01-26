@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:trueledger/domain/usecases/startup_usecase.dart';
@@ -18,7 +17,8 @@ void main() {
   });
 
   group('StartupUseCase', () {
-    test('should return Failure when checkAndProcessRecurring throws', () async {
+    test('should return Failure when checkAndProcessRecurring throws',
+        () async {
       // Arrange - Mock the repository method that the use case calls
       when(() => mockRepository.checkAndProcessRecurring())
           .thenThrow(Exception('Recurring check failed'));

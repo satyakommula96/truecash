@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trueledger/domain/models/monthly_summary.dart';
 
@@ -42,7 +41,9 @@ void main() {
       );
 
       // Total expenses = fixed + variable + subscriptions
-      final totalExpenses = summary.totalFixed + summary.totalVariable + summary.totalSubscriptions;
+      final totalExpenses = summary.totalFixed +
+          summary.totalVariable +
+          summary.totalSubscriptions;
       expect(totalExpenses, 55000);
     });
 

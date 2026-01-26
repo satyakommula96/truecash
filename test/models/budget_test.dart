@@ -1,4 +1,3 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trueledger/domain/models/budget_model.dart';
 
