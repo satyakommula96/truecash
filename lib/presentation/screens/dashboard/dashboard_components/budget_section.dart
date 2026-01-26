@@ -122,9 +122,7 @@ class BudgetSection extends ConsumerWidget {
                           ]),
                     )
                         .animate()
-                        .shimmer(
-                            duration: 2.seconds,
-                            color: Colors.white.withValues(alpha: 0.2))
+                        .shimmer(duration: 2.seconds, color: semantic.shimmer)
                         .scaleX(
                             begin: 0,
                             end: 1,

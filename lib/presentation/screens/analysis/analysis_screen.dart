@@ -176,9 +176,7 @@ class AnalysisScreen extends ConsumerWidget {
                           ]),
                     )
                         .animate()
-                        .shimmer(
-                            duration: 1200.ms,
-                            color: Colors.white.withValues(alpha: 0.2))
+                        .shimmer(duration: 1200.ms, color: semantic.shimmer)
                         .scaleX(
                             begin: 0,
                             end: 1,

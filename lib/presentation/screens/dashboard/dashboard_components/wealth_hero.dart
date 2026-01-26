@@ -113,6 +113,6 @@ class WealthHero extends ConsumerWidget {
     ).animate(onPlay: (controller) => controller.repeat(reverse: true)).shimmer(
         duration: 3.seconds,
         delay: 2.seconds,
-        color: Colors.white.withValues(alpha: 0.1));
+        color: appColors?.shimmer ?? Colors.white.withValues(alpha: 0.1));
   }
 }

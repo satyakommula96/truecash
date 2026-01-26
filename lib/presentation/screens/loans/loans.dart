@@ -228,7 +228,7 @@ class _LoansScreenState extends ConsumerState<LoansScreen> {
                         .shimmer(
                             delay: (300 + 100 * i).ms,
                             duration: 1000.ms,
-                            color: Colors.white12);
+                            color: semantic.shimmer);
                   },
                 ),
     );
