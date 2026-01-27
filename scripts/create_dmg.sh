@@ -7,7 +7,7 @@ VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //; s/+.*//')
 DMG_NAME="TrueLedger.dmg"
 
 echo "Building macOS app..."
-flutter build macos --release
+flutter build macos --release --build-name=$VERSION
 
 APP_PATH="build/macos/Build/Products/Release/TrueLedger.app"
 
