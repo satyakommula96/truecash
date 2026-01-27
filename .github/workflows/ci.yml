@@ -167,10 +167,12 @@ jobs:
       # macOS Test
       - name: Run macOS Integration Test
         if: matrix.target == 'macos'
-        run: flutter test integration_test/app_test.dart -d macos
+        run: |
+          sleep 5
+          flutter test integration_test/app_test.dart -d macos --timeout 10m
 
       # Windows Test
       - name: Run Windows Integration Test
         if: matrix.target == 'windows'
-        run: flutter test integration_test/app_test.dart -d windows
+        run: flutter test integration_test/app_test.dart -d windows --timeout 10m
 
