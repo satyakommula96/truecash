@@ -8,7 +8,8 @@ void main() {
 
   testWidgets('App smoke test - verifies app launches', (tester) async {
     await app.main();
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
 
     // Poll for up to 30 seconds for the app to settle on a known screen
     bool found = false;
