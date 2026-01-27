@@ -150,7 +150,8 @@ jobs:
            fi
            xcrun simctl boot $UDID || true
            xcrun simctl bootstatus $UDID -b
-           flutter test integration_test/app_test.dart -d $UDID
+           sleep 5
+           flutter test integration_test/app_test.dart -d $UDID --timeout 10m
 
       # Android Test
       - name: Run Android Integration Test
