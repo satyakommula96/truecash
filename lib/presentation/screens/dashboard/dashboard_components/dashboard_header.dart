@@ -45,41 +45,53 @@ class DashboardHeader extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: SvgPicture.asset(
-                    'assets/icon/trueledger_icon.svg',
-                    placeholderBuilder: (context) => Icon(
-                      Icons.account_balance_wallet_rounded,
-                      color: colorScheme.primary,
-                      size: 32,
+            Expanded(
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: SvgPicture.asset(
+                      'assets/icon/trueledger_icon.svg',
+                      placeholderBuilder: (context) => Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: colorScheme.primary,
+                        size: 32,
+                      ),
                     ),
+                  )
+                      .animate()
+                      .scale(duration: 600.ms, curve: Curves.easeOutBack),
+                  const SizedBox(width: 16),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(getGreeting(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: semantic.secondaryText,
+                                letterSpacing: 1.5)),
+                        const SizedBox(height: 2),
+                        Text("TrueLedger",
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                                color: colorScheme.onSurface,
+                                letterSpacing: -0.5)),
+                      ],
+                    )
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideX(begin: 0.1, end: 0),
                   ),
-                ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(getGreeting(),
-                        style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            color: semantic.secondaryText,
-                            letterSpacing: 1.5)),
-                    const SizedBox(height: 2),
-                    Text("TrueLedger",
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: colorScheme.onSurface,
-                            letterSpacing: -0.5)),
-                  ],
-                ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1, end: 0),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 16),
             Row(
               children: [
                 _buildHeaderAction(

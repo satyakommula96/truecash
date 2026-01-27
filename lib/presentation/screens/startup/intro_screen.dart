@@ -97,6 +97,7 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                   title: page['title'],
                   description: page['description'],
                   controller: _nameController,
+                  onStart: _finishIntro,
                 );
               }
               return _IntroPage(
@@ -151,61 +152,64 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
-                if (_currentPage == _pages.length - 1)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton(
-                      onPressed: _finishIntro,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: colorScheme.onPrimary,
-                        elevation: 8,
-                        shadowColor: colorScheme.primary.withValues(alpha: 0.4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                if (_pages[_currentPage]['isNamePage'] != true) ...[
+                  const SizedBox(height: 40),
+                  if (_currentPage == _pages.length - 1)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: FilledButton(
+                        onPressed: _finishIntro,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          elevation: 8,
+                          shadowColor:
+                              colorScheme.primary.withValues(alpha: 0.4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'GET STARTED',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16,
-                            letterSpacing: 1),
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .scale(duration: 300.ms, curve: Curves.easeOutBack)
-                      .fadeIn()
-                else
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeOutQuint,
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: colorScheme.outline.withValues(alpha: 0.4),
-                            width: 1.5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Text('NEXT',
+                        child: const Text(
+                          'GET STARTED',
                           style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 16,
-                              letterSpacing: 1,
-                              color: colorScheme.primary)),
+                              letterSpacing: 1),
+                        ),
+                      ),
+                    )
+                        .animate()
+                        .scale(duration: 300.ms, curve: Curves.easeOutBack)
+                        .fadeIn()
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutQuint,
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                              color: colorScheme.outline.withValues(alpha: 0.4),
+                              width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text('NEXT',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
+                                letterSpacing: 1,
+                                color: colorScheme.primary)),
+                      ),
                     ),
-                  ),
+                ],
               ],
             ),
           ),
@@ -306,81 +310,113 @@ class _NamePage extends StatelessWidget {
   final String title;
   final String description;
   final TextEditingController controller;
+  final VoidCallback onStart;
 
   const _NamePage({
     required this.title,
     required this.description,
     required this.controller,
+    required this.onStart,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.all(40.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  colorScheme.primary.withValues(alpha: 0.15),
-                  colorScheme.primary.withValues(alpha: 0.05),
-                ],
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    colorScheme.primary.withValues(alpha: 0.15),
+                    colorScheme.primary.withValues(alpha: 0.05),
+                  ],
+                ),
+                shape: BoxShape.circle,
               ),
-              shape: BoxShape.circle,
+              child: Icon(Icons.person_outline_rounded,
+                  size: 60, color: colorScheme.primary),
+            ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
+            const SizedBox(height: 48),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+              textAlign: TextAlign.center,
             ),
-            child: Icon(Icons.person_outline_rounded,
-                size: 60, color: colorScheme.primary),
-          ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
-          const SizedBox(height: 48),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            description,
-            style: TextStyle(
-                fontSize: 14,
-                color: colorScheme.onSurface.withValues(alpha: 0.6)),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 40),
-          TextField(
-            controller: controller,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              hintText: "Your Name",
-              hintStyle: TextStyle(
-                  color: colorScheme.onSurface.withValues(alpha: 0.2)),
-              filled: true,
-              fillColor: colorScheme.surface,
-              contentPadding: const EdgeInsets.all(24),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide(
-                    color: colorScheme.primary.withValues(alpha: 0.1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide(
-                    color: colorScheme.primary.withValues(alpha: 0.4)),
-              ),
+            const SizedBox(height: 16),
+            Text(
+              description,
+              style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurface.withValues(alpha: 0.6)),
+              textAlign: TextAlign.center,
             ),
-          ).animate(delay: 400.ms).fadeIn().slideY(begin: 0.2, end: 0),
-        ],
+            const SizedBox(height: 40),
+            TextField(
+              controller: controller,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textCapitalization: TextCapitalization.words,
+              onSubmitted: (_) => onStart(),
+              decoration: InputDecoration(
+                hintText: "Your Name",
+                hintStyle: TextStyle(
+                    color: colorScheme.onSurface.withValues(alpha: 0.2)),
+                filled: true,
+                fillColor: colorScheme.surface,
+                contentPadding: const EdgeInsets.all(24),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide(
+                      color: colorScheme.primary.withValues(alpha: 0.1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide(
+                      color: colorScheme.primary.withValues(alpha: 0.4)),
+                ),
+              ),
+            ).animate(delay: 400.ms).fadeIn().slideY(begin: 0.2, end: 0),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: FilledButton(
+                onPressed: onStart,
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  elevation: 8,
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  'GET STARTED',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      letterSpacing: 1),
+                ),
+              ),
+            )
+                .animate(delay: 500.ms)
+                .scale(duration: 300.ms, curve: Curves.easeOutBack)
+                .fadeIn(),
+          ],
+        ),
       ),
     );
   }
