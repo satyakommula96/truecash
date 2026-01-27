@@ -11,7 +11,7 @@ MAINTAINER="Satya Kommula"
 DESCRIPTION="TrueLedger: Premium Financial Management Application"
 
 echo "Building Flutter application..."
-flutter build linux --release
+flutter build linux --release --build-name=$VERSION
 
 # Define build directory
 BUILD_DIR="build/linux/x64/release/bundle"
