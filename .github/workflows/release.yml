@@ -161,9 +161,41 @@ jobs:
           name: TrueLedger-macOS-dmg
           path: TrueLedger.dmg
 
+  build-ios:
+    name: Build iOS (IPA - Unsigned)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get Version
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Build iOS (No Codesign)
+        run: |
+          flutter build ios --release --no-codesign --build-name=${{ steps.version.outputs.VERSION }}
+          mkdir -p build/ios/iphoneos
+          mv build/ios/iphoneos/Runner.app build/ios/iphoneos/TrueLedger.app
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/TrueLedger.app Payload
+          zip -r TrueLedger.ipa Payload
+
+      - name: Upload iOS IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrueLedger-iOS-ipa-unsigned
+          path: TrueLedger.ipa
+
   release:
     name: Create Release
-    needs: [build-linux, build-android, build-windows, build-macos]
+    needs: [build-linux, build-android, build-windows, build-macos, build-ios]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -201,6 +233,11 @@ jobs:
         with:
           name: TrueLedger-macOS-dmg
 
+      - name: Download iOS IPA Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TrueLedger-iOS-ipa-unsigned
+
       - name: Get Version
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
@@ -213,6 +250,7 @@ jobs:
           mv TrueLedger.exe TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.exe
           mv TrueLedger.msix TrueLedger_${{ steps.version.outputs.VERSION }}_signed.msix
           mv TrueLedger.dmg TrueLedger_${{ steps.version.outputs.VERSION }}.dmg
+          mv TrueLedger.ipa TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.ipa
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -225,6 +263,7 @@ jobs:
             TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.exe
             TrueLedger_${{ steps.version.outputs.VERSION }}_signed.msix
             TrueLedger_${{ steps.version.outputs.VERSION }}.dmg
+            TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.ipa
           generate_release_notes: true
 
       - name: Prepare Pages Deployment
