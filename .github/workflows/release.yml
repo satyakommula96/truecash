@@ -65,22 +65,22 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Build APK
-        run: flutter build apk --release --build-name=${{ steps.version.outputs.VERSION }}
-
-      - name: Build App Bundle
+      - name: Build Signed App Bundle
         run: flutter build appbundle --release --build-name=${{ steps.version.outputs.VERSION }}
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: TrueLedger-Android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Build Unsigned APK
+        run: flutter build apk --debug --build-name=${{ steps.version.outputs.VERSION }}
 
-      - name: Upload AAB Artifact
+      - name: Upload Unsigned APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueLedger-Android-aab
+          name: TrueLedger-Android-apk-unsigned
+          path: build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Upload Signed AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrueLedger-Android-aab-signed
           path: build/app/outputs/bundle/release/app-release.aab
 
   build-windows:
@@ -105,21 +105,22 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Build Flutter App
-        run: flutter build windows --release --build-name=${{ steps.version.outputs.VERSION }}
+      - name: Build Unsigned EXE
+        run: flutter build windows --profile --build-name=${{ steps.version.outputs.VERSION }}
 
-      - name: Package with Inno Setup
+      - name: Package with Inno Setup (Unsigned)
         run: |
           iscc /DAppVersion=${{ steps.version.outputs.VERSION }} scripts/windows_setup.iss
 
-      - name: Create MSIX Package
+      - name: Create MSIX Package (Signed)
+        # Note: In real CI, requires signing cert config in pubspec.yaml or secrets
         run: |
           flutter pub run msix:create --version ${{ steps.version.outputs.VERSION }}.0
 
-      - name: Upload EXE Artifact
+      - name: Upload Unsigned EXE Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TrueLedger-Windows-exe
+          name: TrueLedger-Windows-exe-unsigned
           path: build/windows/x64/installer/TrueLedger.exe
 
       - name: Upload MSIX Artifact
@@ -175,22 +176,22 @@ jobs:
         with:
           name: TrueLedger-Linux-deb
 
-      - name: Download Android Artifact
+      - name: Download Android Unsigned APK
         uses: actions/download-artifact@v4
         with:
-          name: TrueLedger-Android-apk
+          name: TrueLedger-Android-apk-unsigned
 
-      - name: Download Android AAB Artifact
+      - name: Download Android Signed AAB
         uses: actions/download-artifact@v4
         with:
-          name: TrueLedger-Android-aab
+          name: TrueLedger-Android-aab-signed
 
-      - name: Download Windows EXE Artifact
+      - name: Download Windows Unsigned EXE
         uses: actions/download-artifact@v4
         with:
-          name: TrueLedger-Windows-exe
+          name: TrueLedger-Windows-exe-unsigned
 
-      - name: Download Windows MSIX Artifact
+      - name: Download Windows Signed MSIX
         uses: actions/download-artifact@v4
         with:
           name: TrueLedger-Windows-msix
@@ -206,11 +207,11 @@ jobs:
 
       - name: Rename Files with Version
         run: |
-          mv app-release.apk TrueLedger_${{ steps.version.outputs.VERSION }}.apk
-          mv app-release.aab TrueLedger_${{ steps.version.outputs.VERSION }}.aab
+          mv app-debug.apk TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.apk
+          mv app-release.aab TrueLedger_${{ steps.version.outputs.VERSION }}_signed.aab
           mv TrueLedger.deb TrueLedger_${{ steps.version.outputs.VERSION }}.deb
-          mv TrueLedger.exe TrueLedger_${{ steps.version.outputs.VERSION }}.exe
-          mv TrueLedger.msix TrueLedger_${{ steps.version.outputs.VERSION }}.msix
+          mv TrueLedger.exe TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.exe
+          mv TrueLedger.msix TrueLedger_${{ steps.version.outputs.VERSION }}_signed.msix
           mv TrueLedger.dmg TrueLedger_${{ steps.version.outputs.VERSION }}.dmg
 
       - name: Create Release
@@ -219,10 +220,10 @@ jobs:
         with:
           files: |
             TrueLedger_${{ steps.version.outputs.VERSION }}.deb
-            TrueLedger_${{ steps.version.outputs.VERSION }}.apk
-            TrueLedger_${{ steps.version.outputs.VERSION }}.aab
-            TrueLedger_${{ steps.version.outputs.VERSION }}.exe
-            TrueLedger_${{ steps.version.outputs.VERSION }}.msix
+            TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.apk
+            TrueLedger_${{ steps.version.outputs.VERSION }}_signed.aab
+            TrueLedger_${{ steps.version.outputs.VERSION }}_unsigned.exe
+            TrueLedger_${{ steps.version.outputs.VERSION }}_signed.msix
             TrueLedger_${{ steps.version.outputs.VERSION }}.dmg
           generate_release_notes: true
 
