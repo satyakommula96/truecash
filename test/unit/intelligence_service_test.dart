@@ -106,7 +106,7 @@ void main() {
   });
 
   group('IntelligenceService.calculateHealthScore', () {
-    test('should return 0 for new user with no data', () {
+    test('should return 50 for new user with no data', () {
       final summary = MonthlySummary(
         totalIncome: 0,
         totalFixed: 0,
@@ -121,7 +121,7 @@ void main() {
       expect(
           IntelligenceService.calculateHealthScore(
               summary: summary, budgets: []),
-          0);
+          50);
     });
 
     test('should give 100 for perfect financial profile', () {
@@ -129,7 +129,7 @@ void main() {
         totalIncome: 100000,
         totalFixed: 10000,
         totalVariable: 10000,
-        totalSubscriptions: 5000, // Savings rate: 75%
+        totalSubscriptions: 5000, // Surplus: 75%
         totalInvestments: 1000000,
         netWorth: 500000,
         creditCardDebt: 0,
@@ -160,7 +160,8 @@ void main() {
 
       final score = IntelligenceService.calculateHealthScore(
           summary: summary, budgets: []);
-      expect(score, lessThanOrEqualTo(40));
+      // Score: Savings(40) + Debt(5) + Solvency(0) + Budget(10) + Liquidity(10) - Penalty(20) = 45
+      expect(score, equals(45));
     });
   });
 }

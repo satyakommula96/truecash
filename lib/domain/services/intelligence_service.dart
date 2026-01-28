@@ -110,6 +110,20 @@ class IntelligenceService {
       ));
     }
 
+    // 4. Overspending Check
+    final totalOutflow = (summary.totalFixed +
+        summary.totalVariable +
+        summary.totalSubscriptions);
+    if (summary.totalIncome > 0 && totalOutflow > summary.totalIncome) {
+      insights.add(AIInsight(
+        title: "CRITICAL OVERSPENDING",
+        body:
+            "Your monthly expenses exceed your income. This is unsustainable. Review your variable costs immediately.",
+        type: InsightType.warning,
+        value: "Danger",
+      ));
+    }
+
     return insights;
   }
 
@@ -117,82 +131,106 @@ class IntelligenceService {
     required MonthlySummary summary,
     required List<Budget> budgets,
   }) {
-    // Edge case: No data at all (New User)
+    // Edge case: No data or newly initialized
     if (summary.totalIncome == 0 &&
         summary.totalFixed == 0 &&
         summary.totalVariable == 0 &&
         summary.netWorth == 0) {
-      return 0; // Or a neutral starting score like 0 until they add data
+      return 50; // New users start at a neutral mid-point
     }
 
-    double score = 0.0; // Start from 0
+    double score = 0.0;
 
-    // 1. Savings Rate (Max 35 points)
-    // Higher weight because saving is the foundation
-    double savingsRate = summary.totalIncome > 0
-        ? (summary.totalIncome -
-                (summary.totalFixed +
-                    summary.totalVariable +
-                    summary.totalSubscriptions)) /
-            summary.totalIncome
-        : 0;
+    // 1. SURPLUS / SAVINGS RATE (Weight: 40%)
+    final totalExpenses =
+        summary.totalFixed + summary.totalVariable + summary.totalSubscriptions;
+    final surplus = summary.totalIncome - totalExpenses;
 
-    if (savingsRate > 0) {
-      score += (savingsRate * 100).clamp(0.0, 35.0);
-    }
-
-    // 2. Debt-to-Income / Debt Load (Max 25 points)
     if (summary.totalIncome > 0) {
-      // Use actual EMI + 5% of Credit Card Balance (Min Due proxy)
+      double savingsRate = surplus / summary.totalIncome;
+      if (savingsRate >= 0.50) {
+        score += 40; // Exceptional (50%+)
+      } else if (savingsRate >= 0.20) {
+        // Linear scale from 20% to 50% (25 to 40 points)
+        score += 25 + (savingsRate - 0.20) * (15 / 0.30);
+      } else if (savingsRate > 0) {
+        // Linear scale from 0% to 20% (0 to 25 points)
+        score += (savingsRate / 0.20) * 25;
+      } else {
+        // Negative savings rate penalty
+        score -= (savingsRate.abs() * 20).clamp(0.0, 30.0);
+      }
+    } else if (totalExpenses > 0) {
+      score -= 20; // Spending with no income
+    }
+
+    // 2. DEBT BURDEN / DTI (Weight: 30%)
+    if (summary.totalIncome > 0) {
+      // Monthly debt obligation = EMI + 5% of CC debt (proxy for min due)
       double monthlyDebt =
           summary.totalMonthlyEMI.toDouble() + (summary.creditCardDebt * 0.05);
-      double dti = (monthlyDebt / summary.totalIncome).clamp(0.0, 1.0);
-      score += (25 * (1 - dti));
-    } else if (summary.loansTotal > 0 || summary.creditCardDebt > 0) {
-      // Debt with no income is a big risk
-      score += 0;
-    } else {
-      score += 20; // No debt and no income (balanced)
+      double dti = monthlyDebt / summary.totalIncome;
+
+      if (dti == 0) {
+        score += 30; // No debt is perfect
+      } else if (dti <= 0.20) {
+        score += 25; // Healthy
+      } else if (dti <= 0.40) {
+        score += 15; // Manageable
+      } else if (dti <= 0.60) {
+        score += 5; // High risk
+      } else {
+        score -= 10; // Extreme burden
+      }
+    } else if (summary.loansTotal == 0 && summary.creditCardDebt == 0) {
+      score += 20; // No income, but at least no debt
     }
 
-    // 3. Asset-to-Liability Ratio (Max 20 points)
-    double assets =
-        (summary.totalInvestments + summary.netWorth.clamp(0, double.infinity))
-            .toDouble();
+    // 3. SOLVENCY & WEALTH (ASSET/LIABILITY) (Weight: 15%)
+    // In our model, netWorth = (Investments + Retirement) - Debt
+    // So Total Assets = netWorth + Debt
     double liabilities =
         (summary.loansTotal + summary.creditCardDebt).toDouble();
-    if (liabilities == 0) {
+    double assets = (summary.netWorth + liabilities).toDouble();
+
+    if (liabilities <= 0) {
       if (assets > 0) {
-        score += 20;
+        score += 15; // Solvent and growing
       } else {
-        score += 10; // Neutral
+        score += 7; // Neutral (no assets, no debt)
       }
-    } else {
+    } else if (assets > 0) {
       double ratio = assets / liabilities;
-      score += (ratio * 10).clamp(0.0, 20.0);
+      if (ratio >= 3.0) {
+        score += 15; // Solid (Assets > 3x Debt)
+      } else if (ratio >= 1.5) {
+        score += 10; // Good
+      } else if (ratio >= 1.0) {
+        score += 5; // Solvent but leveraged
+      } else {
+        score += 0; // Underwater or highly leveraged
+      }
     }
 
-    // 4. Budget Discipline (Max 20 points)
+    // 4. BUDGET DISCIPLINE (Weight: 15%)
     if (budgets.isNotEmpty) {
       int overspentCount =
           budgets.where((b) => b.spent > b.monthlyLimit).length;
-      double adherence = 1 - (overspentCount / budgets.length);
-      score += (adherence * 20);
+      double health = 1 - (overspentCount / budgets.length);
+      score += (health * 15);
     } else {
-      score += 10; // Neutral
+      score += 10; // Bonus for just showing up, or neutral
     }
 
-    // 5. Net Worth / Solvency Penalty
-    if (summary.netWorth < 0) {
-      if (score > 40) {
-        score = 40; // Cap at 40 (At Risk boundary) immediately for insolvency
-      }
+    // 5. LIQUIDITY BONUS (Emergency Fund Proxy)
+    // If Assets covers 3+ months of expenses
+    if (totalExpenses > 0 && assets > (totalExpenses * 3)) {
+      score += 10;
+    }
 
-      // Further reduce if deeply in debt relative to income
-      if (summary.totalIncome > 0 &&
-          summary.netWorth.abs() > (summary.totalIncome * 12)) {
-        score -= 10; // Serious long-term insolvency risk
-      }
+    // 6. SOLVENCY PENALTY
+    if (summary.netWorth < 0) {
+      score -= 20;
     }
 
     return score.toInt().clamp(0, 100);
