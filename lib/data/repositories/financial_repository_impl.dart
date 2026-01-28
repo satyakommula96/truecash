@@ -488,4 +488,35 @@ class FinancialRepositoryImpl implements IFinancialRepository {
     allItems.sort((a, b) => (b['id'] as int).compareTo(a['id'] as int));
     return allItems.map((e) => LedgerItem.fromMap(e)).toList();
   }
+
+  @override
+  Future<void> restoreBackup(Map<String, dynamic> data) async {
+    final db = await AppDatabase.db;
+    final batch = db.batch();
+
+    // Mapping table names to backup keys
+    final tableMap = {
+      'variable_expenses': 'vars',
+      'income_sources': 'income',
+      'fixed_expenses': 'fixed',
+      'investments': 'invs',
+      'subscriptions': 'subs',
+      'credit_cards': 'cards',
+      'loans': 'loans',
+      'saving_goals': 'goals',
+      'budgets': 'budgets',
+    };
+
+    for (var entry in tableMap.entries) {
+      final tableName = entry.key;
+      final backupKey = entry.value;
+      if (data[backupKey] != null && data[backupKey] is List) {
+        for (var item in (data[backupKey] as List)) {
+          batch.insert(tableName, item as Map<String, dynamic>);
+        }
+      }
+    }
+
+    await batch.commit(noResult: true);
+  }
 }

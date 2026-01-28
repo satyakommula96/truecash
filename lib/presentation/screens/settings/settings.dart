@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:trueledger/core/services/file_service.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:trueledger/core/utils/web_saver.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:trueledger/data/datasources/database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:trueledger/main.dart';
@@ -385,13 +385,6 @@ class SettingsScreen extends ConsumerWidget {
       ref.invalidate(dashboardProvider);
       ref.invalidate(analysisProvider);
 
-      try {
-        await ref.read(dashboardProvider.future);
-        await ref.read(analysisProvider.future);
-      } catch (e) {
-        debugPrint("Refresh failed: $e");
-      }
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Generated ${option.toUpperCase()} data scenario")));
@@ -505,8 +498,8 @@ class SettingsScreen extends ConsumerWidget {
       );
 
       if (outputFile != null) {
-        final file = File(outputFile);
-        await file.writeAsString(finalOutput);
+        final fileService = ref.read(fileServiceProvider);
+        await fileService.writeAsString(outputFile, finalOutput);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Encrypted backup saved to $outputFile")));
@@ -517,7 +510,8 @@ class SettingsScreen extends ConsumerWidget {
 
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/$fileName');
-    await file.writeAsString(finalOutput);
+    final fileService = ref.read(fileServiceProvider);
+    await fileService.writeAsString(file.path, finalOutput);
 
     if (context.mounted) {
       // ignore: deprecated_member_use
@@ -536,8 +530,8 @@ class SettingsScreen extends ConsumerWidget {
       if (bytes == null) return;
       fileContent = utf8.decode(bytes);
     } else {
-      final file = File(result.files.single.path!);
-      fileContent = await file.readAsString();
+      final fileService = ref.read(fileServiceProvider);
+      fileContent = await fileService.readAsString(result.files.single.path!);
     }
 
     try {
@@ -633,49 +627,10 @@ class SettingsScreen extends ConsumerWidget {
       if (confirmed == true) {
         final repo = ref.read(financialRepositoryProvider);
         await repo.clearData();
-
-        final db = await AppDatabase.db;
-        final batch = db.batch();
-
-        for (var i in (data['vars'] as List)) {
-          batch.insert('variable_expenses', i as Map<String, dynamic>);
-        }
-        for (var i in (data['income'] as List)) {
-          batch.insert('income_sources', i as Map<String, dynamic>);
-        }
-        for (var i in (data['fixed'] as List)) {
-          batch.insert('fixed_expenses', i as Map<String, dynamic>);
-        }
-        for (var i in (data['invs'] as List)) {
-          batch.insert('investments', i as Map<String, dynamic>);
-        }
-        for (var i in (data['subs'] as List)) {
-          batch.insert('subscriptions', i as Map<String, dynamic>);
-        }
-        for (var i in (data['cards'] as List)) {
-          batch.insert('credit_cards', i as Map<String, dynamic>);
-        }
-        for (var i in (data['loans'] as List)) {
-          batch.insert('loans', i as Map<String, dynamic>);
-        }
-        for (var i in (data['goals'] as List)) {
-          batch.insert('saving_goals', i as Map<String, dynamic>);
-        }
-        for (var i in (data['budgets'] as List)) {
-          batch.insert('budgets', i as Map<String, dynamic>);
-        }
-
-        await batch.commit();
+        await repo.restoreBackup(data);
 
         ref.invalidate(dashboardProvider);
         ref.invalidate(analysisProvider);
-
-        try {
-          await ref.read(dashboardProvider.future);
-          await ref.read(analysisProvider.future);
-        } catch (e) {
-          debugPrint("Refresh failed: $e");
-        }
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -717,12 +672,6 @@ class SettingsScreen extends ConsumerWidget {
       ref.invalidate(dashboardProvider);
       ref.invalidate(analysisProvider);
 
-      try {
-        await ref.read(dashboardProvider.future);
-        await ref.read(analysisProvider.future);
-      } catch (e) {
-        debugPrint("Refresh failed: $e");
-      }
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("All data has been reset")));
