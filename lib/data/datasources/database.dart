@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:sqflite_sqlcipher/sqflite.dart' as sqlcipher;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart' as sqflite_web;
 import 'package:sqflite_common/sqlite_api.dart' as common;
 import 'package:path/path.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -67,7 +68,30 @@ class AppDatabase {
 
     final key = await _getOrGenerateKey();
 
-    if (kIsWeb || Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    if (kIsWeb) {
+      try {
+        return await sqflite_web.databaseFactoryFfiWeb.openDatabase(
+          path,
+          options: common.OpenDatabaseOptions(
+              version: AppVersion.databaseVersion,
+              onConfigure: (db) async {
+                // No encryption for Web for now
+                debugPrint('Web database initialized.');
+              },
+              onCreate: (db, version) async {
+                await _createDb(db);
+                debugPrint('Database tables created successfully.');
+              },
+              onUpgrade: (db, oldVersion, newVersion) async {
+                await _upgradeDb(db, oldVersion, newVersion);
+              }),
+        );
+      } catch (e) {
+        debugPrint(
+            'CRITICAL: Web database open failed ($e). Attempting recovery...');
+        return await _handleDatabaseReset(path, key, isDesktop: false);
+      }
+    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       try {
         return await sqflite_ffi.databaseFactoryFfi.openDatabase(
           path,
@@ -134,7 +158,15 @@ class AppDatabase {
       }
     }
 
-    if (isDesktop) {
+    if (kIsWeb) {
+      return await sqflite_web.databaseFactoryFfiWeb.openDatabase(
+        path,
+        options: common.OpenDatabaseOptions(
+            version: AppVersion.databaseVersion,
+            onCreate: (db, version) => _createDb(db),
+            onUpgrade: (db, old, newV) => _upgradeDb(db, old, newV)),
+      );
+    } else if (isDesktop) {
       return await sqflite_ffi.databaseFactoryFfi.openDatabase(
         path,
         options: common.OpenDatabaseOptions(

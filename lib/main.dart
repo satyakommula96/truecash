@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'dart:ui';
 
 import 'package:trueledger/core/theme/theme.dart';
@@ -16,7 +17,7 @@ Future<void> main() async {
   // 1. Initial Desktop & Web Setup
   if (kIsWeb) {
     // Web support via sqlite3.wasm
-    databaseFactory = databaseFactoryFfi;
+    databaseFactory = databaseFactoryFfiWeb;
   } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     // Desktop support
     // Note: For Windows, we assume sqlcipher.dll is in the same directory or path
