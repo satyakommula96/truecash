@@ -169,4 +169,24 @@ class NotificationService {
           'We will remind you on the ${day}th of every month to update your bill.',
     );
   }
+
+  /// Get list of pending/scheduled notifications
+  Future<List<fln.PendingNotificationRequest>> getPendingNotifications() async {
+    if (kIsWeb) return [];
+    // Note: This throws UnimplementedError on Linux as pendingNotificationRequests
+    // is not supported on that platform
+    return await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+  }
+
+  /// Cancel a specific notification by ID
+  Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return;
+    await flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  /// Cancel all notifications
+  Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return;
+    await flutterLocalNotificationsPlugin.cancelAll();
+  }
 }

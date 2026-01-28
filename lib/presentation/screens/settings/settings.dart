@@ -24,6 +24,7 @@ import 'package:trueledger/core/providers/version_provider.dart';
 import 'package:trueledger/core/providers/shared_prefs_provider.dart';
 
 import 'package:trueledger/core/services/backup_encryption_service.dart';
+import 'package:trueledger/presentation/screens/settings/notifications_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -978,6 +979,20 @@ class SettingsScreen extends ConsumerWidget {
             Icons.payments_outlined,
             Colors.teal,
             () => _showCurrencyPicker(context),
+          ),
+          const SizedBox(height: 16),
+          _buildOption(
+            context,
+            "Notifications",
+            "View and manage scheduled reminders",
+            Icons.notifications_outlined,
+            Colors.purple,
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const NotificationsScreen(),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           _buildOption(

@@ -8,6 +8,7 @@ import 'package:trueledger/presentation/providers/user_provider.dart';
 import 'package:trueledger/core/theme/theme.dart';
 
 import 'package:trueledger/presentation/screens/settings/settings.dart';
+import 'package:trueledger/presentation/screens/settings/notifications_screen.dart';
 
 class DashboardHeader extends ConsumerWidget {
   final bool isDark;
@@ -103,6 +104,18 @@ class DashboardHeader extends ConsumerWidget {
                   color: isPrivacy
                       ? colorScheme.primary
                       : colorScheme.onSurface.withValues(alpha: 0.7),
+                  semantic: semantic,
+                ),
+                const SizedBox(width: 12),
+                _buildHeaderAction(
+                  context,
+                  icon: Icons.notifications_outlined,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen(),
+                    ),
+                  ),
                   semantic: semantic,
                 ),
                 const SizedBox(width: 12),
