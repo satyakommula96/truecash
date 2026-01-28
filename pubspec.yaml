@@ -1,7 +1,7 @@
 name: trueledger
 description: "TrueLedger - Premium Personal Finance & Expense Tracking"
 publish_to: "none"
-version: 1.2.1+1
+version: 1.2.2+1
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -42,6 +42,8 @@ dependencies:
   csv: ^6.0.0
   web: ^1.1.1
   package_info_plus: ^9.0.0
+  encrypt: ^5.0.3
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +54,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   msix: ^3.16.13
+  plugin_platform_interface: ^2.1.8
 
 flutter_launcher_icons:
   android: true
@@ -84,9 +87,13 @@ flutter_launcher_icons:
 msix_config:
   display_name: TrueLedger
   publisher_display_name: Satya Kommula
+  # UPDATE FROM PARTNER CENTER: App Identity -> Package/Identity/Publisher
+  # Example: CN=A9A65466-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   publisher: CN=SatyaKommula, O=SatyaKommula
+  # UPDATE FROM PARTNER CENTER: App Identity -> Package/Identity/Name
+  # Example: 1234SatyaKommula.TrueLedger
   identity_name: com.satyakommula.trueledger
-  msix_version: 1.2.1.0
+  msix_version: 1.2.2.0
   logo_path: assets/icon/trueledger_icon.png
   capabilities: internetClient, internetClientServer, privateNetworkClientServer
   store: true

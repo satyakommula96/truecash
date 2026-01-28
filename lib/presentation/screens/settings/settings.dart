@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:trueledger/core/services/file_service.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -6,13 +7,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:trueledger/core/utils/web_saver.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:trueledger/data/datasources/database.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:trueledger/main.dart';
@@ -24,6 +23,9 @@ import 'package:trueledger/presentation/providers/analysis_provider.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/providers/user_provider.dart';
 import 'package:trueledger/core/providers/version_provider.dart';
+import 'package:trueledger/core/providers/shared_prefs_provider.dart';
+
+import 'package:trueledger/core/services/backup_encryption_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -64,8 +66,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _showThemePicker(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _showThemePicker(BuildContext context, WidgetRef ref) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     if (!context.mounted) return;
 
     showDialog(
@@ -383,13 +385,6 @@ class SettingsScreen extends ConsumerWidget {
       ref.invalidate(dashboardProvider);
       ref.invalidate(analysisProvider);
 
-      try {
-        await ref.read(dashboardProvider.future);
-        await ref.read(analysisProvider.future);
-      } catch (e) {
-        debugPrint("Refresh failed: $e");
-      }
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Generated ${option.toUpperCase()} data scenario")));
@@ -401,8 +396,58 @@ class SettingsScreen extends ConsumerWidget {
   Future<void> _backupData(BuildContext context, WidgetRef ref) async {
     final repo = ref.read(financialRepositoryProvider);
 
-    // Gather all data
-    final data = {
+    // 1. Ask for encryption password
+    String? password;
+    if (context.mounted) {
+      password = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) {
+          String input = "";
+          bool obscure = true;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Encrypt Backup"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Enter a password to encrypt this backup file.",
+                      style: TextStyle(fontSize: 13)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    autofocus: true,
+                    obscureText: obscure,
+                    onChanged: (v) => input = v,
+                    decoration: InputDecoration(
+                        labelText: "Password",
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(obscure
+                              ? Icons.visibility
+                              : Icons.visibility_off),
+                          onPressed: () => setState(() => obscure = !obscure),
+                        )),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text("CANCEL")),
+                FilledButton(
+                    onPressed: () => Navigator.pop(ctx, input),
+                    child: const Text("CREATE BACKUP")),
+              ],
+            );
+          });
+        },
+      );
+    }
+
+    if (password == null || password.isEmpty) return;
+
+    // 2. Gather Data
+    final rawData = {
       'vars': await repo.getAllValues('variable_expenses'),
       'income': await repo.getAllValues('income_sources'),
       'fixed': await repo.getAllValues('fixed_expenses'),
@@ -413,16 +458,29 @@ class SettingsScreen extends ConsumerWidget {
       'goals': await repo.getAllValues('saving_goals'),
       'budgets': await repo.getAllValues('budgets'),
       'backup_date': DateTime.now().toIso8601String(),
-      'version': '1.0'
+      'version': '1.0' // Inner version
     };
 
-    final jsonString = jsonEncode(data);
+    final jsonString = jsonEncode(rawData);
+
+    // 3. Encrypt Data
+    final encryptedData =
+        BackupEncryptionService.encryptData(jsonString, password);
+
+    // 4. Wrap in container JSON
+    final container = {
+      'version': '2.0', // Container version
+      'encrypted': true,
+      'data': encryptedData,
+      'date': DateTime.now().toIso8601String(),
+    };
+    final finalOutput = jsonEncode(container);
+
     final fileName =
-        "trueledger_backup_${DateTime.now().millisecondsSinceEpoch}.json";
+        "trueledger_backup_enc_${DateTime.now().millisecondsSinceEpoch}.json";
 
     if (kIsWeb) {
-      // Web: Create XFile from bytes and "share" it (triggers download)
-      final bytes = utf8.encode(jsonString);
+      final bytes = utf8.encode(finalOutput);
       await saveFileWeb(bytes, fileName);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -432,34 +490,33 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      // Desktop: Open "Save As" dialog
       final outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Backup',
+        dialogTitle: 'Save Encrypted Backup',
         fileName: fileName,
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
 
       if (outputFile != null) {
-        final file = File(outputFile);
-        await file.writeAsString(jsonString);
+        final fileService = ref.read(fileServiceProvider);
+        await fileService.writeAsString(outputFile, finalOutput);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Backup saved to $outputFile")));
+              SnackBar(content: Text("Encrypted backup saved to $outputFile")));
         }
       }
       return;
     }
 
-    // Mobile (Android/iOS)
     final directory = await getTemporaryDirectory();
     final file = File('${directory.path}/$fileName');
-    await file.writeAsString(jsonString);
+    final fileService = ref.read(fileServiceProvider);
+    await fileService.writeAsString(file.path, finalOutput);
 
     if (context.mounted) {
       // ignore: deprecated_member_use
       await Share.shareXFiles([XFile(file.path)],
-          text: 'TrueLedger Backup File');
+          text: 'TrueLedger Encrypted Backup');
     }
   }
 
@@ -467,19 +524,84 @@ class SettingsScreen extends ConsumerWidget {
     final result = await FilePicker.platform.pickFiles(type: FileType.any);
     if (result == null || result.files.isEmpty) return;
 
-    // If web, bytes should be populated; else use path
-    String jsonString;
+    String fileContent;
     if (kIsWeb) {
       final bytes = result.files.single.bytes;
       if (bytes == null) return;
-      jsonString = utf8.decode(bytes);
+      fileContent = utf8.decode(bytes);
     } else {
-      final file = File(result.files.single.path!);
-      jsonString = await file.readAsString();
+      final fileService = ref.read(fileServiceProvider);
+      fileContent = await fileService.readAsString(result.files.single.path!);
     }
 
     try {
-      final data = jsonDecode(jsonString) as Map<String, dynamic>;
+      final container = jsonDecode(fileContent) as Map<String, dynamic>;
+
+      // Check for encryption
+      Map<String, dynamic> data;
+      if (container['encrypted'] == true) {
+        // Ask for password
+        String? password;
+        if (context.mounted) {
+          password = await showDialog<String>(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) {
+              String input = "";
+              bool obscure = true;
+              return StatefulBuilder(builder: (context, setState) {
+                return AlertDialog(
+                  title: const Text("Decrypt Backup"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Enter password to decrypt this file.",
+                          style: TextStyle(fontSize: 13)),
+                      const SizedBox(height: 16),
+                      TextField(
+                        autofocus: true,
+                        obscureText: obscure,
+                        onChanged: (v) => input = v,
+                        decoration: InputDecoration(
+                            labelText: "Password",
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(obscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () =>
+                                  setState(() => obscure = !obscure),
+                            )),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text("CANCEL")),
+                    FilledButton(
+                        onPressed: () => Navigator.pop(ctx, input),
+                        child: const Text("DECRYPT")),
+                  ],
+                );
+              });
+            },
+          );
+        }
+
+        if (password == null) return;
+
+        try {
+          final decryptedJson =
+              BackupEncryptionService.decryptData(container['data'], password);
+          data = jsonDecode(decryptedJson) as Map<String, dynamic>;
+        } catch (e) {
+          throw "Invalid Password or Corrupted File";
+        }
+      } else {
+        // Legacy (unencrypted) support
+        data = container;
+      }
 
       if (data['version'] != '1.0') throw "Unknown backup version";
 
@@ -505,52 +627,10 @@ class SettingsScreen extends ConsumerWidget {
       if (confirmed == true) {
         final repo = ref.read(financialRepositoryProvider);
         await repo.clearData();
+        await repo.restoreBackup(data);
 
-        // Restore tables directly via AppDatabase for batch efficiency (Pragmatic concession until Repo expanded)
-        // Ideally this moves to Repo.
-        final db = await AppDatabase.db;
-        final batch = db.batch();
-
-        for (var i in (data['vars'] as List)) {
-          batch.insert('variable_expenses', i as Map<String, dynamic>);
-        }
-        for (var i in (data['income'] as List)) {
-          batch.insert('income_sources', i as Map<String, dynamic>);
-        }
-        for (var i in (data['fixed'] as List)) {
-          batch.insert('fixed_expenses', i as Map<String, dynamic>);
-        }
-        for (var i in (data['invs'] as List)) {
-          batch.insert('investments', i as Map<String, dynamic>);
-        }
-        for (var i in (data['subs'] as List)) {
-          batch.insert('subscriptions', i as Map<String, dynamic>);
-        }
-        for (var i in (data['cards'] as List)) {
-          batch.insert('credit_cards', i as Map<String, dynamic>);
-        }
-        for (var i in (data['loans'] as List)) {
-          batch.insert('loans', i as Map<String, dynamic>);
-        }
-        for (var i in (data['goals'] as List)) {
-          batch.insert('saving_goals', i as Map<String, dynamic>);
-        }
-        for (var i in (data['budgets'] as List)) {
-          batch.insert('budgets', i as Map<String, dynamic>);
-        }
-
-        await batch.commit();
-
-        // Refresh providers
         ref.invalidate(dashboardProvider);
         ref.invalidate(analysisProvider);
-
-        try {
-          await ref.read(dashboardProvider.future);
-          await ref.read(analysisProvider.future);
-        } catch (e) {
-          debugPrint("Refresh failed: $e");
-        }
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -592,12 +672,6 @@ class SettingsScreen extends ConsumerWidget {
       ref.invalidate(dashboardProvider);
       ref.invalidate(analysisProvider);
 
-      try {
-        await ref.read(dashboardProvider.future);
-        await ref.read(analysisProvider.future);
-      } catch (e) {
-        debugPrint("Refresh failed: $e");
-      }
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("All data has been reset")));
@@ -898,7 +972,7 @@ class SettingsScreen extends ConsumerWidget {
             "Switch between Light, Dark, or System theme",
             Icons.dark_mode_outlined,
             Colors.indigo,
-            () => _showThemePicker(context),
+            () => _showThemePicker(context, ref),
           ),
           const SizedBox(height: 16),
           _buildOption(
