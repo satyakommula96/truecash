@@ -87,7 +87,11 @@ flutter_launcher_icons:
 msix_config:
   display_name: TrueLedger
   publisher_display_name: Satya Kommula
+  # UPDATE FROM PARTNER CENTER: App Identity -> Package/Identity/Publisher
+  # Example: CN=A9A65466-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   publisher: CN=SatyaKommula, O=SatyaKommula
+  # UPDATE FROM PARTNER CENTER: App Identity -> Package/Identity/Name
+  # Example: 1234SatyaKommula.TrueLedger
   identity_name: com.satyakommula.trueledger
   msix_version: 1.2.2.0
   logo_path: assets/icon/trueledger_icon.png
