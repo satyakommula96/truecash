@@ -57,7 +57,7 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
     if (picked != null) {
       setState(() {
         _selectedGenDate = picked;
-        genDateCtrl.text = DateFormat('dd-MM-yyyy').format(picked);
+        genDateCtrl.text = 'Day ${picked.day}';
       });
     }
   }
@@ -80,10 +80,19 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
       } catch (_) {}
     }
     if (widget.card.statementDate.isNotEmpty) {
-      try {
-        _selectedGenDate =
-            DateFormat('dd-MM-yyyy').parse(widget.card.statementDate);
-      } catch (_) {}
+      if (widget.card.statementDate.startsWith('Day ')) {
+        final day = int.tryParse(widget.card.statementDate.split(' ')[1]);
+        if (day != null) {
+          final now = DateTime.now();
+          _selectedGenDate = DateTime(now.year, now.month, day);
+        }
+      } else {
+        // Fallback for old format
+        try {
+          _selectedGenDate =
+              DateFormat('dd-MM-yyyy').parse(widget.card.statementDate);
+        } catch (_) {}
+      }
     }
   }
 

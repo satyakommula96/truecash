@@ -55,7 +55,7 @@ class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
     if (picked != null) {
       setState(() {
         _selectedGenDate = picked;
-        genDateCtrl.text = DateFormat('dd-MM-yyyy').format(picked);
+        genDateCtrl.text = 'Day ${picked.day}';
       });
     }
   }
