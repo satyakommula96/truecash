@@ -4,6 +4,8 @@ import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'usecase_base.dart';
 import 'package:flutter/foundation.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class AddTransactionParams {
   final String type;
@@ -106,13 +108,13 @@ class AddTransactionUseCase
 
           if (percent >= 100) {
             notificationEvents.add(NotificationRequest(
-              id: params.category.hashCode,
+              id: _generateStableId('${params.category}_exceeded'),
               title: 'Budget Exceeded: ${params.category}',
               body: 'You have spent 100% of your ${params.category} budget.',
             ));
           } else if (percent >= 85) {
             notificationEvents.add(NotificationRequest(
-              id: params.category.hashCode,
+              id: _generateStableId('${params.category}_warning'),
               title: 'Budget Warning: ${params.category}',
               body:
                   'You have reached ${percent.round()}% of your ${params.category} budget.',
@@ -134,5 +136,14 @@ class AddTransactionUseCase
       return Failure(
           DatabaseFailure("Failed to add transaction: ${e.toString()}"));
     }
+  }
+
+  int _generateStableId(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    // Use first 4 bytes for 32-bit int
+    return digest.bytes
+        .sublist(0, 4)
+        .fold(0, (prev, byte) => (prev << 8) | byte);
   }
 }

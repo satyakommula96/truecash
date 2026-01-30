@@ -638,16 +638,10 @@ class SettingsScreen extends ConsumerWidget {
       if (confirmed == true) {
         final repo = ref.read(financialRepositoryProvider);
 
-        // Auto-backup before restore for safety (internal backup)
+        // Safety backup for UNDO
+        Map<String, dynamic>? safetyBackup;
         try {
-          // Trigger a silent backup here if needed, or just warn.
-          // For now, we assume the user has access to export.
-          // But to be safe per requirements: "Always backup current data before reset"
-          // We can call _backupData internally or just save a json to app docs.
-          // Let's rely on explicit confirmation + maybe a toast saying "Backing up..."
-          // But implementing full auto-backup here is tricky with passwords.
-          // Instead, we can dump the current state to a hidden file.
-          // For this step, I will stick to the strong Warning.
+          safetyBackup = await repo.generateBackup();
         } catch (e) {
           debugPrint("Safety backup failed: $e");
         }
@@ -656,9 +650,29 @@ class SettingsScreen extends ConsumerWidget {
         await repo.restoreBackup(data);
 
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Restore Successful!")));
-          Navigator.pop(context, true); // Go back to dashboard to refresh
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text("Restore Successful!"),
+            duration: const Duration(seconds: 5),
+            action: safetyBackup != null
+                ? SnackBarAction(
+                    label: "UNDO",
+                    onPressed: () async {
+                      try {
+                        await repo.clearData();
+                        await repo.restoreBackup(safetyBackup!);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Restore undone. Data recovered.")));
+                        }
+                      } catch (e) {
+                        debugPrint("Undo failed: $e");
+                      }
+                    })
+                : null,
+          ));
+          Navigator.pop(context, true); // Go back to refresh
         }
       }
     } catch (e) {

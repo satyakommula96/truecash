@@ -4,6 +4,7 @@ import 'package:trueledger/data/datasources/database.dart';
 import 'package:trueledger/domain/models/models.dart';
 import '../../domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/core/services/notification_service.dart';
+import 'package:flutter/foundation.dart';
 
 class FinancialRepositoryImpl implements IFinancialRepository {
   final NotificationService? _notificationService;
@@ -327,26 +328,31 @@ class FinancialRepositoryImpl implements IFinancialRepository {
 
   @override
   Future<void> seedData() async {
+    if (!kDebugMode) return;
     await AppDatabase.seedDummyData();
   }
 
   @override
   Future<void> seedRoadmapData() async {
+    if (!kDebugMode) return;
     await AppDatabase.seedRoadmapData();
   }
 
   @override
   Future<void> seedHealthyProfile() async {
+    if (!kDebugMode) return;
     await AppDatabase.seedHealthyProfile();
   }
 
   @override
   Future<void> seedAtRiskProfile() async {
+    if (!kDebugMode) return;
     await AppDatabase.seedAtRiskProfile();
   }
 
   @override
   Future<void> seedLargeData(int count) async {
+    if (!kDebugMode) return;
     await AppDatabase.seedLargeData(count: count);
   }
 

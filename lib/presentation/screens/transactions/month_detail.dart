@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
+import 'package:trueledger/presentation/components/empty_state.dart';
 
 class MonthDetailScreen extends ConsumerStatefulWidget {
   final String month;
@@ -245,13 +246,34 @@ class _MonthDetailScreenState extends ConsumerState<MonthDetailScreen> {
                 : Builder(builder: (context) {
                     final items = _getFilteredItems();
                     if (items.isEmpty) {
-                      return Center(
-                          child: Text("NO ENTRIES FOUND",
-                              style: TextStyle(
-                                  color: semantic.secondaryText,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.5)));
+                      return EmptyState(
+                        message: "No entries yet",
+                        subMessage:
+                            "Track your first transaction for this month.\nConsistency is key to financial health!",
+                        icon: Icons.receipt_long_rounded,
+                        actionLabel: "ADD ENTRY",
+                        onAction: () async {
+                          String? initial;
+                          List<String>? allowed;
+
+                          if (typeFilter == 'Income') {
+                            initial = 'Income';
+                            allowed = ['Income'];
+                          } else if (typeFilter == 'Expenses') {
+                            initial = 'Variable';
+                            allowed = ['Variable', 'Fixed', 'Subscription'];
+                          }
+
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => AddExpense(
+                                        initialType: initial,
+                                        allowedTypes: allowed,
+                                      )));
+                          _loadData();
+                        },
+                      );
                     }
 
                     return ListView.builder(
