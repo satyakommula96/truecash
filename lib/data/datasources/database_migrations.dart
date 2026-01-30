@@ -44,6 +44,21 @@ class MigrationV2 extends Migration {
   }
 }
 
+class MigrationV3 extends Migration {
+  MigrationV3() : super(3);
+
+  @override
+  Future<void> up(common.Database db) async {
+    // Re-check for v2 column in case v2 migration skipped
+    await addColumnSafe(
+        db, Schema.creditCardsTable, Schema.colStatementDate, "TEXT");
+  }
+
+  @override
+  Future<void> down(common.Database db) async {}
+}
+
 final List<Migration> appMigrations = [
   MigrationV2(),
+  MigrationV3(),
 ];

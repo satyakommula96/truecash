@@ -123,7 +123,8 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
                 isNumber: true, prefix: CurrencyFormatter.symbol),
             _buildField("Minimum Due", minDueCtrl, Icons.low_priority,
                 isNumber: true, prefix: CurrencyFormatter.symbol),
-            _buildField("Statement Generation Date", genDateCtrl, Icons.event,
+            _buildField(
+                "Statement Date (Every Month)", genDateCtrl, Icons.event,
                 readOnly: true, onTap: _pickGenDate),
             _buildField("Payment Due Date", dueDateCtrl, Icons.calendar_today,
                 readOnly: true, onTap: _pickDueDate),
@@ -227,7 +228,7 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
         int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text, genDateCtrl.text);
 
     // Trigger notification
-    final reminderDate = _selectedDueDate;
+    final reminderDate = _selectedGenDate ?? _selectedDueDate;
     if (reminderDate != null) {
       await ref
           .read(notificationServiceProvider)

@@ -417,16 +417,18 @@ class AppDatabase {
       Schema.colCreditLimit: 1500000,
       Schema.colStatementBalance: 87000,
       Schema.colMinDue: 0,
-      Schema.colDueDate:
-          DateFormat('dd-MM-yyyy').format(DateTime(now.year, now.month + 1, 12))
+      Schema.colDueDate: DateFormat('dd-MM-yyyy')
+          .format(DateTime(now.year, now.month + 1, 12)),
+      Schema.colStatementDate: 'Day 18'
     });
     batch.insert(Schema.creditCardsTable, {
       Schema.colBank: 'Amex Platinum',
       Schema.colCreditLimit: 1000000,
       Schema.colStatementBalance: 12500,
       Schema.colMinDue: 0,
-      Schema.colDueDate:
-          DateFormat('dd-MM-yyyy').format(DateTime(now.year, now.month + 1, 24))
+      Schema.colDueDate: DateFormat('dd-MM-yyyy')
+          .format(DateTime(now.year, now.month + 1, 24)),
+      Schema.colStatementDate: 'Day 2'
     });
 
     // Subscriptions (Active List)
