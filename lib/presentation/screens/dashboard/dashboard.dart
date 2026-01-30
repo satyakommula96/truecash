@@ -96,21 +96,23 @@ class Dashboard extends ConsumerWidget {
                                       end: 0,
                                       curve: Curves.easeOutQuint),
                               const SizedBox(height: 24),
-                              DailySummary(
-                                      todaySpend: data.todaySpend,
-                                      semantic: semantic)
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: DailySummary(
+                                        todaySpend: data.todaySpend,
+                                        semantic: semantic),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: WeeklySummary(
+                                        thisWeekSpend: data.thisWeekSpend,
+                                        lastWeekSpend: data.lastWeekSpend,
+                                        semantic: semantic),
+                                  ),
+                                ],
+                              )
                                   .animate(delay: 100.ms)
-                                  .fade(duration: 600.ms)
-                                  .slideY(
-                                      begin: 0.2,
-                                      end: 0,
-                                      curve: Curves.easeOutQuint),
-                              const SizedBox(height: 16),
-                              WeeklySummary(
-                                      thisWeekSpend: data.thisWeekSpend,
-                                      lastWeekSpend: data.lastWeekSpend,
-                                      semantic: semantic)
-                                  .animate(delay: 200.ms)
                                   .fade(duration: 600.ms)
                                   .slideY(
                                       begin: 0.2,

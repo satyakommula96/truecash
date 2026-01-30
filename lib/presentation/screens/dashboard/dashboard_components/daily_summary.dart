@@ -20,52 +20,36 @@ class DailySummary extends ConsumerWidget {
     final spendStr = CurrencyFormatter.format(todaySpend, isPrivate: isPrivacy);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: semantic.divider.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "TODAY'S SPEND",
+            "TODAY",
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
               color: semantic.secondaryText,
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                spendStr,
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1.0,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              spendStr,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "Track early to stay on budget.",
-            style: TextStyle(
-              fontSize: 13,
-              color: semantic.secondaryText.withValues(alpha: 0.8),
             ),
           ),
         ],
