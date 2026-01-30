@@ -374,7 +374,7 @@ class FinancialRepositoryImpl implements IFinancialRepository {
 
   @override
   Future<void> addCreditCard(String bank, int creditLimit, int statementBalance,
-      int minDue, String dueDate) async {
+      int minDue, String dueDate, String statementDate) async {
     final db = await AppDatabase.db;
     await db.insert('credit_cards', {
       'bank': bank,
@@ -382,12 +382,19 @@ class FinancialRepositoryImpl implements IFinancialRepository {
       'statement_balance': statementBalance,
       'min_due': minDue,
       'due_date': dueDate,
+      'statement_date': statementDate,
     });
   }
 
   @override
-  Future<void> updateCreditCard(int id, String bank, int creditLimit,
-      int statementBalance, int minDue, String dueDate) async {
+  Future<void> updateCreditCard(
+      int id,
+      String bank,
+      int creditLimit,
+      int statementBalance,
+      int minDue,
+      String dueDate,
+      String statementDate) async {
     final db = await AppDatabase.db;
     await db.update(
       'credit_cards',
@@ -397,6 +404,7 @@ class FinancialRepositoryImpl implements IFinancialRepository {
         'statement_balance': statementBalance,
         'min_due': minDue,
         'due_date': dueDate,
+        'statement_date': statementDate,
       },
       where: 'id = ?',
       whereArgs: [id],

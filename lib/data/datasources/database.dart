@@ -107,6 +107,7 @@ class AppDatabase {
                 if (_isTest) {
                   debugPrint('Skipping desktop encryption check in Test Mode.');
                 } else {
+                  bool isEncrypted = false;
                   try {
                     // Check if SQLCipher is available
                     final result = await db.rawQuery('PRAGMA cipher_version;');
@@ -120,16 +121,21 @@ class AppDatabase {
                             'Encryption is MANDATORY for privacy compliance.');
                       }
                     } else {
+                      isEncrypted = true;
                       // Apply the key only if SQLCipher is available
                       await db.execute("PRAGMA key = '$key';");
                     }
 
                     // Validation: Try a simple query that requires a valid key/encryption setup
-                    // Since the DB is fresh or already keyed, this should succeed.
                     await db.rawQuery('SELECT count(*) FROM sqlite_master;');
 
-                    debugPrint(
-                        'Desktop SQLCipher encryption verified and active on ${kIsWeb ? "Web" : Platform.operatingSystem}.');
+                    if (isEncrypted) {
+                      debugPrint(
+                          'Desktop SQLCipher encryption verified and active on ${kIsWeb ? "Web" : Platform.operatingSystem}.');
+                    } else {
+                      debugPrint(
+                          'Running in UNENCRYPTED mode (Development Fallback).');
+                    }
                   } catch (e) {
                     debugPrint('CRITICAL: Database encryption failure: $e');
                     // Re-throw to prevent the app from starting with unencrypted data

@@ -71,12 +71,18 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
         TextEditingController(text: widget.card.statementBalance.toString());
     minDueCtrl = TextEditingController(text: widget.card.minDue.toString());
     dueDateCtrl = TextEditingController(text: widget.card.dueDate);
-    genDateCtrl = TextEditingController();
+    genDateCtrl = TextEditingController(text: widget.card.statementDate);
     try {
       _selectedDueDate = DateFormat('dd-MM-yyyy').parse(widget.card.dueDate);
     } catch (_) {
       try {
         _selectedDueDate = DateFormat('dd-MM-yy').parse(widget.card.dueDate);
+      } catch (_) {}
+    }
+    if (widget.card.statementDate.isNotEmpty) {
+      try {
+        _selectedGenDate =
+            DateFormat('dd-MM-yyyy').parse(widget.card.statementDate);
       } catch (_) {}
     }
   }
@@ -209,7 +215,7 @@ class _EditCreditCardScreenState extends ConsumerState<EditCreditCardScreen> {
     }
 
     await repo.updateCreditCard(widget.card.id, bankCtrl.text, limit, balance,
-        int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text);
+        int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text, genDateCtrl.text);
 
     // Trigger notification
     final reminderDate = _selectedDueDate;

@@ -145,7 +145,7 @@ class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
     }
 
     await repo.addCreditCard(bankCtrl.text, limit, balance,
-        int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text);
+        int.tryParse(minDueCtrl.text) ?? 0, dueDateCtrl.text, genDateCtrl.text);
 
     // Trigger notification
     if (_selectedGenDate != null) {
