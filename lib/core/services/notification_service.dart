@@ -101,7 +101,7 @@ class NotificationService {
       );
 
       await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        settings: initializationSettings,
         onDidReceiveNotificationResponse:
             (fln.NotificationResponse response) async {
           _onNotificationClick.add(response.payload);
@@ -200,10 +200,10 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      notificationDetails,
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
       payload: payload,
     );
   }
@@ -221,11 +221,11 @@ class NotificationService {
 
     // Using periodicallyShow as a robust workaround for zonedSchedule compilation issues
     await flutterLocalNotificationsPlugin.periodicallyShow(
-      dailyReminderId,
-      'Daily Reminder',
-      'Add your expenses for today!',
-      fln.RepeatInterval.daily,
-      const fln.NotificationDetails(
+      id: dailyReminderId,
+      title: 'Daily Reminder',
+      body: 'Add your expenses for today!',
+      repeatInterval: fln.RepeatInterval.daily,
+      notificationDetails: const fln.NotificationDetails(
         android: fln.AndroidNotificationDetails(
           'scheduled_channel',
           'Scheduled Notifications',
@@ -322,7 +322,7 @@ class NotificationService {
     if (!_isInitialized) await init();
     await _removeScheduledNotification(id);
     if (kIsWeb || _isTest || _initFailed) return;
-    await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   /// Cancel all notifications
