@@ -55,13 +55,13 @@ Welcome to the **TrueLedger** documentation! TrueLedger is a privacy-first, offl
 
 This documentation covers:
 
-- **Getting Started**: Installation, configuration, and quick start guides
-- **Architecture**: Deep dive into Clean Architecture, layers, and design patterns
-- **Development**: How to add features, write tests, and follow best practices
-- **Features**: Detailed guides for each app feature
-- **Database**: Schema, migrations, and performance optimization
-- **Platform-Specific**: Platform-specific implementation details
-- **CI/CD**: Continuous integration and deployment workflows
+- **Getting Started**: Installation, configuration, and quick start guides.
+- **Architecture**: Deep dive into Clean Architecture, layers, and design patterns.
+- **Development**: How to add features, write tests, and follow best practices.
+- **Features**: Detailed guides for Dashboard, Transactions, Budgets, and AI Insights.
+- **Database**: Schema, migrations, and performance optimization.
+- **Platform-Specific**: Implementation details for Web, Android, iOS, and Desktop.
+- **CI/CD**: Continuous integration and deployment workflows.
 
 ## 🏗️ Architecture at a Glance
 

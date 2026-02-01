@@ -30,14 +30,19 @@ We implement these phases sequentially.
 
 ## Phase 2: Trust (Goal: Reliability & Correction)
 
-- [ ] **Search & Edit**
-    - [ ] Search bar in Transactions list (Amount, Category, Note).
-    - [ ] Edit/Delete capabilities for existing transactions.
-    - [ ] Undo option for deletions.
+- [x] **Search & Edit**
+    - [x] Search bar in Transactions list (Amount, Category, Note).
+    - [x] Edit/Delete capabilities for existing transactions.
+    - [x] Undo option for deletions.
 
-- [ ] **Backup & Restore**
-    - [ ] JSON Export/Import (Clean UI).
-    - [ ] Auto-backup to local file.
+- [x] **Backup & Restore**
+    - [x] Encrypted JSON Export/Import.
+    - [x] Auto-backup to local file (Desktop/Mobile).
+    - [x] Web browser download support.
+
+- [x] **Web Support**
+    - [x] Full responsive dashboard.
+    - [x] SQLite WASM persistence.
 
 - [x] **Weekly/Monthly Insights**
     - [x] "You spent 12% more than last week" (Plain text insights).
@@ -45,9 +50,9 @@ We implement these phases sequentially.
 
 ## Phase 3: Delight (Goal: Polish & Engagement)
 
-- [ ] **Streaks**
-    - [ ] "5 Day Streak" counter on Dashboard.
-    - [ ] Confetti animation for hitting streak milestones.
+- [x] **Streaks**
+    - [x] "Daily Streak" counter on Dashboard.
+    - [x] Confetti animation for hitting streak milestones.
 
 - [ ] **Performance Polish**
     - [ ] Ensure app opens < 1s.
