@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/core/utils/result.dart';
@@ -15,6 +16,7 @@ class AutoBackupUseCase extends UseCase<void, NoParams> {
 
   @override
   Future<Result<void>> call(NoParams params) async {
+    if (kIsWeb) return const Success(null);
     try {
       final backupData = await repository.generateBackup();
       backupData['auto_backup'] = true;

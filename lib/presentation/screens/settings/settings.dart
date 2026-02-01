@@ -339,9 +339,21 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     String csv = const ListToCsvConverter().convert(rows);
+    final fileName =
+        "trueledger_export_${DateTime.now().millisecondsSinceEpoch}.csv";
+
+    if (kIsWeb) {
+      final bytes = utf8.encode(csv);
+      await saveFileWeb(bytes, fileName);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Export download started")));
+      }
+      return;
+    }
+
     final directory = await getApplicationDocumentsDirectory();
-    final path =
-        "${directory.path}/expensetracker_export_${DateTime.now().millisecondsSinceEpoch}.csv";
+    final path = "${directory.path}/$fileName";
     final file = File(path);
     await file.writeAsString(csv);
 

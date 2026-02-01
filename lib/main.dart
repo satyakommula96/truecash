@@ -7,11 +7,14 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'dart:ui';
 
+import 'package:flutter_web_plugins/url_strategy.dart';
+
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/core/providers/shared_prefs_provider.dart';
 import 'package:trueledger/presentation/screens/startup/startup_screen.dart';
 
 Future<void> main() async {
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
 
   // 1. Initial Desktop & Web Setup
