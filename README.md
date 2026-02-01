@@ -6,14 +6,17 @@ A privacy-first personal finance tracker with AI-powered insights.
 [![Documentation](https://github.com/satyakommula96/trueledger/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/satyakommula96/trueledger/actions/workflows/deploy-docs.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+### 🚀 **[Live Web Demo](https://trueledger.satyakommula.com)**
+
 ## 🌟 Features
 
-- **💰 Complete Financial Tracking**: Track income, expenses, budgets, and saving goals
-- **🤖 AI-Powered Insights**: Get intelligent forecasts and personalized financial advice
-- **🔒 Privacy First**: All data stored locally with optional encryption
-- **📊 Beautiful Analytics**: Visualize your financial health with interactive charts
-- **🌙 Modern UI**: Dark mode, smooth animations, and premium design
-- **📱 Cross-Platform**: Available on Android, iOS, Linux, macOS, Windows, and Web
+- **💰 Complete Financial Tracking**: Track income, expenses, budgets, and saving goals.
+- **🌐 Web Support**: Fully responsive web version powered by **SQLite WASM** for local persistence.
+- **🤖 AI-Powered Insights**: Get intelligent forecasts and personalized financial advice.
+- **🔒 Privacy First**: All data stored locally with AES-256 encryption (SQLCipher) on mobile/desktop.
+- **📊 Beautiful Analytics**: Visualize your financial health with interactive charts and streak tracking.
+- **🌙 Modern UI**: Dark mode, smooth animations, and premium design inspired by modern fintech apps.
+- **📱 Cross-Platform**: Native experience on Android, iOS, Linux, macOS, Windows, and Web.
 
 ## 📖 Documentation
 

@@ -2,6 +2,8 @@
 
 Welcome to the **TrueLedger** documentation! TrueLedger is a privacy-first, offline-first personal finance tracker with AI-powered insights.
 
+### 🌐 **[Live Web Demo](https://trueledger.satyakommula.com)**
+
 ## 🌟 Key Features
 
 - **💰 Complete Financial Tracking**: Track income, expenses, budgets, and saving goals

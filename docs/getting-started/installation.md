@@ -12,7 +12,7 @@ Get TrueLedger up and running on your platform of choice.
   - **Linux**: `libsecret-1-dev`, `libjsoncpp-dev`
   - **macOS**: Xcode Command Line Tools
   - **Windows**: Visual Studio 2022 with C++ tools
-  - **Web**: Chrome or Edge browser
+  - **Web**: Chrome, Edge, or Firefox (SQLite WASM requires a modern browser)
 
 ## Quick Install
 
@@ -150,6 +150,9 @@ flutter build web --release
 ```
 
 Output: `build/web/`
+
+!!! info "Deployment Tip"
+    The web version is a Single Page Application (SPA). For production deployment (like the **[Live Demo](https://trueledger.satyakommula.com)**), ensure your server is configured to redirect all traffic to `index.html`. See the **[Web Platform Guide](../platforms/web.md)** for more.
 
 ## Troubleshooting
 
