@@ -71,11 +71,24 @@ class IntelligenceService {
 
   Future<void> dismissInsight(String id, InsightGroup group) async {
     _recordShown(id, group);
-    // Invalidate cache to force re-generation without the dismissed item
+    _clearCache();
+  }
+
+  Future<void> snoozeInsight(String id, {int days = 7}) async {
+    final historyJson = _prefs.getString(_historyKey) ?? '{}';
+    final Map<String, dynamic> history = jsonDecode(historyJson);
+    final snoozeDate = DateTime.now().add(Duration(days: days));
+
+    history['snooze_$id'] = snoozeDate.toIso8601String();
+    await _prefs.setString(_historyKey, jsonEncode(history));
+    _clearCache();
+  }
+
+  void _clearCache() {
     _memCache = null;
     _memCacheDate = null;
-    await _prefs.remove(_dailyCacheKey);
-    await _prefs.remove(_dailyCacheTimestampKey);
+    _prefs.remove(_dailyCacheKey);
+    _prefs.remove(_dailyCacheTimestampKey);
   }
 
   List<AIInsight> generateInsights({
@@ -270,6 +283,19 @@ class IntelligenceService {
     final List<AIInsight> filtered = [];
 
     for (final insight in potential) {
+      // 0. Check Explicit Snooze
+      final snoozeUntilStr = history['snooze_${insight.id}'];
+      if (snoozeUntilStr != null) {
+        try {
+          final snoozeUntil = DateTime.parse(snoozeUntilStr);
+          if (now.isBefore(snoozeUntil)) {
+            continue;
+          }
+        } catch (e) {
+          // Ignore malformed snooze
+        }
+      }
+
       // 1. Check Individual Insight Cooldown
       final lastShownStr = history[insight.id];
       if (lastShownStr != null) {

@@ -414,16 +414,44 @@ class InsightItem extends ConsumerWidget {
                             onTap: () async {
                               await ref
                                   .read(intelligenceServiceProvider)
+                                  .snoozeInsight(insight.id, days: 7);
+                              ref.invalidate(insightsProvider);
+                            },
+                            child: Tooltip(
+                              message: "Snooze for 7 days",
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.access_time_rounded,
+                                  size: 16,
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () async {
+                              await ref
+                                  .read(intelligenceServiceProvider)
                                   .dismissInsight(insight.id, insight.group);
                               ref.invalidate(insightsProvider);
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(4),
-                              child: Icon(
-                                Icons.close_rounded,
-                                size: 16,
-                                color: semantic.secondaryText
-                                    .withValues(alpha: 0.5),
+                            child: Tooltip(
+                              message: "Dismiss",
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  size: 16,
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.5),
+                                ),
                               ),
                             ),
                           ),
