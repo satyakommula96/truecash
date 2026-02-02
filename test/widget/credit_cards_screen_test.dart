@@ -84,11 +84,16 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
+      await tester.ensureVisible(find.text('RECORD PAYMENT'));
       await tester.tap(find.text('RECORD PAYMENT'));
       await tester.pumpAndSettle();
 
       expect(find.text('Record Payment - HDFC'), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
+
+      // Dismiss dialog
+      await tester.tap(find.text('CANCEL'));
+      await tester.pumpAndSettle();
     });
   });
 }

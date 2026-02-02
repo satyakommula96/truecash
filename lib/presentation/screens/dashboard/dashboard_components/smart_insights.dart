@@ -7,6 +7,9 @@ import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
+import 'package:trueledger/presentation/screens/dashboard/scenario_mode.dart';
+import 'package:trueledger/presentation/providers/insights_provider.dart';
+
 class SmartInsightsCard extends ConsumerWidget {
   final List<AIInsight> insights;
   final AppColors semantic;
@@ -22,7 +25,6 @@ class SmartInsightsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPrivate = ref.watch(privacyProvider);
-    if (insights.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +52,7 @@ class SmartInsightsCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF00C853), // Material Green A700
+                color: const Color(0xFF00C853),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(Icons.psychology_rounded,
@@ -64,52 +66,29 @@ class SmartInsightsCard extends ConsumerWidget {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            itemCount: insights.length + 1,
+            itemCount:
+                insights.length + 2, // +1 for ScoreCard, +1 for ScenarioCard
             itemBuilder: (context, index) {
-              // Priority: 1. Wealth Projection, 2. ScoreCard, 3. Other Insights
-
-              // We want: [Wealth Projection] (if exists) -> [ScoreCard] -> [Remaining Insights]
-
-              final hasWealth =
-                  insights.any((i) => i.title == "WEALTH PROJECTION");
-
-              if (index == 0 && hasWealth) {
-                final wealth =
-                    insights.firstWhere((i) => i.title == "WEALTH PROJECTION");
-                return _buildInsightItem(context, wealth, isPrivate)
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
-              }
-
-              // If index 0 and no wealth, show ScoreCard
-              if (index == 0 && !hasWealth) {
+              // Always show ScoreCard first
+              if (index == 0) {
                 return _buildScoreCard(context)
                     .animate()
                     .fadeIn(duration: 600.ms)
                     .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
               }
 
-              // If index 1 and has wealth, show ScoreCard
-              if (index == 1 && hasWealth) {
-                return _buildScoreCard(context)
+              // Show Insights
+              if (index > 0 && index <= insights.length) {
+                final insight = insights[index - 1];
+                return _buildInsightItem(context, insight, isPrivate)
                     .animate()
-                    .fadeIn(delay: 100.ms, duration: 600.ms)
+                    .fadeIn(delay: (100 * index).ms, duration: 600.ms)
                     .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
               }
 
-              // Otherwise show remaining insights
-              // Adjust offset based on whether wealth exists
-              // Skip the wealth projection if we encounter it in the list again
-              final dynInsights = insights
-                  .where((i) => i.title != "WEALTH PROJECTION")
-                  .toList();
-              final currentDynIndex = hasWealth ? index - 2 : index - 1;
-
-              if (currentDynIndex >= 0 &&
-                  currentDynIndex < dynInsights.length) {
-                return _buildInsightItem(
-                        context, dynInsights[currentDynIndex], isPrivate)
+              // Show Scenario Card at the end
+              if (index == insights.length + 1) {
+                return _buildScenarioCard(context)
                     .animate()
                     .fadeIn(delay: (100 * index).ms, duration: 600.ms)
                     .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
@@ -127,6 +106,59 @@ class SmartInsightsCard extends ConsumerWidget {
     return ScoreCard(
       score: score,
       semantic: semantic,
+    );
+  }
+
+  Widget _buildScenarioCard(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16, top: 4, bottom: 4),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ScenarioScreen()));
+        },
+        child: Container(
+          width: 280,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.rocket_launch_rounded,
+                  color: Colors.white, size: 32),
+              const SizedBox(height: 16),
+              const Text(
+                "SCENARIO MODE",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Simulate your future progress.",
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -273,7 +305,7 @@ class ScoreCard extends StatelessWidget {
   }
 }
 
-class InsightItem extends StatelessWidget {
+class InsightItem extends ConsumerWidget {
   final AIInsight insight;
   final bool isPrivate;
   final AppColors semantic;
@@ -286,7 +318,7 @@ class InsightItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Color accentColor;
     IconData icon;
 
@@ -344,14 +376,87 @@ class InsightItem extends StatelessWidget {
                     ),
                     child: Icon(icon, size: 18, color: accentColor),
                   ),
-                  Text(
-                    insight.currencyValue != null
-                        ? "${insight.value}: ${CurrencyFormatter.format(insight.currencyValue!, isPrivate: isPrivate)}"
-                        : insight.value,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
-                      color: accentColor,
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (insight.currencyValue != null)
+                          Flexible(
+                            child: Text(
+                              "${insight.value}: ${CurrencyFormatter.format(insight.currencyValue!, isPrivate: isPrivate)}",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                color: accentColor,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        else
+                          Flexible(
+                            child: Text(
+                              insight.value,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                color: accentColor,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () async {
+                              await ref
+                                  .read(intelligenceServiceProvider)
+                                  .snoozeInsight(insight.id, days: 7);
+                              ref.invalidate(insightsProvider);
+                            },
+                            child: Tooltip(
+                              message: "Snooze for 7 days",
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.access_time_rounded,
+                                  size: 16,
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () async {
+                              await ref
+                                  .read(intelligenceServiceProvider)
+                                  .dismissInsight(insight.id, insight.group);
+                              ref.invalidate(insightsProvider);
+                            },
+                            child: Tooltip(
+                              message: "Dismiss",
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  size: 16,
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ],
