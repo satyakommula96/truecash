@@ -40,26 +40,32 @@ void main() {
     );
   }
 
-  testWidgets('renders nothing when insights are empty',
+  testWidgets('renders score card even when insights are empty',
       (WidgetTester tester) async {
     await tester.pumpWidget(createWidgetUnderTest(insights: [], score: 85));
-    expect(find.text('INTELLIGENT INSIGHTS'), findsNothing);
+    await tester.pumpAndSettle();
+    expect(find.text('INTELLIGENT INSIGHTS'), findsOneWidget);
+    expect(find.text('EXCELLENT'), findsOneWidget);
   });
 
   testWidgets('renders insights and score card', (WidgetTester tester) async {
     final insights = [
       AIInsight(
+        id: '1',
         title: 'WEALTH PROJECTION',
         body: 'Your wealth will double in 10 years.',
         value: 'Forecast',
         type: InsightType.prediction,
+        priority: InsightPriority.high,
         currencyValue: 1000000,
       ),
       AIInsight(
+        id: '2',
         title: 'SAVINGS POTENTIAL',
         body: 'You can save more by reducing dining out.',
         value: 'Advice',
         type: InsightType.info,
+        priority: InsightPriority.medium,
       ),
     ];
 

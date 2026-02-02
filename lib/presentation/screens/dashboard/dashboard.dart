@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 
 import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/insights_provider.dart';
 import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
@@ -55,7 +56,7 @@ class Dashboard extends ConsumerWidget {
         final summary = data.summary;
         final budgets = data.budgets;
         final upcomingBills = data.upcomingBills;
-        final trendData = data.trendData;
+        // final trendData = data.trendData; // Unused
 
         Future<void> reload() async {
           debugPrint("Dashboard: Reloading data...");
@@ -306,12 +307,8 @@ class Dashboard extends ConsumerWidget {
                                       curve: Curves.easeOutQuint),
                               const SizedBox(height: 32),
                               SmartInsightsCard(
-                                insights: IntelligenceService.generateInsights(
-                                  summary: summary,
-                                  trendData: trendData,
-                                  budgets: budgets,
-                                  categorySpending: data.categorySpending,
-                                ),
+                                // Use the dedicated insights provider for performance (memoization)
+                                insights: ref.watch(insightsProvider),
                                 score: IntelligenceService.calculateHealthScore(
                                   summary: summary,
                                   budgets: budgets,

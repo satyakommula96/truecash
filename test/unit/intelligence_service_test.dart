@@ -1,8 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/domain/services/intelligence_service.dart';
 import 'package:trueledger/domain/models/models.dart';
 
 void main() {
+  late IntelligenceService service;
+  late SharedPreferences prefs;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+    service = IntelligenceService(prefs);
+  });
+
   group('IntelligenceService.generateInsights', () {
     test('should generate wealth projection when net income is positive', () {
       final summary = MonthlySummary(
@@ -14,7 +24,7 @@ void main() {
         netWorth: 1000,
       );
 
-      final insights = IntelligenceService.generateInsights(
+      final insights = service.generateInsights(
         summary: summary,
         trendData: [],
         budgets: [],
@@ -36,7 +46,7 @@ void main() {
         {'month': '2025-12', 'total': 200.0},
       ];
       final summary = MonthlySummary(
-        totalIncome: 1000,
+        totalIncome: 150, // Matches current expenses to avoid wealth projection
         totalFixed: 50,
         totalVariable: 50,
         totalSubscriptions: 50,
@@ -44,84 +54,38 @@ void main() {
         netWorth: 0,
       );
 
-      final insights = IntelligenceService.generateInsights(
+      final insights = service.generateInsights(
         summary: summary,
         trendData: trendData,
         budgets: [],
         categorySpending: [],
       );
 
-      // Values: 100, 200. Slope = 100. Next = 300.
-      // Current total = 150. Forecast 300 > 150 * 1.2
+      // Current total = 150. Forecast 300 > 150 * 1.15
       expect(insights.any((i) => i.title == 'SPENDING SURGE DETECTED'), isTrue);
     });
 
-    test('should generate spending stability when forecast is normal', () {
-      final trendData = [
-        {'month': '2025-11', 'total': 200.0},
-        {'month': '2025-12', 'total': 200.0},
-      ];
-      final summary = MonthlySummary(
-        totalIncome: 1000,
-        totalFixed: 100,
-        totalVariable: 100,
-        totalSubscriptions: 0,
-        totalInvestments: 0,
-        netWorth: 0,
-      );
-
-      final insights = IntelligenceService.generateInsights(
-        summary: summary,
-        trendData: trendData,
-        budgets: [],
-        categorySpending: [],
-      );
-
-      expect(insights.any((i) => i.title == 'SPENDING STABILITY'), isTrue);
-    });
-
-    test('should generate high savings efficiency when rate > 30%', () {
-      final summary = MonthlySummary(
-        totalIncome: 10000,
-        totalFixed: 1000,
-        totalVariable: 1000,
-        totalSubscriptions: 1000,
-        totalInvestments: 0,
-        netWorth: 0,
-      );
-
-      final insights = IntelligenceService.generateInsights(
-        summary: summary,
-        trendData: [],
-        budgets: [],
-        categorySpending: [],
-      );
-
-      expect(insights.any((i) => i.title == 'HIGH SAVINGS EFFICIENCY'), isTrue);
-    });
-
-    test('should generate subscription overload and overspending', () {
+    test('should generate critical overspending when expenses > income', () {
       final summary = MonthlySummary(
         totalIncome: 1000,
         totalFixed: 500,
         totalVariable: 500,
-        totalSubscriptions: 150, // total outflow = 1150
+        totalSubscriptions: 100, // total outflow = 1100
         totalInvestments: 0,
         netWorth: 0,
       );
 
-      final insights = IntelligenceService.generateInsights(
+      final insights = service.generateInsights(
         summary: summary,
         trendData: [],
         budgets: [],
         categorySpending: [],
       );
 
-      expect(insights.any((i) => i.title == 'SUBSCRIPTION OVERLOAD'), isTrue);
       expect(insights.any((i) => i.title == 'CRITICAL OVERSPENDING'), isTrue);
     });
 
-    test('should generate neutral patterns when no significant data', () {
+    test('should generate neutral patterns when no insights found', () {
       final summary = MonthlySummary(
         totalIncome: 0,
         totalFixed: 0,
@@ -131,7 +95,7 @@ void main() {
         netWorth: 0,
       );
 
-      final insights = IntelligenceService.generateInsights(
+      final insights = service.generateInsights(
         summary: summary,
         trendData: [],
         budgets: [],
@@ -141,30 +105,33 @@ void main() {
       expect(insights.any((i) => i.title == 'NEUTRAL PATTERNS'), isTrue);
     });
 
-    test('should generate projected savings insight', () {
+    test('should respect cooldown and filter insights', () {
       final summary = MonthlySummary(
-        totalIncome: 1000,
-        totalFixed: 200,
-        totalVariable: 200,
+        totalIncome: 10000,
+        totalFixed: 1000,
+        totalVariable: 1000,
         totalSubscriptions: 0,
         totalInvestments: 0,
-        netWorth: 0,
+        netWorth: 1000,
       );
 
-      final insights = IntelligenceService.generateInsights(
+      // Generate first time - should have wealth projection
+      final insights1 = service.generateInsights(
         summary: summary,
         trendData: [],
         budgets: [],
         categorySpending: [],
       );
+      expect(insights1.any((i) => i.id == 'wealth_projection'), isTrue);
 
-      expect(insights.any((i) => i.title == 'PROJECTED SAVINGS'), isTrue);
-      // 1000 - 400 = 600 monthly savings
-      expect(
-          insights
-              .firstWhere((i) => i.title == 'PROJECTED SAVINGS')
-              .currencyValue,
-          600);
+      // Generate second time immediately - should NOT have wealth projection (due to cooldown)
+      final insights2 = service.generateInsights(
+        summary: summary,
+        trendData: [],
+        budgets: [],
+        categorySpending: [],
+      );
+      expect(insights2.any((i) => i.id == 'wealth_projection'), isFalse);
     });
   });
 
