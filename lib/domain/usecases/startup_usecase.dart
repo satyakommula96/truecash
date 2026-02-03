@@ -6,6 +6,7 @@ import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'usecase_base.dart';
 import 'package:trueledger/domain/usecases/auto_backup_usecase.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:trueledger/core/config/app_config.dart';
@@ -87,10 +88,17 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
 
         final files = oldDir.listSync().whereType<File>();
         for (final file in files) {
-          final fileName = file.uri.pathSegments.last;
-          final newFile = File('${newDir.path}/$fileName');
+          final fileName = path.basename(file.path);
+          final newFile = File(path.join(newDir.path, fileName));
+
           if (!await newFile.exists()) {
-            await file.rename(newFile.path);
+            try {
+              await file.rename(newFile.path);
+            } catch (e) {
+              // Copy and delete as fallback for rename failure
+              await file.copy(newFile.path);
+              await file.delete();
+            }
           } else {
             // If it already exists in both places, just delete the old one
             await file.delete();
