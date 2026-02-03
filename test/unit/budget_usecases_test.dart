@@ -23,12 +23,15 @@ void main() {
     test('should return Success when repository call is successful', () async {
       when(() => mockRepository.updateBudget(any(), any()))
           .thenAnswer((_) async {});
+      when(() => mockRepository.markBudgetAsReviewed(any()))
+          .thenAnswer((_) async {});
 
       final result =
           await useCase.call(UpdateBudgetParams(id: 1, monthlyLimit: 500));
 
       expect(result.isSuccess, isTrue);
       verify(() => mockRepository.updateBudget(1, 500)).called(1);
+      verify(() => mockRepository.markBudgetAsReviewed(1)).called(1);
     });
 
     test('should return Failure when limit is negative', () async {
