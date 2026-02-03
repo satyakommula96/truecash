@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/core/theme/theme.dart';
@@ -74,10 +75,57 @@ class BudgetSection extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text(b.category.toUpperCase(),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 12),
-                          overflow: TextOverflow.ellipsis),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(b.category.toUpperCase(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12),
+                                  overflow: TextOverflow.ellipsis),
+                              if (b.isStable) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        semantic.success.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                        color: semantic.success
+                                            .withValues(alpha: 0.3)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.verified,
+                                          size: 10, color: semantic.success),
+                                      const SizedBox(width: 2),
+                                      Text("STABLE",
+                                          style: TextStyle(
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                              color: semantic.success)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (b.lastReviewedAt != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                "Last reviewed: ${DateFormat('dd MMM').format(b.lastReviewedAt!)}",
+                                style: TextStyle(
+                                    fontSize: 9, color: semantic.secondaryText),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Flexible(

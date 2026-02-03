@@ -109,9 +109,23 @@ class MigrationV5 extends Migration {
   Future<void> down(common.Database db) async {}
 }
 
+class MigrationV6 extends Migration {
+  MigrationV6() : super(6);
+
+  @override
+  Future<void> up(common.Database db) async {
+    await addColumnSafe(
+        db, Schema.budgetsTable, Schema.colLastReviewedAt, "TEXT");
+  }
+
+  @override
+  Future<void> down(common.Database db) async {}
+}
+
 final List<Migration> appMigrations = [
   MigrationV2(),
   MigrationV3(),
   MigrationV4(),
   MigrationV5(),
+  MigrationV6(),
 ];

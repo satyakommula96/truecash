@@ -282,6 +282,23 @@ class IntelligenceService {
       ));
     }
 
+    // 7. Budget Stability (Multi-month pattern) - Low Priority
+    final stableBudgets = budgets.where((b) => b.isStable).toList();
+    if (stableBudgets.length >= budgets.length / 2 && budgets.isNotEmpty) {
+      allPotentialInsights.add(AIInsight(
+        id: 'stable_lifestyle',
+        title: "STABLE LIFESTYLE",
+        body:
+            "Most of your budget categories have remained stable for over 3 months. This level of consistency is a hallmark of financial maturity.",
+        type: InsightType.success,
+        priority: InsightPriority.low,
+        value: "Stability",
+        currencyValue: null,
+        group: InsightGroup.behavioral,
+        cooldown: const Duration(days: 21), // Patterns: 21 days
+      ));
+    }
+
     // Filter by Cooldown
     List<AIInsight> filteredInsights = _filterByCooldown(allPotentialInsights);
 

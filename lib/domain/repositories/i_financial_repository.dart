@@ -18,6 +18,7 @@ abstract class IFinancialRepository {
   Future<void> deleteItem(String table, int id);
   Future<void> addBudget(String category, int monthlyLimit);
   Future<void> updateBudget(int id, int monthlyLimit);
+  Future<void> markBudgetAsReviewed(int id);
   Future<List<Map<String, dynamic>>> getAllValues(String table);
   Future<void> seedRoadmapData();
   Future<void> seedHealthyProfile();

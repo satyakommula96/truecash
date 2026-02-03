@@ -158,14 +158,55 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   @override
   Future<List<Budget>> getBudgets() async {
     final db = await AppDatabase.db;
-    final nowStr = DateTime.now().toIso8601String().substring(0, 7);
+    final now = DateTime.now();
+    final nowStr = now.toIso8601String().substring(0, 7);
+
+    // Calculate stability over last 3 completed months
+    final last3Months = List.generate(3, (i) {
+      final d = DateTime(now.year, now.month - (i + 1), 1);
+      return d.toIso8601String().substring(0, 7);
+    });
+
     final res = await db.rawQuery('''
-      SELECT b.*, COALESCE(SUM(ve.amount), 0) as spent
+      SELECT b.*, 
+             COALESCE(SUM(ve.amount), 0) as spent
       FROM budgets b
       LEFT JOIN variable_expenses ve ON b.category = ve.category AND substr(ve.date, 1, 7) = ?
       GROUP BY b.id
     ''', [nowStr]);
-    return res.map((e) => Budget.fromMap(e)).toList();
+
+    final List<Budget> budgets = [];
+    for (var row in res) {
+      final category = row['category'] as String;
+      final limit = row['monthly_limit'] as int;
+
+      // Check stability: Did we overspend in any of the last 3 months?
+      bool isStable = true;
+      for (var month in last3Months) {
+        final monthSpend = Sqflite.firstIntValue(await db.rawQuery(
+                'SELECT SUM(amount) FROM variable_expenses WHERE category = ? AND substr(date, 1, 7) = ?',
+                [category, month])) ??
+            0;
+        if (monthSpend > limit) {
+          isStable = false;
+          break;
+        }
+      }
+
+      final budgetMap = Map<String, dynamic>.from(row);
+      budgetMap['is_stable'] = isStable ? 1 : 0;
+      budgets.add(Budget.fromMap(budgetMap));
+    }
+
+    return budgets;
+  }
+
+  @override
+  Future<void> markBudgetAsReviewed(int id) async {
+    final db = await AppDatabase.db;
+    await db.update(
+        'budgets', {'last_reviewed_at': DateTime.now().toIso8601String()},
+        where: 'id = ?', whereArgs: [id]);
   }
 
   @override

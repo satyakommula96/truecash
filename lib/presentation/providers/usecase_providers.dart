@@ -52,6 +52,11 @@ final deleteBudgetUseCaseProvider = Provider<DeleteBudgetUseCase>((ref) {
   return DeleteBudgetUseCase(ref.watch(financialRepositoryProvider));
 });
 
+final markBudgetAsReviewedUseCaseProvider =
+    Provider<MarkBudgetAsReviewedUseCase>((ref) {
+  return MarkBudgetAsReviewedUseCase(ref.watch(financialRepositoryProvider));
+});
+
 final getAnalysisDataUseCaseProvider = Provider<GetAnalysisDataUseCase>((ref) {
   return GetAnalysisDataUseCase(ref.watch(financialRepositoryProvider));
 });

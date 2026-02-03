@@ -30,7 +30,28 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit ${widget.budget.category} Budget"),
+        title: Row(
+          children: [
+            Text("Edit ${widget.budget.category} Budget"),
+            if (widget.budget.isStable) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border:
+                      Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                ),
+                child: const Text("STABLE",
+                    style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green)),
+              ),
+            ],
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
@@ -63,6 +84,22 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
             SizedBox(
               width: double.infinity,
               height: 60,
+              child: OutlinedButton(
+                onPressed: _markReviewed,
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary, width: 2),
+                ),
+                child: const Text("MARK AS REVIEWED",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 60,
               child: ElevatedButton(
                 onPressed: _update,
                 style: ElevatedButton.styleFrom(
@@ -79,6 +116,20 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _markReviewed() async {
+    final markReviewed = ref.read(markBudgetAsReviewedUseCaseProvider);
+    final result = await markReviewed(widget.budget.id);
+
+    if (!mounted) return;
+
+    if (result.isSuccess) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result.failureOrThrow.message)));
+    }
   }
 
   Future<void> _update() async {

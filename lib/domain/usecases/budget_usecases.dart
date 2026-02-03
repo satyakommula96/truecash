@@ -53,6 +53,7 @@ class UpdateBudgetUseCase extends UseCase<void, UpdateBudgetParams> {
 
     try {
       await repository.updateBudget(params.id, params.monthlyLimit);
+      await repository.markBudgetAsReviewed(params.id);
       return const Success(null);
     } catch (e) {
       return Failure(
@@ -74,6 +75,23 @@ class DeleteBudgetUseCase extends UseCase<void, int> {
     } catch (e) {
       return Failure(
           DatabaseFailure("Failed to delete budget: ${e.toString()}"));
+    }
+  }
+}
+
+class MarkBudgetAsReviewedUseCase extends UseCase<void, int> {
+  final IFinancialRepository repository;
+
+  MarkBudgetAsReviewedUseCase(this.repository);
+
+  @override
+  Future<Result<void>> call(int id) async {
+    try {
+      await repository.markBudgetAsReviewed(id);
+      return const Success(null);
+    } catch (e) {
+      return Failure(DatabaseFailure(
+          "Failed to mark budget as reviewed: ${e.toString()}"));
     }
   }
 }
