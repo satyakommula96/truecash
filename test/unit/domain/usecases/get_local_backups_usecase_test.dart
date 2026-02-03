@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:trueledger/domain/usecases/get_local_backups_usecase.dart';
 import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'package:flutter/services.dart';
+import 'package:trueledger/core/config/app_config.dart';
 
 void main() {
   late GetLocalBackupsUseCase useCase;
@@ -39,7 +40,8 @@ void main() {
   });
 
   test('returns sorted list of backup files', () async {
-    final backupDir = Directory('${tempDir.path}/backups');
+    final backupDir =
+        Directory('${tempDir.path}/${AppConfig.backupFolderName}');
     await backupDir.create(recursive: true);
 
     // Create some dummy files with explicit modification times to ensure deterministic sorting

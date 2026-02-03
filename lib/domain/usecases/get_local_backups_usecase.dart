@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:trueledger/core/utils/result.dart';
 import 'package:trueledger/core/error/failure.dart';
+import 'package:trueledger/core/config/app_config.dart';
 import 'usecase_base.dart';
 
 class BackupFile {
@@ -25,7 +26,8 @@ class GetLocalBackupsUseCase extends UseCase<List<BackupFile>, NoParams> {
     if (kIsWeb) return const Success([]);
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final backupDir = Directory('${directory.path}/backups');
+      final backupDir =
+          Directory('${directory.path}/${AppConfig.backupFolderName}');
       if (!await backupDir.exists()) {
         return const Success([]);
       }

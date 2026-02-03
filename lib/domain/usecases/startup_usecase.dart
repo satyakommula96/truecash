@@ -5,8 +5,10 @@ import 'package:trueledger/data/datasources/database.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'usecase_base.dart';
-
 import 'package:trueledger/domain/usecases/auto_backup_usecase.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:trueledger/core/config/app_config.dart';
 
 class StartupResult {
   final bool shouldScheduleReminder;
@@ -28,6 +30,9 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
   Future<Result<StartupResult>> call(NoParams params,
       {VoidCallback? onBackupSuccess}) async {
     try {
+      // 0. Migrate old backup folder if it exists
+      await _migrateBackupFolder();
+
       // 1. Initialize Database (including migrations)
       await AppDatabase.db;
 
@@ -65,6 +70,40 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
       if (e is AppFailure) return Failure(e);
       return Failure(
           UnexpectedFailure("Critical startup failure: ${e.toString()}"));
+    }
+  }
+
+  Future<void> _migrateBackupFolder() async {
+    if (kIsWeb) return;
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      final oldDir = Directory('${docsDir.path}/backups');
+      final newDir = Directory('${docsDir.path}/${AppConfig.backupFolderName}');
+
+      if (await oldDir.exists()) {
+        if (!await newDir.exists()) {
+          await newDir.create(recursive: true);
+        }
+
+        final files = oldDir.listSync().whereType<File>();
+        for (final file in files) {
+          final fileName = file.uri.pathSegments.last;
+          final newFile = File('${newDir.path}/$fileName');
+          if (!await newFile.exists()) {
+            await file.rename(newFile.path);
+          } else {
+            // If it already exists in both places, just delete the old one
+            await file.delete();
+          }
+        }
+
+        // Try to delete old directory if empty
+        if (oldDir.listSync().isEmpty) {
+          await oldDir.delete();
+        }
+      }
+    } catch (e) {
+      debugPrint('Backup folder migration failed: $e');
     }
   }
 }

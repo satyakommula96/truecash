@@ -10,6 +10,7 @@ import 'package:trueledger/core/services/backup_encryption_service.dart';
 import 'package:trueledger/core/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:trueledger/core/config/app_config.dart';
 import 'usecase_base.dart';
 
 class AutoBackupUseCase extends UseCase<void, NoParams> {
@@ -54,7 +55,8 @@ class AutoBackupUseCase extends UseCase<void, NoParams> {
       final finalOutput = jsonEncode(container);
 
       final directory = await getApplicationDocumentsDirectory();
-      final backupDir = Directory('${directory.path}/backups');
+      final backupDir =
+          Directory('${directory.path}/${AppConfig.backupFolderName}');
       if (!await backupDir.exists()) {
         await backupDir.create(recursive: true);
       }

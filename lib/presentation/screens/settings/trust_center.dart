@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
+import 'package:trueledger/core/config/app_config.dart';
 import 'package:trueledger/domain/usecases/restore_from_local_file_usecase.dart';
 import 'package:trueledger/presentation/providers/usecase_providers.dart';
 
@@ -169,7 +170,8 @@ class TrustCenterScreen extends ConsumerWidget {
                       try {
                         final directory =
                             await getApplicationDocumentsDirectory();
-                        final backupPath = '${directory.path}/backups';
+                        final backupPath =
+                            '${directory.path}/${AppConfig.backupFolderName}';
                         final backupDir = Directory(backupPath);
 
                         if (!await backupDir.exists()) {

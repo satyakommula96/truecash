@@ -5,6 +5,7 @@ import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/domain/usecases/auto_backup_usecase.dart';
 import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'package:flutter/services.dart';
+import 'package:trueledger/core/config/app_config.dart';
 
 class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
@@ -50,7 +51,8 @@ void main() {
 
       // Assert
       expect(result.isSuccess, isTrue);
-      final backupDir = Directory('${tempDir.path}/backups');
+      final backupDir =
+          Directory('${tempDir.path}/${AppConfig.backupFolderName}');
       expect(await backupDir.exists(), isTrue);
       final files = backupDir.listSync();
       expect(files.length, 1);
@@ -64,7 +66,8 @@ void main() {
 
     test('should keep only last 7 backups plus the new one', () async {
       // Arrange
-      final backupDir = Directory('${tempDir.path}/backups');
+      final backupDir =
+          Directory('${tempDir.path}/${AppConfig.backupFolderName}');
       await backupDir.create(recursive: true);
 
       // Create 10 dummy files with different timestamps
