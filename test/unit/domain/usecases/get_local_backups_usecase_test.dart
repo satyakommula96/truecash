@@ -42,15 +42,15 @@ void main() {
     final backupDir = Directory('${tempDir.path}/backups');
     await backupDir.create(recursive: true);
 
-    // Create some dummy files
+    // Create some dummy files with explicit modification times to ensure deterministic sorting
+    final now = DateTime.now();
     final file1 = File('${backupDir.path}/backup1.json');
     await file1.writeAsString('data1');
-
-    await Future.delayed(
-        const Duration(milliseconds: 100)); // Ensure different timestamp
+    file1.setLastModifiedSync(now.subtract(const Duration(hours: 1)));
 
     final file2 = File('${backupDir.path}/backup2.json');
     await file2.writeAsString('data2');
+    file2.setLastModifiedSync(now);
 
     final result = await useCase.call(NoParams());
 
