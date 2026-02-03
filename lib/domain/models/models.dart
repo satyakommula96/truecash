@@ -1,5 +1,6 @@
 export 'loan_model.dart';
 export 'subscription_model.dart';
+export 'personalization_models.dart';
 export 'credit_card_model.dart';
 export 'saving_goal_model.dart';
 export 'budget_model.dart';

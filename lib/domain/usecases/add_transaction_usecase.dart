@@ -3,6 +3,7 @@ import 'package:trueledger/core/error/failure.dart';
 import 'package:trueledger/core/utils/result.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
+import 'package:trueledger/domain/services/personalization_service.dart';
 import 'usecase_base.dart';
 
 class AddTransactionParams {
@@ -12,12 +13,17 @@ class AddTransactionParams {
   final String note;
   final String date;
 
+  final String? merchant;
+  final String? paymentMethod;
+
   AddTransactionParams({
     required this.type,
     required this.amount,
     required this.category,
     required this.note,
     required this.date,
+    this.merchant,
+    this.paymentMethod,
   });
 }
 
@@ -48,8 +54,9 @@ class AddTransactionResult {
 class AddTransactionUseCase
     extends UseCase<AddTransactionResult, AddTransactionParams> {
   final IFinancialRepository repository;
+  final PersonalizationService? personalizationService;
 
-  AddTransactionUseCase(this.repository);
+  AddTransactionUseCase(this.repository, [this.personalizationService]);
 
   @override
   Future<Result<AddTransactionResult>> call(AddTransactionParams params) async {
@@ -72,6 +79,15 @@ class AddTransactionUseCase
         params.category,
         params.note,
         params.date,
+      );
+
+      // 2b. Personalization logic
+      await personalizationService?.recordUsage(
+        category: params.category,
+        paymentMethod: params.paymentMethod ?? 'Cash',
+        merchant: params.merchant,
+        amount: params.amount,
+        note: params.note,
       );
 
       bool shouldCancelDaily = false;

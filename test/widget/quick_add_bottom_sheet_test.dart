@@ -13,6 +13,7 @@ import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/services/personalization_service.dart';
 
 class MockAddTransactionUseCase extends Mock implements AddTransactionUseCase {}
 
@@ -20,15 +21,20 @@ class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
 class MockNotificationService extends Mock implements NotificationService {}
 
+class MockPersonalizationService extends Mock
+    implements PersonalizationService {}
+
 void main() {
   late MockAddTransactionUseCase mockUseCase;
   late MockNotificationService mockNotificationService;
   late MockFinancialRepository mockRepository;
+  late MockPersonalizationService mockPersonalizationService;
 
   setUp(() {
     mockUseCase = MockAddTransactionUseCase();
     mockNotificationService = MockNotificationService();
     mockRepository = MockFinancialRepository();
+    mockPersonalizationService = MockPersonalizationService();
 
     registerFallbackValue(AddTransactionParams(
       type: 'Variable',
@@ -43,7 +49,19 @@ void main() {
         .thenAnswer((_) async => [
               TransactionCategory(id: 1, name: 'Food', type: 'Variable'),
               TransactionCategory(id: 2, name: 'General', type: 'Variable'),
+              TransactionCategory(id: 3, name: 'Transport', type: 'Variable'),
             ]);
+
+    // Mock PersonalizationService
+    when(() => mockPersonalizationService.getLastUsed())
+        .thenReturn({'category': 'Food', 'paymentMethod': 'Cash'});
+    when(() => mockPersonalizationService.getSettings())
+        .thenReturn(PersonalizationSettings());
+    when(() => mockPersonalizationService.getPresets()).thenReturn([]);
+    when(() => mockPersonalizationService.getSuggestedCategoryForTime(any()))
+        .thenReturn(null);
+    when(() => mockPersonalizationService.findShortcutSuggestion())
+        .thenReturn(null);
   });
 
   Widget createWidgetUnderTest() {
@@ -52,6 +70,8 @@ void main() {
         addTransactionUseCaseProvider.overrideWithValue(mockUseCase),
         notificationServiceProvider.overrideWithValue(mockNotificationService),
         financialRepositoryProvider.overrideWithValue(mockRepository),
+        personalizationServiceProvider
+            .overrideWithValue(mockPersonalizationService),
       ],
       child: MaterialApp(
         theme: AppTheme.darkTheme,
@@ -180,5 +200,39 @@ void main() {
       expect(find.text('Please enter a valid amount'), findsOneWidget);
       verifyNever(() => mockUseCase.call(any()));
     });
+
+    testWidgets('should pre-fill category based on last-used', (tester) async {
+      when(() => mockPersonalizationService.getLastUsed()).thenReturn({
+        'category': 'Transport',
+        'paymentMethod': 'Credit Card',
+      });
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Transport'), findsWidgets);
+      expect(find.textContaining('Suggested: Transport & Credit Card'),
+          findsOneWidget);
+    });
+
+    testWidgets('should show and use presets', (tester) async {
+      when(() => mockPersonalizationService.getPresets()).thenReturn([
+        QuickAddPreset(id: '1', title: 'Lunch', amount: 300, category: 'Food'),
+      ]);
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lunch · ₹300'), findsOneWidget);
+      await tester.tap(find.text('Lunch · ₹300'));
+      await tester
+          .pumpAndSettle(const Duration(seconds: 1)); // Wait for animation
+
+      expect(_amountController(tester).text, '300');
+    });
   });
+}
+
+TextEditingController _amountController(WidgetTester tester) {
+  return (tester.widget(find.byType(TextField).first) as TextField).controller!;
 }

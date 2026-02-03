@@ -10,6 +10,8 @@ import 'package:trueledger/core/utils/hash_utils.dart';
 import 'package:trueledger/presentation/providers/category_provider.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/domain/services/personalization_service.dart';
 
 class QuickAddBottomSheet extends ConsumerStatefulWidget {
   const QuickAddBottomSheet({super.key});
@@ -23,14 +25,63 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   String _selectedCategory = ''; // Will be set when categories load
+  String? _suggestedCategory;
+  String? _suggestedPaymentMethod;
+  String? _suggestedReason;
+  QuickAddPreset? _shortcutSuggestion;
+  String? _paymentMethod;
+  final List<String> _paymentMethods = ['Cash', 'UPI', 'Card', 'Net Banking'];
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _categoryKey = GlobalKey();
+  final GlobalKey _paymentKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    _loadDefaults();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
+  }
+
+  void _loadDefaults() {
+    final service = ref.read(personalizationServiceProvider);
+    final lastUsed = service.getLastUsed();
+    final settings = service.getSettings();
+
+    if (settings.rememberLastUsed) {
+      if (lastUsed['category'] != null) {
+        setState(() {
+          _selectedCategory = lastUsed['category']!;
+          _suggestedCategory = lastUsed['category'];
+          _suggestedReason = "Based on your last entry";
+        });
+      }
+      if (lastUsed['paymentMethod'] != null) {
+        final pm = lastUsed['paymentMethod']!;
+        setState(() {
+          _paymentMethod = pm;
+          _suggestedPaymentMethod = pm;
+          if (!_paymentMethods.contains(pm)) {
+            _paymentMethods.insert(0, pm);
+          }
+        });
+      }
+    }
+
+    // Phase 5.2 Time-of-day suggestion (Preview integration)
+    if (settings.timeOfDaySuggestions) {
+      final todSuggestion =
+          service.getSuggestedCategoryForTime(DateTime.now().hour);
+      if (todSuggestion != null) {
+        setState(() {
+          _selectedCategory = todSuggestion;
+          _suggestedCategory = todSuggestion;
+          _suggestedReason = "Based on your daily routine";
+        });
+      }
+    }
   }
 
   @override
@@ -38,6 +89,7 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
     _amountController.dispose();
     _noteController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -72,6 +124,7 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                 ? 'Quick add'
                 : _noteController.text,
             date: DateTime.now().toIso8601String(),
+            paymentMethod: _paymentMethod,
           ),
         );
 
@@ -129,6 +182,7 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -153,6 +207,65 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                 ],
               ),
               const SizedBox(height: 16),
+              if ((_suggestedCategory != null &&
+                      _selectedCategory == _suggestedCategory) ||
+                  (_suggestedPaymentMethod != null &&
+                      _paymentMethod == _suggestedPaymentMethod))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: semantic.income.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color: semantic.income.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.auto_awesome_rounded,
+                              size: 14, color: semantic.income),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              _buildSuggestionText(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: semantic.income,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.circle, size: 3, color: semantic.income),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _jumpToOverride,
+                            child: Text(
+                              "CHANGE",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: semantic.income,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => _showSuggestionInfo(context),
+                            child: Icon(Icons.help_outline_rounded,
+                                size: 14, color: semantic.income),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               TextField(
                 controller: _amountController,
                 focusNode: _focusNode,
@@ -184,8 +297,13 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                 ),
                 onChanged: _onNoteChanged,
               ),
+              const SizedBox(height: 12),
+              _buildShortcutSuggestion(context, semantic),
+              const SizedBox(height: 24),
+              _buildPresetsSection(context),
               const SizedBox(height: 24),
               Consumer(
+                key: _categoryKey,
                 builder: (context, ref, child) {
                   final categoriesAsync =
                       ref.watch(categoriesProvider('Variable'));
@@ -234,6 +352,8 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                                 itemBuilder: (context, index) {
                                   final cat = categories[index].name;
                                   final isSelected = cat == _selectedCategory;
+                                  final isSuggested =
+                                      cat == _suggestedCategory && isSelected;
                                   return InkWell(
                                     onTap: () =>
                                         setState(() => _selectedCategory = cat),
@@ -283,8 +403,12 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             if (isSelected) ...[
-                                              const Icon(
-                                                  Icons.check_circle_rounded,
+                                              Icon(
+                                                  isSuggested
+                                                      ? Icons
+                                                          .auto_awesome_rounded
+                                                      : Icons
+                                                          .check_circle_rounded,
                                                   size: 16,
                                                   color: Colors.white),
                                               const SizedBox(width: 8),
@@ -336,6 +460,8 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
                   );
                 },
               ),
+              const SizedBox(height: 24),
+              _buildPaymentMethodSection(context, semantic),
               const SizedBox(height: 32),
               Container(
                 decoration: BoxDecoration(
@@ -389,6 +515,308 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildShortcutSuggestion(BuildContext context, AppColors semantic) {
+    if (_shortcutSuggestion == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .secondaryContainer
+            .withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.lightbulb_outline_rounded,
+              size: 18, color: Theme.of(context).colorScheme.secondary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Save as shortcut?",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                ),
+                Text(
+                  "You log '${_shortcutSuggestion!.title}' often.",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: semantic.secondaryText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(personalizationServiceProvider).snoozeSuggestion(
+                  'shortcut_${_shortcutSuggestion!.title}|${_shortcutSuggestion!.category}|${_shortcutSuggestion!.amount}');
+              setState(() => _shortcutSuggestion = null);
+            },
+            child: const Text("NOT NOW", style: TextStyle(fontSize: 11)),
+          ),
+          const SizedBox(width: 4),
+          ElevatedButton(
+            onPressed: () {
+              ref
+                  .read(personalizationServiceProvider)
+                  .addPreset(_shortcutSuggestion!);
+              setState(() => _shortcutSuggestion = null);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Shortcut saved!")),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            child: const Text("SAVE",
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPresetsSection(BuildContext context) {
+    final service = ref.read(personalizationServiceProvider);
+    final presets = service.getPresets();
+    final semantic = Theme.of(context).extension<AppColors>()!;
+
+    if (presets.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "PRESETS",
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: semantic.secondaryText,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 44,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: presets.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final preset = presets[index];
+              return ActionChip(
+                label: Text("${preset.title} · ₹${preset.amount}"),
+                onPressed: () {
+                  _amountController.text = preset.amount.toString();
+                  _noteController.text = preset.note ?? preset.title;
+                  setState(() {
+                    _selectedCategory = preset.category;
+                    _paymentMethod = preset.paymentMethod;
+                  });
+                },
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                side: BorderSide.none,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                labelStyle:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentMethodSection(BuildContext context, AppColors semantic) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      key: _paymentKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "PAYMENT METHOD",
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: semantic.secondaryText,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 38,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            children: _paymentMethods.map((method) {
+              final isSelected = _paymentMethod == method;
+              final isSuggested =
+                  _suggestedPaymentMethod == method && isSelected;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: InkWell(
+                  onTap: () => setState(() => _paymentMethod = method),
+                  borderRadius: BorderRadius.circular(12),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? colorScheme.primary.withValues(alpha: 0.1)
+                          : colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? colorScheme.primary
+                            : Colors.transparent,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isSuggested) ...[
+                            Icon(Icons.auto_awesome_rounded,
+                                size: 12, color: colorScheme.primary),
+                            const SizedBox(width: 6),
+                          ],
+                          Text(
+                            method,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurfaceVariant,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _buildSuggestionText() {
+    final catSuggested =
+        _suggestedCategory != null && _selectedCategory == _suggestedCategory;
+    final paySuggested = _suggestedPaymentMethod != null &&
+        _paymentMethod == _suggestedPaymentMethod;
+
+    if (!catSuggested && !paySuggested) return "";
+
+    if (catSuggested && paySuggested) {
+      return "Suggested: $_selectedCategory & $_paymentMethod · ${_suggestedReason ?? 'Daily Pattern'}";
+    }
+
+    if (catSuggested) {
+      return "Suggested: $_selectedCategory · $_suggestedReason";
+    }
+
+    return "Suggested: $_paymentMethod · Based on last record";
+  }
+
+  void _jumpToOverride() {
+    final catSuggested =
+        _suggestedCategory != null && _selectedCategory == _suggestedCategory;
+    final targetKey = catSuggested ? _categoryKey : _paymentKey;
+
+    final context = targetKey.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _showSuggestionInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Transparency Check"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+                "We pre-filled some values locally to save you typing effort.",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 16),
+            if (_suggestedCategory != null &&
+                _selectedCategory == _suggestedCategory)
+              _buildInfoRow(
+                  Icons.category_rounded, "Category", _suggestedReason!),
+            if (_suggestedPaymentMethod != null &&
+                _paymentMethod == _suggestedPaymentMethod)
+              _buildInfoRow(Icons.payment_rounded, "Payment",
+                  "Based on your last record"),
+            const SizedBox(height: 12),
+            const Text(
+              "This data never leaves your device.",
+              style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("GOT IT")),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String reason) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 12)),
+                Text(reason, style: const TextStyle(fontSize: 11)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
