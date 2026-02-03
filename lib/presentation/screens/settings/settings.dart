@@ -31,6 +31,7 @@ import 'package:trueledger/data/datasources/database.dart';
 import 'package:intl/intl.dart';
 import 'package:trueledger/presentation/screens/settings/trust_center.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
+import 'package:trueledger/presentation/screens/settings/personalization_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -1117,6 +1118,19 @@ class SettingsScreen extends ConsumerWidget {
             Icons.dark_mode_outlined,
             Colors.indigo,
             () => _showThemePicker(context, ref),
+          ),
+          const SizedBox(height: 16),
+          _buildOption(
+            context,
+            "Personalization",
+            "Adaptive defaults & presets",
+            Icons.auto_awesome_outlined,
+            Colors.pink,
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const PersonalizationSettingsScreen())),
           ),
           const SizedBox(height: 16),
           _buildOption(

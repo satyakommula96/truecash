@@ -9,6 +9,7 @@ import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 import 'package:trueledger/presentation/screens/dashboard/scenario_mode.dart';
 import 'package:trueledger/presentation/providers/insights_provider.dart';
+import 'package:trueledger/domain/services/personalization_service.dart';
 
 class SmartInsightsCard extends ConsumerWidget {
   final List<AIInsight> insights;
@@ -66,8 +67,7 @@ class SmartInsightsCard extends ConsumerWidget {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            itemCount:
-                insights.length + 2, // +1 for ScoreCard, +1 for ScenarioCard
+            itemCount: insights.length + 3, // +Score, +Scenario, +Reflection
             itemBuilder: (context, index) {
               // Always show ScoreCard first
               if (index == 0) {
@@ -86,8 +86,16 @@ class SmartInsightsCard extends ConsumerWidget {
                     .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
               }
 
-              // Show Scenario Card at the end
+              // Show Reflections
               if (index == insights.length + 1) {
+                return _buildReflectionCard(context, ref)
+                    .animate()
+                    .fadeIn(delay: (100 * index).ms, duration: 600.ms)
+                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
+              }
+
+              // Show Scenario Card at the end
+              if (index == insights.length + 2) {
                 return _buildScenarioCard(context)
                     .animate()
                     .fadeIn(delay: (100 * index).ms, duration: 600.ms)
@@ -168,6 +176,67 @@ class SmartInsightsCard extends ConsumerWidget {
       insight: insight,
       isPrivate: isPrivate,
       semantic: semantic,
+    );
+  }
+
+  Widget _buildReflectionCard(BuildContext context, WidgetRef ref) {
+    final reflections =
+        ref.read(personalizationServiceProvider).generateBaselineReflections();
+
+    if (reflections.isEmpty) return const SizedBox.shrink();
+
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 280,
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: colorScheme.outlineVariant, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.auto_awesome_outlined,
+                  size: 16, color: colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                "SELF REFLECTION",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                  color: semantic.secondaryText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Text(
+              reflections.first,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                height: 1.4,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Based on your local history.",
+            style: TextStyle(
+              fontSize: 11,
+              color: semantic.secondaryText,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

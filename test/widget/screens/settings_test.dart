@@ -125,7 +125,7 @@ void main() {
 
   group('SettingsScreen', () {
     testWidgets('covers backup encryption logic', (tester) async {
-      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
 
       when(() => mockFilePicker.saveFile(
@@ -152,7 +152,7 @@ void main() {
     });
 
     testWidgets('covers reset application logic', (tester) async {
-      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(createSettingsScreen());
@@ -206,7 +206,7 @@ void main() {
     });
 
     testWidgets('covers encrypted restore logic - success', (tester) async {
-      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.physicalSize = const Size(800, 1600);
 
       final encryptedData = BackupEncryptionService.encryptData(
           jsonEncode({
@@ -263,7 +263,7 @@ void main() {
 
     testWidgets('covers encrypted restore logic - wrong password',
         (tester) async {
-      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.physicalSize = const Size(800, 1600);
       final container = jsonEncode({
         'encrypted': true,
         'data': 'bad-data',

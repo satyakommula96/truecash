@@ -140,3 +140,5 @@ app.*.map.json
 # Python virtual environment
 .venv/
 venv/
+/*.diff
+/*.patch
