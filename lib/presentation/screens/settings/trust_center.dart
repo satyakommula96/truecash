@@ -7,6 +7,8 @@ import 'package:trueledger/presentation/providers/backup_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:trueledger/domain/usecases/get_local_backups_usecase.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
@@ -164,7 +166,27 @@ class TrustCenterScreen extends ConsumerWidget {
                         Platform.isMacOS))
                   TextButton.icon(
                     onPressed: () async {
-                      // Note: getApplicationDocumentsDirectory path is standard
+                      try {
+                        final directory =
+                            await getApplicationDocumentsDirectory();
+                        final backupPath = '${directory.path}/backups';
+                        final backupDir = Directory(backupPath);
+
+                        if (!await backupDir.exists()) {
+                          await backupDir.create(recursive: true);
+                        }
+
+                        final uri = Uri.file(backupPath);
+                        await launchUrl(uri,
+                            mode: LaunchMode.externalApplication);
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text("Could not open folder: $e")),
+                          );
+                        }
+                      }
                     },
                     icon: const Icon(Icons.folder_open_rounded, size: 16),
                     label: const Text("VIEW FOLDER",
