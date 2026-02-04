@@ -311,12 +311,16 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurface)),
+                        color: Theme.of(context).colorScheme.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
                 Text(bill['type'] ?? 'PAYMENT',
                     style: TextStyle(
                         fontSize: 10,
                         color: widget.semantic.secondaryText,
-                        fontWeight: FontWeight.w600)),
+                        fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

@@ -183,17 +183,19 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                            CurrencyFormatter.format(widget.summary.netWorth,
-                                compact: false, isPrivate: isPrivate),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -1.5,
-                                height: 1.0),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                              CurrencyFormatter.format(widget.summary.netWorth,
+                                  compact: false, isPrivate: isPrivate),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -1.5,
+                                  height: 1.0),
+                              maxLines: 1),
+                        ),
                       ],
                     ).animate().fadeIn(duration: 600.ms),
                   ],
@@ -233,7 +235,7 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
   Widget _buildHeaderPill(BuildContext context, String text, IconData icon,
       {bool isAlt = false, Color? color}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
           color: color != null
               ? color.withValues(alpha: 0.2)
@@ -250,14 +252,14 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
         children: [
           Icon(icon,
               size: 14, color: color ?? Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Flexible(
             child: Text(text,
                 style: TextStyle(
                     color: color ?? Colors.white.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w900,
                     fontSize: 10,
-                    letterSpacing: 0.5),
+                    letterSpacing: 0),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1),
           ),

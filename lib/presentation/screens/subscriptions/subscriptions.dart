@@ -138,7 +138,9 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.w900,
                                                   fontSize: 13,
-                                                  letterSpacing: 1)),
+                                                  letterSpacing: 1),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis),
                                           Text(
                                               DateHelper.formatDue(
                                                   s.billingDate,
@@ -150,10 +152,17 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                                         ],
                                       ),
                                     ),
-                                    Text(CurrencyFormatter.format(s.amount),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 15)),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                            CurrencyFormatter.format(s.amount),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 15)),
+                                      ),
+                                    ),
                                     const SizedBox(width: 8),
                                     IconButton(
                                       onPressed: () => _delete(s.id),

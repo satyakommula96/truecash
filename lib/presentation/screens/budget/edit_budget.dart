@@ -32,7 +32,12 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text("Edit ${widget.budget.category} Budget"),
+            Flexible(
+              child: Text(
+                "Edit ${widget.budget.category} Budget",
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (widget.budget.isStable) ...[
               const SizedBox(width: 8),
               Container(

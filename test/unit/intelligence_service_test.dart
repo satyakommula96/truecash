@@ -295,7 +295,7 @@ void main() {
   });
 
   group('IntelligenceService.calculateHealthScore', () {
-    test('New user (no data) should have 50', () {
+    test('New user (no data) should have 0', () {
       final summary = MonthlySummary(
         totalIncome: 0,
         totalFixed: 0,
@@ -307,7 +307,7 @@ void main() {
       expect(
           IntelligenceService.calculateHealthScore(
               summary: summary, budgets: []),
-          50);
+          0);
     });
 
     test('Perfect profile: 100', () {

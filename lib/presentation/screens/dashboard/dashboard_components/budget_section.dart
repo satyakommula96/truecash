@@ -85,6 +85,7 @@ class BudgetSection extends ConsumerWidget {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12),
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                               ),
                               if (b.isStable) ...[
@@ -131,18 +132,19 @@ class BudgetSection extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Flexible(
+                      flex: 0,
                       child: Semantics(
                         container: true,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                              "${CurrencyFormatter.format(b.spent, isPrivate: isPrivate)} / ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: isOver
-                                      ? semantic.overspent
-                                      : semantic.secondaryText,
-                                  fontWeight: FontWeight.w700)),
+                        child: Text(
+                          "${CurrencyFormatter.format(b.spent, isPrivate: isPrivate)} / ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: isOver
+                                  ? semantic.overspent
+                                  : semantic.secondaryText,
+                              fontWeight: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),

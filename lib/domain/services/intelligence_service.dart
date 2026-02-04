@@ -35,7 +35,7 @@ class IntelligenceService {
   static const int _monthsInYear = 12;
 
   // --- Health Score Weights ---
-  static const int _defaultScore = 50;
+  static const int _defaultScore = 0;
   static const double _highSavingsThreshold = 0.50;
   static const double _savingsBaseScore = 25.0;
   static const double _savingsMaxBonus = 15.0;
@@ -84,6 +84,12 @@ class IntelligenceService {
     history['snooze_$id'] = snoozeDate.toIso8601String();
     await _prefs.setString(_historyKey, jsonEncode(history));
     _clearCache();
+  }
+
+  void resetAll() {
+    _clearCache();
+    _prefs.remove(_historyKey);
+    _prefs.remove(_kindHistoryKey);
   }
 
   void _clearCache() {
@@ -318,8 +324,9 @@ class IntelligenceService {
   List<AIInsight> _filterBySurface(
       List<AIInsight> insights, InsightSurface surface) {
     if (surface == InsightSurface.main) {
-      // Main surface: Never show Low priority
-      return insights.where((i) => i.priority != InsightPriority.low).toList();
+      // Main surface: Allow all priorities passed by the priority logic
+      // The priority logic already ensures we don't spam (High overrides others, etc.)
+      return insights;
     }
     return insights;
   }
