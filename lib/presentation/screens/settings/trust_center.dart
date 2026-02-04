@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/presentation/providers/backup_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -32,8 +31,8 @@ class TrustCenterScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text("Trust & Privacy",
-            style: TextStyle(fontWeight: FontWeight.w900)),
+        title:
+            const Text("Trust", style: TextStyle(fontWeight: FontWeight.w900)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -41,7 +40,7 @@ class TrustCenterScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeroSection(context, semantic),
+            _buildFraming(context, semantic),
             const SizedBox(height: 32),
             _buildSectionHeader("OUR GUARANTEES", semantic),
             const SizedBox(height: 16),
@@ -94,14 +93,15 @@ class TrustCenterScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: semantic.surfaceCombined,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: semantic.divider),
               ),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.cloud_done_rounded, color: Colors.green),
+                      Icon(Icons.check_circle_outline_rounded,
+                          color: semantic.success, size: 20),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -121,7 +121,7 @@ class TrustCenterScreen extends ConsumerWidget {
                   const Divider(height: 32),
                   Row(
                     children: [
-                      Icon(Icons.auto_awesome,
+                      Icon(Icons.update_rounded,
                           size: 14, color: semantic.secondaryText),
                       const SizedBox(width: 8),
                       Expanded(
@@ -212,6 +212,8 @@ class TrustCenterScreen extends ConsumerWidget {
                   error: (e, _) => Text("Error: $e"),
                 ),
             const SizedBox(height: 48),
+            _buildChangePolicy(semantic),
+            const SizedBox(height: 24),
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -241,97 +243,46 @@ class TrustCenterScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroSection(BuildContext context, AppColors semantic) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.green.withValues(alpha: 0.15),
-            Colors.green.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildFraming(BuildContext context, AppColors semantic) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "This page describes product-level guarantees enforced by design.",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: semantic.secondaryText,
+          ),
         ),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.shield_rounded,
-                    color: Colors.green, size: 28),
-              ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Trust Center",
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.green),
-                    ),
-                    Text(
-                      "Your Privacy is Sovereign",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        const SizedBox(height: 16),
+        Text(
+          "TrueLedger is built on the principle that your financial life is yours alone. We believe in absolute privacy, which is why your data never leaves your device unless you choose to move it.",
+          style: TextStyle(
+            fontSize: 15,
+            color: semantic.text,
+            height: 1.6,
           ),
-          const SizedBox(height: 24),
-          Text(
-            "TrueLedger is built on the principle that your financial life is yours alone. We believe in absolute privacy, which is why your data never leaves your device unless you choose to move it.",
-            style: TextStyle(
-              fontSize: 15,
-              color: semantic.text,
-              fontWeight: FontWeight.w500,
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
-    )
-        .animate()
-        .fadeIn(duration: 600.ms)
-        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
+        ),
+      ],
+    );
   }
 
   Widget _buildGuaranteesGrid(AppColors semantic) {
-    final guarantees = [
+    const guarantees = [
       (
-        Icons.block_rounded,
         "No Ads",
         "We will never clutter your experience with advertisements or sponsored content."
       ),
       (
-        Icons.location_off_rounded,
         "No Tracking",
         "We don't track your behavior, location, or usage patterns. You are not a data point."
       ),
       (
-        Icons.person_off_rounded,
         "No Profiling",
         "Your financial habits are private. We don't build profiles for targeting or selling."
       ),
       (
-        Icons.devices_rounded,
         "100% Local",
         "Your database exists only on your device. We have no 'cloud' access to your logs."
       ),
@@ -344,7 +295,7 @@ class TrustCenterScreen extends ConsumerWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        childAspectRatio: 1.1,
       ),
       itemCount: guarantees.length,
       itemBuilder: (context, index) {
@@ -353,21 +304,19 @@ class TrustCenterScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: semantic.surfaceCombined,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: semantic.divider),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(g.$1, color: semantic.income, size: 24),
-              const SizedBox(height: 12),
-              Text(g.$2,
+              Text(g.$1,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w900, fontSize: 14)),
-              const SizedBox(height: 4),
+                      fontWeight: FontWeight.w900, fontSize: 13)),
+              const SizedBox(height: 8),
               Expanded(
                 child: Text(
-                  g.$3,
+                  g.$2,
                   style: TextStyle(
                       fontSize: 11, color: semantic.secondaryText, height: 1.4),
                 ),
@@ -376,38 +325,47 @@ class TrustCenterScreen extends ConsumerWidget {
           ),
         );
       },
-    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.05, end: 0);
+    );
   }
 
   Widget _buildNeverList(AppColors semantic) {
     final nevers = [
-      "Sell your personal or financial data to third parties.",
-      "Share your transactions with any external servers.",
-      "Require an internet connection for core functionality.",
-      "Lock your data behind proprietary formats or subscriptions.",
-      "Use your data to train AI models without your consent.",
+      "No ads",
+      "No analytics or tracking SDKs",
+      "No profiling or behavior scoring",
+      "No cross-user comparison",
+      "No bank scraping",
+      "No selling or sharing user data",
+      "All data stays on the user’s device by default",
     ];
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: semantic.overspent.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: semantic.overspent.withValues(alpha: 0.1)),
+        color: semantic.surfaceCombined,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: semantic.divider),
       ),
       child: Column(
         children: nevers
             .map((item) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.cancel_outlined,
-                          color: semantic.overspent, size: 18),
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: semantic.secondaryText,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          "We will NEVER $item",
+                          item,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -421,7 +379,27 @@ class TrustCenterScreen extends ConsumerWidget {
                 ))
             .toList(),
       ),
-    ).animate().fadeIn(delay: 400.ms);
+    );
+  }
+
+  Widget _buildChangePolicy(AppColors semantic) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(color: semantic.divider),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        "Any modification to these guarantees must be documented in release notes.",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: semantic.secondaryText,
+        ),
+      ),
+    );
   }
 
   Widget _buildBackupItem(BuildContext context, WidgetRef ref, BackupFile file,
@@ -430,20 +408,12 @@ class TrustCenterScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: semantic.divider),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.history_rounded,
-                size: 20, color: Colors.blueAccent),
-          ),
+          Icon(Icons.history_rounded, size: 20, color: semantic.secondaryText),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -556,7 +526,7 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: semantic.divider),
       ),
       child: Column(

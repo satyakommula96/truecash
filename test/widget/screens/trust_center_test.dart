@@ -71,11 +71,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text("Trust & Privacy"), findsOneWidget);
+    expect(find.text("Trust"), findsOneWidget);
     expect(find.text("DATA HEALTH"), findsOneWidget);
     expect(find.text("Total Records"), findsOneWidget);
     expect(find.text("20"), findsOneWidget);
-    expect(find.text("Trust Center"), findsOneWidget);
     expect(find.text("OUR GUARANTEES"), findsOneWidget);
     expect(find.text("WHAT WE NEVER DO"), findsOneWidget);
   });
