@@ -85,7 +85,7 @@ class AppDatabase {
 
       // Check for legacy migrations if the new stable DB doesn't exist
       if (!await File(path).exists()) {
-        await _migrateLegacyDatabases(docsDir.path, path);
+        await migrateLegacyDatabases(docsDir.path, path);
       }
     }
 
@@ -115,7 +115,7 @@ class AppDatabase {
         debugPrint(
             'MIGRATION FAILED (Web) ($e). Attempting to open last known good version...');
         if (kDebugMode && !_isTest) rethrow;
-        return await _handleMigrationFallback(path, key, isDesktop: false);
+        return await handleMigrationFallback(path, key, isDesktop: false);
       }
     } else if (Platform.isLinux ||
         Platform.isWindows ||
@@ -180,7 +180,7 @@ class AppDatabase {
         debugPrint(
             'MIGRATION FAILED (Desktop) ($e). Falling back to existing schema data...');
         if (kDebugMode && !_isTest) rethrow;
-        return await _handleMigrationFallback(path, key, isDesktop: true);
+        return await handleMigrationFallback(path, key, isDesktop: true);
       }
     } else {
       // Android / iOS / macOS
@@ -202,14 +202,14 @@ class AppDatabase {
         debugPrint(
             'MIGRATION FAILED (Mobile) ($e). Preserving data and falling back...');
         if (kDebugMode && !_isTest) rethrow;
-        return await _handleMigrationFallback(path, key,
+        return await handleMigrationFallback(path, key,
             isDesktop: !kIsWeb &&
                 (Platform.isWindows || Platform.isLinux || Platform.isMacOS));
       }
     }
   }
 
-  static Future<common.Database> _handleMigrationFallback(
+  static Future<common.Database> handleMigrationFallback(
       String path, String key,
       {required bool isDesktop}) async {
     debugPrint(
@@ -240,7 +240,7 @@ class AppDatabase {
     }
   }
 
-  static Future<void> _migrateLegacyDatabases(
+  static Future<void> migrateLegacyDatabases(
       String docsDirPath, String newPath) async {
     debugPrint('Checking for legacy database files to migrate...');
     // Traverse backwards from current version to find the latest existing DB
