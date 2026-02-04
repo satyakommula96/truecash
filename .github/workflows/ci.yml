@@ -144,18 +144,28 @@ jobs:
             xcrun simctl erase "$UDID"
           fi
 
-          xcrun simctl boot "$UDID"
+          xcrun simctl boot "$UDID" || true
           xcrun simctl bootstatus "$UDID" -b
 
           echo "Waiting for simulator readiness..."
 
+          NEXT_WAIT_TIME=0
           until xcrun simctl spawn "$UDID" launchctl print system >/dev/null 2>&1; do
             sleep 5
+            NEXT_WAIT_TIME=$((NEXT_WAIT_TIME + 5))
+            echo "Waiting for system... ($NEXT_WAIT_TIME s)"
+            if [ $NEXT_WAIT_TIME -gt 300 ]; then echo "Timeout waiting for system"; exit 1; fi
           done
 
+          NEXT_WAIT_TIME=0
           until xcrun simctl spawn "$UDID" defaults read com.apple.springboard >/dev/null 2>&1; do
             sleep 5
+            NEXT_WAIT_TIME=$((NEXT_WAIT_TIME + 5))
+            echo "Waiting for springboard... ($NEXT_WAIT_TIME s)"
+            if [ $NEXT_WAIT_TIME -gt 300 ]; then echo "Timeout waiting for springboard"; exit 1; fi
           done
+
+          echo "Simulator ready. Starting tests..."
 
           flutter drive \
             --driver=test_driver/integration_test.dart \
