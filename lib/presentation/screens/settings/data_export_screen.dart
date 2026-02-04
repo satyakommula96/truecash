@@ -394,7 +394,17 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
       }
 
       if (rows.length <= 1) {
-        throw "No data found for $type";
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("No $type data found to export."),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        setState(() => _isExporting = false);
+        return;
       }
 
       String csv = const ListToCsvConverter().convert(rows);
