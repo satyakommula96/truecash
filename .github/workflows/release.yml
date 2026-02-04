@@ -165,7 +165,11 @@ jobs:
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
-      - run: brew install sqlcipher
+      - name: Setup macOS Environment
+        run: |
+          brew install sqlcipher
+          flutter config --enable-macos-desktop
+
       - run: flutter pub get
 
       - id: version
