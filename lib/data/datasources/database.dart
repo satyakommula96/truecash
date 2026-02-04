@@ -27,9 +27,10 @@ class AppDatabase {
   );
   static const _keyParams = 'db_key';
 
-  static bool get _isTest =>
-      AppConfig.isIntegrationTest ||
-      (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'));
+  static bool get _isTest => AppConfig.isIntegrationTest || _isUnitTest;
+
+  static bool get _isUnitTest =>
+      !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
 
   static Future<common.Database> get db async {
     if (_db != null) return _db!;
@@ -112,7 +113,10 @@ class AppDatabase {
         if (kDebugMode) rethrow;
         return await _handleDatabaseReset(path, key, isDesktop: false);
       }
-    } else if (Platform.isLinux || Platform.isWindows || _isTest) {
+    } else if (Platform.isLinux ||
+        Platform.isWindows ||
+        Platform.isMacOS ||
+        _isUnitTest) {
       try {
         return await sqflite_ffi.databaseFactoryFfi.openDatabase(
           path,
