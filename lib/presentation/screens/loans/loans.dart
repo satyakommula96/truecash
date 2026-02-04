@@ -151,44 +151,32 @@ class _LoansScreenState extends ConsumerState<LoansScreen> {
                                     ),
                                     const SizedBox(width: 16),
                                     Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(l.name.toUpperCase(),
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w900,
-                                                  letterSpacing: 0.5)),
-                                          const SizedBox(height: 2),
-                                          Text(l.loanType.toUpperCase(),
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: semantic.secondaryText,
-                                                  letterSpacing: 1)),
-                                        ],
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(l.name.toUpperCase(),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w900,
+                                                    letterSpacing: 0.5),
+                                                maxLines: 2,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                            const SizedBox(height: 2),
+                                            Text(l.loanType.toUpperCase(),
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w800,
+                                                    color:
+                                                        semantic.secondaryText,
+                                                    letterSpacing: 1)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: semantic.divider
-                                            .withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                          DateHelper.formatDue(l.dueDate,
-                                                  prefix:
-                                                      l.loanType == 'Individual'
-                                                          ? "DUE"
-                                                          : "EMI")
-                                              .toUpperCase(),
-                                          style: TextStyle(
-                                              fontSize: 9,
-                                              fontWeight: FontWeight.w900,
-                                              color: semantic.secondaryText)),
                                     ),
                                   ],
                                 ),
@@ -196,6 +184,7 @@ class _LoansScreenState extends ConsumerState<LoansScreen> {
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Expanded(
                                       child: Column(
@@ -209,37 +198,76 @@ class _LoansScreenState extends ConsumerState<LoansScreen> {
                                                   color: semantic.secondaryText,
                                                   letterSpacing: 1)),
                                           const SizedBox(height: 4),
-                                          Text(
-                                              CurrencyFormatter.format(
-                                                  remaining.toInt()),
-                                              style: const TextStyle(
-                                                  fontSize: 26,
-                                                  fontWeight: FontWeight.w900,
-                                                  letterSpacing: -1)),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                                CurrencyFormatter.format(
+                                                    remaining.toInt()),
+                                                style: const TextStyle(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.w900,
+                                                    letterSpacing: -1)),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                    if (l.loanType != 'Individual')
-                                      Column(
+                                    Flexible(
+                                      child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
                                         children: [
-                                          Text("EMI",
-                                              style: TextStyle(
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: semantic.secondaryText,
-                                                  letterSpacing: 1)),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                              CurrencyFormatter.format(
-                                                  emi.toInt()),
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: barColor)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: semantic.divider
+                                                  .withValues(alpha: 0.2),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                                DateHelper.formatDue(l.dueDate,
+                                                        prefix: l.loanType ==
+                                                                'Individual'
+                                                            ? "DUE"
+                                                            : "EMI")
+                                                    .toUpperCase(),
+                                                style: TextStyle(
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.w900,
+                                                    color:
+                                                        semantic.secondaryText),
+                                                maxLines: 1,
+                                                overflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                          if (l.loanType != 'Individual') ...[
+                                            const SizedBox(height: 8),
+                                            Text("EMI",
+                                                style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w900,
+                                                    color:
+                                                        semantic.secondaryText,
+                                                    letterSpacing: 1)),
+                                            const SizedBox(height: 4),
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                  CurrencyFormatter.format(
+                                                      emi.toInt()),
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color: barColor)),
+                                            ),
+                                          ],
                                         ],
                                       ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 24),

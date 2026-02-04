@@ -48,11 +48,14 @@ class UpcomingBills extends StatelessWidget {
                                 fontSize: 8,
                                 color: semantic.secondaryText,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5)),
+                                letterSpacing: 0.5),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 4),
                         Text(b['title'].toString().toUpperCase(),
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 13),
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 12),
                         Semantics(

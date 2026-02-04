@@ -21,6 +21,10 @@ import 'package:trueledger/presentation/screens/settings/trust_center.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
 import 'package:trueledger/presentation/screens/settings/personalization_settings.dart';
 import 'package:trueledger/presentation/screens/settings/data_export_screen.dart';
+import 'package:trueledger/domain/services/intelligence_service.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/insights_provider.dart';
+import 'package:trueledger/presentation/providers/analysis_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -374,8 +378,16 @@ class SettingsScreen extends ConsumerWidget {
       try {
         final repo = ref.read(financialRepositoryProvider);
         final notificationService = ref.read(notificationServiceProvider);
+
+        // Clear all data sources
         await repo.clearData();
+        ref.read(intelligenceServiceProvider).resetAll();
         await notificationService.cancelAllNotifications();
+
+        // Invalidate all providers
+        ref.invalidate(dashboardProvider);
+        ref.invalidate(insightsProvider);
+        ref.invalidate(analysisProvider);
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -67,12 +67,14 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
             Icon(Icons.check_circle_rounded,
                 color: widget.semantic.success, size: 20),
             const SizedBox(width: 12),
-            Text(
-              "Day ritual complete. See you tomorrow!",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: widget.semantic.secondaryText,
+            Flexible(
+              child: Text(
+                "Day ritual complete. See you tomorrow!",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: widget.semantic.secondaryText,
+                ),
               ),
             ),
           ],
@@ -107,36 +109,42 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: (widget.transactionCount > 0
-                                  ? widget.semantic.success
-                                  : widget.semantic.warning)
-                              .withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: (widget.transactionCount > 0
+                                    ? widget.semantic.success
+                                    : widget.semantic.warning)
+                                .withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.nightlight_round,
+                            size: 16,
+                            color: widget.transactionCount > 0
+                                ? widget.semantic.success
+                                : widget.semantic.warning,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.nightlight_round,
-                          size: 16,
-                          color: widget.transactionCount > 0
-                              ? widget.semantic.success
-                              : widget.semantic.warning,
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Text(
+                            "DAY CLOSURE",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: widget.semantic.secondaryText,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "DAY CLOSURE",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          color: widget.semantic.secondaryText,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -189,16 +197,18 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
                                   : widget.semantic.overspent,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              isUnderBudget
-                                  ? "${CurrencyFormatter.format(diff)} under daily budget"
-                                  : "${CurrencyFormatter.format(diff)} over daily budget",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: isUnderBudget
-                                    ? widget.semantic.success
-                                    : widget.semantic.overspent,
+                            Flexible(
+                              child: Text(
+                                isUnderBudget
+                                    ? "${CurrencyFormatter.format(diff)} under daily budget"
+                                    : "${CurrencyFormatter.format(diff)} over daily budget",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: isUnderBudget
+                                      ? widget.semantic.success
+                                      : widget.semantic.overspent,
+                                ),
                               ),
                             ),
                           ],

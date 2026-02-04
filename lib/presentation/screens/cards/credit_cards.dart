@@ -226,7 +226,9 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w900,
-                                                  letterSpacing: 0.5)),
+                                                  letterSpacing: 0.5),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis),
                                           const SizedBox(height: 2),
                                           Text("CREDIT CARD",
                                               style: TextStyle(
@@ -295,13 +297,17 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
                                                   color: semantic.secondaryText,
                                                   letterSpacing: 1)),
                                           const SizedBox(height: 4),
-                                          Text(
-                                              CurrencyFormatter.format(
-                                                  stmt.toInt()),
-                                              style: const TextStyle(
-                                                  fontSize: 26,
-                                                  fontWeight: FontWeight.w900,
-                                                  letterSpacing: -1)),
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                                CurrencyFormatter.format(
+                                                    stmt.toInt()),
+                                                style: const TextStyle(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.w900,
+                                                    letterSpacing: -1)),
+                                          ),
                                         ],
                                       ),
                                     ),
