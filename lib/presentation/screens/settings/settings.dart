@@ -683,8 +683,8 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "Trust & Privacy",
-            "Data health & security",
+            "Trust",
+            "Explicit guarantees & data health",
             Icons.verified_user_outlined,
             Colors.green,
             () => Navigator.push(context,
@@ -800,6 +800,22 @@ class SettingsScreen extends ConsumerWidget {
                   style: TextStyle(fontSize: 10, color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const TrustCenterScreen())),
+                  child: const Text(
+                    "Our Trust Guarantees",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 InkWell(
                   onTap: () => launchUrl(Uri.parse(
                       "https://satyakommula96.github.io/trueledger/privacy/")),
