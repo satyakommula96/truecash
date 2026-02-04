@@ -11,6 +11,7 @@ import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
+import 'package:trueledger/presentation/screens/analysis/annual_reflection_screen.dart';
 
 class AnalysisScreen extends ConsumerWidget {
   const AnalysisScreen({super.key});
@@ -60,6 +61,10 @@ class AnalysisScreen extends ConsumerWidget {
                       .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
                   const SizedBox(height: 32),
                 ],
+                _buildAnnualReflectionBanner(context, semantic)
+                    .animate()
+                    .fadeIn(delay: 100.ms),
+                const SizedBox(height: 32),
                 Text("SPENDING TREND",
                         style: TextStyle(
                             fontSize: 10,
@@ -263,6 +268,67 @@ class AnalysisScreen extends ConsumerWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnnualReflectionBanner(
+      BuildContext context, AppColors semantic) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AnnualReflectionScreen(year: DateTime.now().year),
+        ),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: semantic.divider.withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.auto_awesome_rounded,
+                  color: Colors.deepPurple),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "YEAR-IN-REVIEW",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: semantic.secondaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "View your ${DateTime.now().year} annual reflection",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: semantic.secondaryText),
           ],
         ),
       ),
