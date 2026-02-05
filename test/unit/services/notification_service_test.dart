@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/core/services/notification_service.dart';
+import 'package:trueledger/domain/models/models.dart';
 
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
@@ -21,8 +22,9 @@ void main() {
       expect(NotificationService.routeCards, '/cards');
     });
 
-    test('dailyReminderId and creditCardBaseId are correct', () {
+    test('dailyReminderId, digestId and creditCardBaseId are correct', () {
       expect(NotificationService.dailyReminderId, 888);
+      expect(NotificationService.dailyBillDigestId, 999);
       expect(NotificationService.creditCardBaseId, 10000);
     });
 
@@ -91,6 +93,14 @@ void main() {
       ]);
 
       await subscription.cancel();
+    });
+
+    test('showDailyBillDigest does not throw', () async {
+      final bills = [
+        BillSummary(id: '1', name: 'Rent', amount: 2000, type: 'BILL'),
+      ];
+      // In unit test mode (kIsWeb or linux), showNotification is no-op
+      await notificationService.showDailyBillDigest(bills);
     });
   });
 }

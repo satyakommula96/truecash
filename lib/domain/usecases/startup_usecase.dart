@@ -10,17 +10,22 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:trueledger/core/config/app_config.dart';
+import 'package:trueledger/domain/models/models.dart';
 
 class StartupResult {
   final bool shouldScheduleReminder;
   final bool shouldCancelReminder;
+  final List<BillSummary> billsDueToday;
 
   StartupResult({
     this.shouldScheduleReminder = false,
     this.shouldCancelReminder = false,
+    this.billsDueToday = const [],
   });
 }
 
+// NOTE: StartupUseCase is intentionally capped.
+// Do not add more behavioral logic here.
 class StartupUseCase extends UseCase<StartupResult, NoParams> {
   final IFinancialRepository repository;
   final AutoBackupUseCase autoBackup;
@@ -63,9 +68,17 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
       // 4. Check for recurring transactions
       await repository.checkAndProcessRecurring();
 
+      // 5. Daily Bill Digest Logic
+      List<BillSummary> billsDueToday = [];
+      final upcomingBills = await repository.getUpcomingBills();
+      final now = DateTime.now();
+
+      billsDueToday = BillSummary.filterDueEntries(upcomingBills, now);
+
       return Success(StartupResult(
         shouldScheduleReminder: shouldScheduleReminder,
         shouldCancelReminder: shouldCancelReminder,
+        billsDueToday: billsDueToday,
       ));
     } catch (e) {
       if (e is AppFailure) return Failure(e);

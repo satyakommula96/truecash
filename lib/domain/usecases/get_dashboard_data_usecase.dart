@@ -11,6 +11,7 @@ class DashboardData {
   final List<SavingGoal> savingGoals;
   final List<Map<String, dynamic>> trendData;
   final List<Map<String, dynamic>> upcomingBills;
+  final List<BillSummary> billsDueToday;
   final int todaySpend;
   final int thisWeekSpend;
   final int lastWeekSpend;
@@ -24,6 +25,7 @@ class DashboardData {
     required this.savingGoals,
     required this.trendData,
     required this.upcomingBills,
+    required this.billsDueToday,
     required this.todaySpend,
     required this.thisWeekSpend,
     required this.lastWeekSpend,
@@ -55,13 +57,18 @@ class GetDashboardDataUseCase extends UseCase<DashboardData, NoParams> {
 
       final weeklySummary = results[7] as Map<String, int>;
 
+      final summary = results[0] as MonthlySummary;
+      final upcomingBills = (results[5] as List).cast<Map<String, dynamic>>();
+
       return Success(DashboardData(
-        summary: results[0] as MonthlySummary,
+        summary: summary,
         categorySpending: (results[1] as List).cast<Map<String, dynamic>>(),
         budgets: (results[2] as List).cast<Budget>(),
         savingGoals: (results[3] as List).cast<SavingGoal>(),
         trendData: (results[4] as List).cast<Map<String, dynamic>>(),
-        upcomingBills: (results[5] as List).cast<Map<String, dynamic>>(),
+        upcomingBills: upcomingBills,
+        billsDueToday:
+            BillSummary.filterDueEntries(results[5] as List, DateTime.now()),
         todaySpend: results[6] as int,
         thisWeekSpend: weeklySummary['thisWeek'] ?? 0,
         lastWeekSpend: weeklySummary['lastWeek'] ?? 0,

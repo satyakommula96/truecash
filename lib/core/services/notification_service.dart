@@ -8,10 +8,23 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/core/config/app_config.dart';
 import 'package:trueledger/core/utils/hash_utils.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 class NotificationService {
-  // Notification IDs are deterministic to support cancel/update across restarts
+  /// Notification IDs must be deterministic and stable to allow:
+  /// 1. Cancellation across app restarts (e.g. dailyReminderId).
+  /// 2. Overwriting/Updating existing notifications in the tray (e.g. dailyBillDigestId).
+  ///
+  /// IMPORTANT: Never reuse these specific IDs for other notification types,
+  /// otherwise they will silently overwrite each other.
   static const int dailyReminderId = 888;
+
+  /// Specifically used for the aggregated daily summary. Overwriting this ID
+  /// ensures the user doesn't get flooded with multiple digest entries in the tray.
+  static const int dailyBillDigestId = 999;
+
+  /// Starting range for credit card specific reminders to avoid collisions.
   static const int creditCardBaseId = 10000;
   // Injected for testability
   final SharedPreferences _prefs;
@@ -208,6 +221,59 @@ class NotificationService {
     );
   }
 
+  /*
+  Future<void> scheduleNotification({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledDate,
+    String? payload,
+  }) async {
+    if (!_isInitialized) await init();
+    if (_initFailed) return;
+    if (kIsWeb || _isTest || Platform.isLinux || Platform.isWindows) {
+      return;
+    }
+
+    try {
+      // Calculate delay efficiently to avoid relying on uninitialized tz.local
+      final now = DateTime.now();
+
+      // If the scheduled date is in the past compared to now, add 1 minute to avoid crash
+      // or simply don't schedule. But our logic guarantees future.
+      // We calculate the duration from now to the target local time.
+      final duration = scheduledDate.difference(now);
+
+      // Create a TZDateTime in UTC that corresponds to the same absolute instant
+      final tzDate = tz.TZDateTime.now(tz.UTC).add(duration);
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tzDate,
+        notificationDetails: const fln.NotificationDetails(
+          android: fln.AndroidNotificationDetails(
+            'scheduled_channel',
+            'Scheduled Notifications',
+            importance: fln.Importance.max,
+            priority: fln.Priority.high,
+          ),
+          iOS: fln.DarwinNotificationDetails(),
+          macOS: fln.DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            fln.UILocalNotificationDateInterpretation.absoluteTime,
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint(
+          "NotificationService: Failed to schedule zoned notification: $e");
+    }
+  }
+  */
+
   Future<void> scheduleDailyReminder() async {
     if (!_isInitialized) await init();
 
@@ -261,6 +327,43 @@ class NotificationService {
     // Also save as if it were scheduled, for UI demo purposes
     await _saveScheduledNotification(
         id, 'Reminder: $bank', 'Bill payment due on day $day', routeCards);
+  }
+
+  Future<void> showDailyBillDigest(List<BillSummary> bills) async {
+    if (bills.isEmpty) return;
+    if (!_isInitialized) await init();
+
+    final int count = bills.length;
+    final int total = bills.fold(0, (sum, b) => sum + b.amount);
+
+    final String title = "Daily Bill Digest";
+    final String body =
+        "$count ${count == 1 ? 'bill' : 'bills'} due today · ${CurrencyFormatter.format(total)} total";
+
+    // Timing Guard: Morning window functionality currently disabled due to
+    // flutter_local_notifications API/version mismatch.
+    // TODO: Restore scheduling logic once API surface is stable.
+    /*
+    final now = DateTime.now();
+    if (now.hour < 8) {
+      await scheduleNotification(
+        id: dailyBillDigestId,
+        title: title,
+        body: body,
+        scheduledDate: DateTime(now.year, now.month, now.day, 8, 0),
+        payload: routeDashboard,
+      );
+    } else {
+    */
+    await showNotification(
+      id: dailyBillDigestId,
+      title: title,
+      body: body,
+      payload: routeDashboard,
+    );
+    /*
+    }
+    */
   }
 
   Future<List<fln.PendingNotificationRequest>> getPendingNotifications() async {

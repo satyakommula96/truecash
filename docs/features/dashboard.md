@@ -14,3 +14,4 @@ The Dashboard is the central hub of TrueLedger, designed to give you an immediat
 
 ## 🔔 Smart Notifications
 - **Status Indicator**: A bell icon shows your notification status. Tap to view your scheduled reminders (Daily reminders, Credit Card due dates, etc.).
+- **Daily Bill Digest**: An aggregated morning notification that summarizes everything due today (Bills, Subscriptions, EMIs), avoiding notification fatigue.

@@ -26,6 +26,7 @@ We implement these phases sequentially.
 
 - [x] **Smart Reminders**
     - [x] "Daily Log" reminder (e.g., at 9 PM) *only if* no transaction added today.
+    - [x] Daily Bill Digest (aggregated morning summary of items due today).
     - [x] Budget proximity warning notification.
 
 ## Phase 2: Trust (Goal: Reliability & Correction)

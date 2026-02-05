@@ -7,7 +7,6 @@ import 'package:trueledger/core/services/notification_service.dart';
 import 'package:trueledger/presentation/providers/backup_provider.dart';
 import 'package:trueledger/core/utils/result.dart';
 import 'package:trueledger/domain/usecases/startup_usecase.dart';
-
 import 'package:trueledger/core/config/app_config.dart';
 import 'package:trueledger/core/providers/secure_storage_provider.dart';
 
@@ -36,6 +35,9 @@ final bootProvider = FutureProvider<String?>((ref) async {
           .cancelNotification(NotificationService.dailyReminderId);
     }
   }
+
+  // 2. The Daily Bill Digest logic is now handled reactively by
+  // dailyDigestOrchestratorProvider to support resume and real-time updates.
 
   // Bypass Secure Storage during tests to avoid UI blocking hangs
   if (AppConfig.isIntegrationTest) {

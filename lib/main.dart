@@ -11,6 +11,8 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/presentation/providers/digest_provider.dart';
+import 'package:trueledger/presentation/components/privacy_guard.dart';
 import 'package:trueledger/presentation/screens/startup/startup_screen.dart';
 
 Future<void> main() async {
@@ -53,11 +55,14 @@ Future<void> main() async {
 // Global theme notifier (Keeping for now to avoid breaking existing toggle logic)
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
-class TrueLedgerApp extends StatelessWidget {
+class TrueLedgerApp extends ConsumerWidget {
   const TrueLedgerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Start the reactive coordinator for daily digest notifications
+    ref.watch(dailyDigestCoordinatorProvider);
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
       builder: (_, mode, __) {
@@ -75,6 +80,9 @@ class TrueLedgerApp extends StatelessWidget {
               PointerDeviceKind.trackpad
             },
           ),
+          builder: (context, child) {
+            return PrivacyGuard(child: child!);
+          },
           home: const StartupScreen(),
         );
       },

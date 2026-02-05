@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/core/utils/result.dart';
 import 'package:trueledger/domain/usecases/auto_backup_usecase.dart';
 import 'package:trueledger/domain/usecases/startup_usecase.dart';
@@ -7,7 +8,6 @@ import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/core/error/failure.dart';
 import 'package:trueledger/data/datasources/database.dart';
-
 import 'package:flutter/services.dart';
 import 'dart:io';
 
@@ -24,6 +24,7 @@ void main() {
 
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     registerFallbackValue(NoParams());
   });
 
@@ -51,6 +52,12 @@ void main() {
     when(() => mockAutoBackupUseCase.call(any(),
             onSuccess: any(named: 'onSuccess')))
         .thenAnswer((_) async => const Success(null));
+
+    // Default setup for digest (empty)
+    when(() => mockRepository.getTodaySpend()).thenAnswer((_) async => 0);
+    when(() => mockRepository.checkAndProcessRecurring())
+        .thenAnswer((_) async {});
+    when(() => mockRepository.getUpcomingBills()).thenAnswer((_) async => []);
   });
 
   tearDown(() async {
@@ -90,6 +97,72 @@ void main() {
       expect(await newDir.exists(), isTrue);
       expect(await File('${newDir.path}/test_backup.json').exists(), isTrue);
       expect(await oldDir.exists(), isFalse);
+    });
+
+    test('should identify bills due today', () async {
+      // Arrange
+      final now = DateTime.now();
+      final bills = [
+        {
+          'id': 1,
+          'name': 'Rent',
+          'amount': 20000,
+          'due': now.toIso8601String(),
+          'type': 'BILL'
+        },
+        {
+          'id': 2,
+          'name': 'Netflix',
+          'amount': 199,
+          'due': now.toIso8601String(),
+          'type': 'SUBSCRIPTION'
+        },
+      ];
+      when(() => mockRepository.getUpcomingBills())
+          .thenAnswer((_) async => bills);
+
+      // Act
+      final result = await useCase.call(NoParams());
+
+      // Assert
+      expect(result.isSuccess, isTrue);
+      final data = result.getOrThrow;
+      expect(data.billsDueToday.length, 2);
+      expect(data.billsDueToday.first.name, 'Rent');
+    });
+
+    test('should exclude paid bills from digest', () async {
+      // Arrange
+      final now = DateTime.now();
+      final bills = [
+        {
+          'id': 1,
+          'name': 'Paid Bill',
+          'amount': 500,
+          'due': now.toIso8601String(),
+          'type': 'BILL',
+          'isPaid': true
+        },
+        {
+          'id': 2,
+          'name': 'Unpaid Bill',
+          'amount': 1000,
+          'due': now.toIso8601String(),
+          'type': 'BILL',
+          'isPaid': false
+        },
+      ];
+      when(() => mockRepository.getUpcomingBills())
+          .thenAnswer((_) async => bills);
+
+      // Act
+      final result = await useCase.call(NoParams());
+
+      // Assert
+      expect(result.isSuccess, isTrue);
+      final data = result.getOrThrow;
+      expect(data.billsDueToday.length, 1);
+      expect(data.billsDueToday.first.name, 'Unpaid Bill');
     });
   });
 }
