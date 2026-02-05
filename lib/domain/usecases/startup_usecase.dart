@@ -10,22 +10,29 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:trueledger/core/config/app_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/utils/date_helper.dart';
+import 'package:intl/intl.dart';
 
 class StartupResult {
   final bool shouldScheduleReminder;
   final bool shouldCancelReminder;
+  final List<BillSummary> billsDueToday;
 
   StartupResult({
     this.shouldScheduleReminder = false,
     this.shouldCancelReminder = false,
+    this.billsDueToday = const [],
   });
 }
 
 class StartupUseCase extends UseCase<StartupResult, NoParams> {
   final IFinancialRepository repository;
   final AutoBackupUseCase autoBackup;
+  final SharedPreferences prefs;
 
-  StartupUseCase(this.repository, this.autoBackup);
+  StartupUseCase(this.repository, this.autoBackup, this.prefs);
 
   @override
   Future<Result<StartupResult>> call(NoParams params,
@@ -63,9 +70,32 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
       // 4. Check for recurring transactions
       await repository.checkAndProcessRecurring();
 
+      // 5. Daily Bill Digest Logic
+      List<BillSummary> billsDueToday = [];
+      final upcomingBills = await repository.getUpcomingBills();
+      final now = DateTime.now();
+
+      final filtered = upcomingBills
+          .map((m) => BillSummary.fromMap(m))
+          .where(
+              (b) => b.dueDate != null && DateHelper.isSameDay(b.dueDate!, now))
+          .toList();
+
+      if (filtered.isNotEmpty) {
+        final todayStr = DateFormat('yyyy-MM-dd').format(now);
+        final lastDigestDate = prefs.getString('last_bill_digest_date');
+
+        if (lastDigestDate != todayStr) {
+          billsDueToday = filtered;
+          // We mark it as shown now in the domain logic to ensure deduplication
+          await prefs.setString('last_bill_digest_date', todayStr);
+        }
+      }
+
       return Success(StartupResult(
         shouldScheduleReminder: shouldScheduleReminder,
         shouldCancelReminder: shouldCancelReminder,
+        billsDueToday: billsDueToday,
       ));
     } catch (e) {
       if (e is AppFailure) return Failure(e);

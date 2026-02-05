@@ -8,10 +8,13 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/core/config/app_config.dart';
 import 'package:trueledger/core/utils/hash_utils.dart';
+import 'package:trueledger/domain/models/models.dart';
+import 'package:trueledger/core/utils/currency_formatter.dart';
 
 class NotificationService {
   // Notification IDs are deterministic to support cancel/update across restarts
   static const int dailyReminderId = 888;
+  static const int dailyBillDigestId = 999;
   static const int creditCardBaseId = 10000;
   // Injected for testability
   final SharedPreferences _prefs;
@@ -261,6 +264,25 @@ class NotificationService {
     // Also save as if it were scheduled, for UI demo purposes
     await _saveScheduledNotification(
         id, 'Reminder: $bank', 'Bill payment due on day $day', routeCards);
+  }
+
+  Future<void> showDailyBillDigest(List<BillSummary> bills) async {
+    if (bills.isEmpty) return;
+    if (!_isInitialized) await init();
+
+    final int count = bills.length;
+    final int total = bills.fold(0, (sum, b) => sum + b.amount);
+
+    final String title = "💰 Daily Bill Digest";
+    final String body =
+        "$count bills due today · ${CurrencyFormatter.format(total)} total";
+
+    await showNotification(
+      id: dailyBillDigestId,
+      title: title,
+      body: body,
+      payload: routeDashboard, // Deep-link to dashboard (calendar is there)
+    );
   }
 
   Future<List<fln.PendingNotificationRequest>> getPendingNotifications() async {

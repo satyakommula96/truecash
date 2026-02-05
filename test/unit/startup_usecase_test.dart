@@ -1,5 +1,7 @@
+import 'package:intl/intl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/core/utils/result.dart';
 import 'package:trueledger/domain/usecases/auto_backup_usecase.dart';
 import 'package:trueledger/domain/usecases/startup_usecase.dart';
@@ -15,22 +17,27 @@ class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
 class MockAutoBackupUseCase extends Mock implements AutoBackupUseCase {}
 
+class MockSharedPreferences extends Mock implements SharedPreferences {}
+
 void main() {
   late StartupUseCase useCase;
   late MockFinancialRepository mockRepository;
   late MockAutoBackupUseCase mockAutoBackupUseCase;
+  late MockSharedPreferences mockPrefs;
 
   late Directory tempDir;
 
   setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     registerFallbackValue(NoParams());
   });
 
   setUp(() async {
     mockRepository = MockFinancialRepository();
     mockAutoBackupUseCase = MockAutoBackupUseCase();
-    useCase = StartupUseCase(mockRepository, mockAutoBackupUseCase);
+    mockPrefs = MockSharedPreferences();
+    useCase = StartupUseCase(mockRepository, mockAutoBackupUseCase, mockPrefs);
     tempDir = await Directory.systemTemp.createTemp('startup_test');
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -51,6 +58,11 @@ void main() {
     when(() => mockAutoBackupUseCase.call(any(),
             onSuccess: any(named: 'onSuccess')))
         .thenAnswer((_) async => const Success(null));
+
+    // Default setup for digest (empty)
+    when(() => mockRepository.getUpcomingBills()).thenAnswer((_) async => []);
+    when(() => mockPrefs.getString(any())).thenReturn(null);
+    when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
   });
 
   tearDown(() async {
@@ -90,6 +102,70 @@ void main() {
       expect(await newDir.exists(), isTrue);
       expect(await File('${newDir.path}/test_backup.json').exists(), isTrue);
       expect(await oldDir.exists(), isFalse);
+    });
+
+    test('should identify bills due today', () async {
+      // Arrange
+      final now = DateTime.now();
+      final bills = [
+        {
+          'id': 1,
+          'name': 'Rent',
+          'amount': 20000,
+          'due': now.toIso8601String(),
+          'type': 'BILL'
+        },
+        {
+          'id': 2,
+          'name': 'Netflix',
+          'amount': 199,
+          'due': now.toIso8601String(),
+          'type': 'SUBSCRIPTION'
+        },
+      ];
+      when(() => mockRepository.getUpcomingBills())
+          .thenAnswer((_) async => bills);
+      when(() => mockPrefs.getString('last_bill_digest_date')).thenReturn(null);
+
+      // Act
+      final result = await useCase.call(NoParams());
+
+      // Assert
+      expect(result.isSuccess, isTrue);
+      final data = result.getOrThrow;
+      expect(data.billsDueToday.length, 2);
+      expect(data.billsDueToday.first.name, 'Rent');
+      verify(() => mockPrefs.setString('last_bill_digest_date', any()))
+          .called(1);
+    });
+
+    test('should deduplicate digest if already shown today', () async {
+      // Arrange
+      final now = DateTime.now();
+      final bills = [
+        {
+          'id': 1,
+          'name': 'Rent',
+          'amount': 20000,
+          'due': now.toIso8601String(),
+          'type': 'BILL'
+        },
+      ];
+      final todayStr = DateFormat('yyyy-MM-dd').format(now);
+
+      when(() => mockRepository.getUpcomingBills())
+          .thenAnswer((_) async => bills);
+      when(() => mockPrefs.getString('last_bill_digest_date'))
+          .thenReturn(todayStr);
+
+      // Act
+      final result = await useCase.call(NoParams());
+
+      // Assert
+      expect(result.isSuccess, isTrue);
+      final data = result.getOrThrow;
+      expect(data.billsDueToday, isEmpty);
+      verifyNever(() => mockPrefs.setString('last_bill_digest_date', any()));
     });
   });
 }

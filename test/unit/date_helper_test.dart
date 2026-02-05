@@ -53,4 +53,34 @@ void main() {
       expect(DateHelper.parseDue('invalid date'), isNull);
     });
   });
+  group('DateHelper.isSameDay', () {
+    test('returns true for exact same time', () {
+      final now = DateTime(2026, 2, 5, 11, 0);
+      expect(DateHelper.isSameDay(now, now), isTrue);
+    });
+
+    test('returns true for same day different time', () {
+      final t1 = DateTime(2026, 2, 5, 10, 0);
+      final t2 = DateTime(2026, 2, 5, 22, 0);
+      expect(DateHelper.isSameDay(t1, t2), isTrue);
+    });
+
+    test('returns false for different days', () {
+      final t1 = DateTime(2026, 2, 5);
+      final t2 = DateTime(2026, 2, 6);
+      expect(DateHelper.isSameDay(t1, t2), isFalse);
+    });
+
+    test('returns false for same day different months', () {
+      final t1 = DateTime(2026, 2, 5);
+      final t2 = DateTime(2026, 3, 5);
+      expect(DateHelper.isSameDay(t1, t2), isFalse);
+    });
+
+    test('returns false for same day/month different years', () {
+      final t1 = DateTime(2026, 2, 5);
+      final t2 = DateTime(2027, 2, 5);
+      expect(DateHelper.isSameDay(t1, t2), isFalse);
+    });
+  });
 }

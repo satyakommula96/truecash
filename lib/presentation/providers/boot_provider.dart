@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/domain/usecases/usecase_base.dart';
@@ -34,6 +35,16 @@ final bootProvider = FutureProvider<String?>((ref) async {
     } else if (startupResult.shouldCancelReminder) {
       await notificationService
           .cancelNotification(NotificationService.dailyReminderId);
+    }
+
+    // 2. Trigger Daily Bill Digest (Aggregated)
+    if (startupResult.billsDueToday.isNotEmpty) {
+      // Foreground suppression: Only notify if not actively in the app
+      final state = WidgetsBinding.instance.lifecycleState;
+      if (state != AppLifecycleState.resumed) {
+        await notificationService
+            .showDailyBillDigest(startupResult.billsDueToday);
+      }
     }
   }
 

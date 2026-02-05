@@ -9,6 +9,7 @@ import 'package:trueledger/presentation/providers/boot_provider.dart';
 import 'package:trueledger/presentation/providers/usecase_providers.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:trueledger/core/services/notification_service.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
@@ -24,8 +25,11 @@ class MockAutoBackupUseCase extends Mock implements AutoBackupUseCase {}
 
 class MockSecureStorage extends Mock implements FlutterSecureStorage {}
 
+class MockPrefs extends Mock implements SharedPreferences {}
+
 class SuccessStartupUseCase extends StartupUseCase {
-  SuccessStartupUseCase() : super(MockRepo(), MockAutoBackupUseCase());
+  SuccessStartupUseCase()
+      : super(MockRepo(), MockAutoBackupUseCase(), MockPrefs());
   @override
   Future<Result<StartupResult>> call(NoParams params,
           {void Function()? onBackupSuccess}) async =>
@@ -33,7 +37,8 @@ class SuccessStartupUseCase extends StartupUseCase {
 }
 
 class FailureStartupUseCase extends StartupUseCase {
-  FailureStartupUseCase() : super(MockRepo(), MockAutoBackupUseCase());
+  FailureStartupUseCase()
+      : super(MockRepo(), MockAutoBackupUseCase(), MockPrefs());
   @override
   Future<Result<StartupResult>> call(NoParams params,
           {void Function()? onBackupSuccess}) async =>
