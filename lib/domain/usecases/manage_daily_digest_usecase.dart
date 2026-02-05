@@ -29,6 +29,14 @@ class NoAction extends DailyDigestAction {
 }
 
 /// Use Case to manage the logic of the Daily Bill Digest.
+///
+/// IMPORTANT:
+/// This use case is safe to be invoked from:
+/// - foreground reactive providers
+/// - background workers (future)
+///
+/// Do NOT schedule notifications outside this logic,
+/// or duplicate notifications will occur.
 class ManageDailyDigestUseCase {
   final DailyDigestStore _store;
 
@@ -58,6 +66,9 @@ class ManageDailyDigestUseCase {
         (lastTotal != currentTotal) ||
         (lastDigestDate != todayStr);
 
+    // If content and DATE are identical to last execution, no-op.
+    // Note: If lastDigestDate differs from todayStr (e.g. rolled over to new day),
+    // contentChanged becomes true, ensuring we evaluate downstream logic (likely cancelling yesterday's digest if today is empty).
     if (!contentChanged) {
       return const NoAction();
     }

@@ -99,5 +99,30 @@ void main() {
       verify(() => mockStore.saveState(date: todayStr, count: 0, total: 0))
           .called(1);
     });
+
+    test(
+        'should explicitly cancel and update date even if yesterday had 0 bills (date change)',
+        () async {
+      // Scenario: Yesterday had 0 bills (Cancel/NoAction stored). Today has 0 bills.
+      // logic must still return CancelDigestAction (or act to save state)
+      // so that the "lastDigestDate" is updated to today.
+      // If we returned NoAction immediately without saving, the date would stay "yesterday",
+      // causing "contentChanged=true" loop or stale date issues.
+
+      when(() => mockStore.getLastDigestDate()).thenReturn('2026-01-01');
+      when(() => mockStore.getLastDigestCount()).thenReturn(0);
+      when(() => mockStore.getLastDigestTotal()).thenReturn(0);
+      when(() => mockStore.saveState(
+            date: any(named: 'date'),
+            count: any(named: 'count'),
+            total: any(named: 'total'),
+          )).thenAnswer((_) async {});
+
+      final result = await useCase.execute([], AppRunContext.coldStart);
+
+      expect(result, isA<CancelDigestAction>());
+      verify(() => mockStore.saveState(date: todayStr, count: 0, total: 0))
+          .called(1);
+    });
   });
 }
