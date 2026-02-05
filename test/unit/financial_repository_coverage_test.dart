@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:trueledger/data/repositories/financial_repository_impl.dart';
@@ -10,25 +11,43 @@ void main() {
   group('FinancialRepositoryImpl Coverage Expansion', () {
     late FinancialRepositoryImpl repo;
 
-    setUpAll(() {
+    late Directory tempDir;
+
+    setUpAll(() async {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
+      tempDir = await Directory.systemTemp.createTemp('financial_repo_test_');
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
         const MethodChannel('plugins.flutter.io/path_provider'),
         (message) async {
           if (message.method == 'getApplicationDocumentsDirectory') {
-            return '.';
+            return tempDir.path;
           }
           return null;
         },
       );
     });
 
+    tearDownAll(() async {
+      await AppDatabase.close();
+      if (tempDir.existsSync()) {
+        try {
+          tempDir.deleteSync(recursive: true);
+        } catch (_) {}
+      }
+    });
+
     setUp(() async {
       repo = FinancialRepositoryImpl();
+      // Ensure we start with a clean state even if sharing the file in this group
       await AppDatabase.clearData();
+    });
+
+    tearDown(() async {
+      // Close DB after each test to release locks
+      await AppDatabase.close();
     });
 
     test('getMonthlySummary returns correct totals', () async {
