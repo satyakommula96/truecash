@@ -28,8 +28,7 @@ class MockSecureStorage extends Mock implements FlutterSecureStorage {}
 class MockPrefs extends Mock implements SharedPreferences {}
 
 class SuccessStartupUseCase extends StartupUseCase {
-  SuccessStartupUseCase()
-      : super(MockRepo(), MockAutoBackupUseCase(), MockPrefs());
+  SuccessStartupUseCase() : super(MockRepo(), MockAutoBackupUseCase());
   @override
   Future<Result<StartupResult>> call(NoParams params,
           {void Function()? onBackupSuccess}) async =>
@@ -37,8 +36,7 @@ class SuccessStartupUseCase extends StartupUseCase {
 }
 
 class FailureStartupUseCase extends StartupUseCase {
-  FailureStartupUseCase()
-      : super(MockRepo(), MockAutoBackupUseCase(), MockPrefs());
+  FailureStartupUseCase() : super(MockRepo(), MockAutoBackupUseCase());
   @override
   Future<Result<StartupResult>> call(NoParams params,
           {void Function()? onBackupSuccess}) async =>

@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +8,6 @@ import 'package:trueledger/domain/usecases/usecase_base.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:trueledger/core/error/failure.dart';
 import 'package:trueledger/data/datasources/database.dart';
-
 import 'package:flutter/services.dart';
 import 'dart:io';
 
@@ -17,13 +15,10 @@ class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
 class MockAutoBackupUseCase extends Mock implements AutoBackupUseCase {}
 
-class MockSharedPreferences extends Mock implements SharedPreferences {}
-
 void main() {
   late StartupUseCase useCase;
   late MockFinancialRepository mockRepository;
   late MockAutoBackupUseCase mockAutoBackupUseCase;
-  late MockSharedPreferences mockPrefs;
 
   late Directory tempDir;
 
@@ -36,8 +31,7 @@ void main() {
   setUp(() async {
     mockRepository = MockFinancialRepository();
     mockAutoBackupUseCase = MockAutoBackupUseCase();
-    mockPrefs = MockSharedPreferences();
-    useCase = StartupUseCase(mockRepository, mockAutoBackupUseCase, mockPrefs);
+    useCase = StartupUseCase(mockRepository, mockAutoBackupUseCase);
     tempDir = await Directory.systemTemp.createTemp('startup_test');
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -64,9 +58,6 @@ void main() {
     when(() => mockRepository.checkAndProcessRecurring())
         .thenAnswer((_) async {});
     when(() => mockRepository.getUpcomingBills()).thenAnswer((_) async => []);
-    when(() => mockPrefs.getString(any())).thenReturn(null);
-    when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
-    when(() => mockPrefs.setInt(any(), any())).thenAnswer((_) async => true);
   });
 
   tearDown(() async {
@@ -129,7 +120,6 @@ void main() {
       ];
       when(() => mockRepository.getUpcomingBills())
           .thenAnswer((_) async => bills);
-      when(() => mockPrefs.getString('last_bill_digest_date')).thenReturn(null);
 
       // Act
       final result = await useCase.call(NoParams());
@@ -139,36 +129,6 @@ void main() {
       final data = result.getOrThrow;
       expect(data.billsDueToday.length, 2);
       expect(data.billsDueToday.first.name, 'Rent');
-      verifyNever(() => mockPrefs.setString('last_bill_digest_date', any()));
-    });
-
-    test('should deduplicate digest if already shown today', () async {
-      // Arrange
-      final now = DateTime.now();
-      final bills = [
-        {
-          'id': 1,
-          'name': 'Rent',
-          'amount': 20000,
-          'due': now.toIso8601String(),
-          'type': 'BILL'
-        },
-      ];
-      final todayStr = DateFormat('yyyy-MM-dd').format(now);
-
-      when(() => mockRepository.getUpcomingBills())
-          .thenAnswer((_) async => bills);
-      when(() => mockPrefs.getString('last_bill_digest_date'))
-          .thenReturn(todayStr);
-
-      // Act
-      final result = await useCase.call(NoParams());
-
-      // Assert
-      expect(result.isSuccess, isTrue);
-      final data = result.getOrThrow;
-      expect(data.billsDueToday, isEmpty);
-      verifyNever(() => mockPrefs.setString('last_bill_digest_date', any()));
     });
   });
 }

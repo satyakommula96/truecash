@@ -10,10 +10,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:trueledger/core/config/app_config.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/core/utils/date_helper.dart';
-import 'package:intl/intl.dart';
 
 class StartupResult {
   final bool shouldScheduleReminder;
@@ -30,9 +28,8 @@ class StartupResult {
 class StartupUseCase extends UseCase<StartupResult, NoParams> {
   final IFinancialRepository repository;
   final AutoBackupUseCase autoBackup;
-  final SharedPreferences prefs;
 
-  StartupUseCase(this.repository, this.autoBackup, this.prefs);
+  StartupUseCase(this.repository, this.autoBackup);
 
   @override
   Future<Result<StartupResult>> call(NoParams params,
@@ -75,23 +72,11 @@ class StartupUseCase extends UseCase<StartupResult, NoParams> {
       final upcomingBills = await repository.getUpcomingBills();
       final now = DateTime.now();
 
-      final filtered = upcomingBills
+      billsDueToday = upcomingBills
           .map((m) => BillSummary.fromMap(m))
           .where(
               (b) => b.dueDate != null && DateHelper.isSameDay(b.dueDate!, now))
           .toList();
-
-      if (filtered.isNotEmpty) {
-        final todayStr = DateFormat('yyyy-MM-dd').format(now);
-        final lastDigestDate = prefs.getString('last_bill_digest_date');
-
-        if (lastDigestDate != todayStr) {
-          billsDueToday = filtered;
-          // Note: We do NOT persist the state here. Persistence is a side-effect
-          // that should happen in the Presentation layer (Provider) only after
-          // the notification is successfully dispatched/handled.
-        }
-      }
 
       return Success(StartupResult(
         shouldScheduleReminder: shouldScheduleReminder,

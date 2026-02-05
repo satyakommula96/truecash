@@ -40,23 +40,29 @@ final bootProvider = FutureProvider<String?>((ref) async {
 
     // 2. Trigger Daily Bill Digest (Aggregated)
     if (startupResult.billsDueToday.isNotEmpty) {
-      // Foreground suppression: Only notify if not actively in the app
-      final state = WidgetsBinding.instance.lifecycleState;
-      if (state != AppLifecycleState.resumed) {
-        await notificationService
-            .showDailyBillDigest(startupResult.billsDueToday);
+      // Logic Check: Have we already shown this today?
+      final prefs = ref.read(sharedPreferencesProvider);
+      final now = DateTime.now();
+      final todayStr = DateFormat('yyyy-MM-dd').format(now);
+      final lastDigestDate = prefs.getString('last_bill_digest_date');
 
-        // 3. Persist State (Side Effect) - Only after successful dispatch
-        final prefs = ref.read(sharedPreferencesProvider);
-        final now = DateTime.now();
-        final todayStr = DateFormat('yyyy-MM-dd').format(now);
-        final count = startupResult.billsDueToday.length;
-        final total =
-            startupResult.billsDueToday.fold(0, (sum, b) => sum + b.amount);
+      // Only proceed if not already shown today
+      if (lastDigestDate != todayStr) {
+        // Foreground suppression: Only notify if not actively in the app
+        final state = WidgetsBinding.instance.lifecycleState;
+        if (state != AppLifecycleState.resumed) {
+          await notificationService
+              .showDailyBillDigest(startupResult.billsDueToday);
 
-        await prefs.setString('last_bill_digest_date', todayStr);
-        await prefs.setInt('last_bill_digest_count', count);
-        await prefs.setInt('last_bill_digest_total', total);
+          // 3. Persist State (Side Effect) - Only after successful dispatch
+          final count = startupResult.billsDueToday.length;
+          final total =
+              startupResult.billsDueToday.fold(0, (sum, b) => sum + b.amount);
+
+          await prefs.setString('last_bill_digest_date', todayStr);
+          await prefs.setInt('last_bill_digest_count', count);
+          await prefs.setInt('last_bill_digest_total', total);
+        }
       }
     }
   }

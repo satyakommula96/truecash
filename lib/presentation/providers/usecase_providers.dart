@@ -28,7 +28,6 @@ final startupUseCaseProvider = Provider<StartupUseCase>((ref) {
   return StartupUseCase(
     ref.watch(financialRepositoryProvider),
     ref.watch(autoBackupUseCaseProvider),
-    ref.watch(sharedPreferencesProvider),
   );
 });
 
