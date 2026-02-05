@@ -80,7 +80,10 @@ class TrueLedgerApp extends ConsumerWidget {
               PointerDeviceKind.trackpad
             },
           ),
-          home: const PrivacyGuard(child: StartupScreen()),
+          builder: (context, child) {
+            return PrivacyGuard(child: child!);
+          },
+          home: const StartupScreen(),
         );
       },
     );

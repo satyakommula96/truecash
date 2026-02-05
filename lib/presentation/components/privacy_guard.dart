@@ -30,25 +30,30 @@ class PrivacyGuard extends ConsumerWidget {
     ref.listen(appLifecycleProvider, (previous, next) {
       if (next == AppLifecycleState.resumed) {
         final bootState = ref.read(bootProvider);
-        final pin = bootState.asData?.value;
-        // If a PIN exists and we just resumed, lock the session.
-        if (pin != null && pin.isNotEmpty) {
-          ref.read(sessionLockedProvider.notifier).lock();
-        }
+        bootState.whenData((pin) {
+          if (pin != null && pin.isNotEmpty) {
+            ref.read(sessionLockedProvider.notifier).lock();
+          }
+        });
       }
     });
 
     if (isLocked) {
-      final bootState = ref.read(bootProvider);
-      final pin = bootState.asData?.value;
-      if (pin != null && pin.isNotEmpty) {
-        return LockScreen(
-          expectedPinLength: pin.length,
-          onUnlocked: () {
-            ref.read(sessionLockedProvider.notifier).unlock();
-          },
-        );
-      }
+      final bootState = ref.watch(bootProvider);
+      return bootState.maybeWhen(
+        data: (pin) {
+          if (pin != null && pin.isNotEmpty) {
+            return LockScreen(
+              expectedPinLength: pin.length,
+              onUnlocked: () {
+                ref.read(sessionLockedProvider.notifier).unlock();
+              },
+            );
+          }
+          return child;
+        },
+        orElse: () => child,
+      );
     }
 
     return child;
