@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/domain/services/intelligence_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,6 @@ import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
-
 import 'package:trueledger/presentation/screens/dashboard/scenario_mode.dart';
 import 'package:trueledger/presentation/providers/insights_provider.dart';
 import 'package:trueledger/domain/services/personalization_service.dart';
@@ -36,73 +36,69 @@ class SmartInsightsCard extends ConsumerWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("INTELLIGENT INSIGHTS",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                        color: semantic.secondaryText)),
+                Text(
+                  "INTELLIGENT INSIGHTS",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    color: semantic.secondaryText,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text("AI Powered Analysis",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Theme.of(context).colorScheme.onSurface)),
+                Text(
+                  "AI Powered Analysis",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: semantic.text,
+                    letterSpacing: -0.5,
+                  ),
+                ),
               ],
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF00C853),
-                borderRadius: BorderRadius.circular(20),
+                color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: semantic.divider, width: 1.5),
               ),
-              child: const Icon(Icons.psychology_rounded,
-                  size: 16, color: Colors.white),
+              child: Icon(Icons.psychology_rounded,
+                  size: 20, color: semantic.primary),
             ),
           ],
         ).animate().fadeIn(duration: 600.ms),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         SizedBox(
           height: 190,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            itemCount: insights.length + 3, // +Score, +Scenario, +Reflection
+            clipBehavior: Clip.none,
+            itemCount: insights.length + 3, // +Score, +Reflection, +Scenario
             itemBuilder: (context, index) {
-              // Always show ScoreCard first
+              Widget child;
               if (index == 0) {
-                return _buildScoreCard(context)
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
+                child = ScoreCard(score: score, semantic: semantic);
+              } else if (index > 0 && index <= insights.length) {
+                child = InsightItem(
+                    insight: insights[index - 1],
+                    isPrivate: isPrivate,
+                    semantic: semantic);
+              } else if (index == insights.length + 1) {
+                child = _buildReflectionCard(context, ref);
+              } else {
+                child = _buildScenarioCard(context);
               }
 
-              // Show Insights
-              if (index > 0 && index <= insights.length) {
-                final insight = insights[index - 1];
-                return _buildInsightItem(context, insight, isPrivate)
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: child
                     .animate()
-                    .fadeIn(delay: (100 * index).ms, duration: 600.ms)
-                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
-              }
-
-              // Show Reflections
-              if (index == insights.length + 1) {
-                return _buildReflectionCard(context, ref)
-                    .animate()
-                    .fadeIn(delay: (100 * index).ms, duration: 600.ms)
-                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
-              }
-
-              // Show Scenario Card at the end
-              if (index == insights.length + 2) {
-                return _buildScenarioCard(context)
-                    .animate()
-                    .fadeIn(delay: (100 * index).ms, duration: 600.ms)
-                    .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint);
-              }
-
-              return const SizedBox.shrink();
+                    .fadeIn(delay: (40 * index).ms, duration: 600.ms)
+                    .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuint),
+              );
             },
           ),
         ),
@@ -110,129 +106,123 @@ class SmartInsightsCard extends ConsumerWidget {
     ).animate().fadeIn(duration: 800.ms);
   }
 
-  Widget _buildScoreCard(BuildContext context) {
-    return ScoreCard(
-      score: score,
-      semantic: semantic,
-    );
-  }
-
   Widget _buildScenarioCard(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16, top: 4, bottom: 4),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ScenarioScreen()));
-        },
-        child: Container(
-          width: 280,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.blue,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
+    return HoverWrapper(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const ScenarioScreen())),
+      borderRadius: 28,
+      glowColor: semantic.primary,
+      glowOpacity: 0.1,
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: semantic.primary.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: semantic.primary.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.rocket_launch_rounded,
-                  color: Colors.white, size: 32),
-              const SizedBox(height: 16),
-              const Text(
-                "SCENARIO MODE",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                ),
+              child: const Icon(Icons.rocket_launch_rounded,
+                  color: Colors.white, size: 24),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "SCENARIO MODE",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
               ),
-              const SizedBox(height: 4),
-              Text(
-                "Simulate your future progress.",
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Simulate your financial future.",
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
-  Widget _buildInsightItem(
-      BuildContext context, AIInsight insight, bool isPrivate) {
-    return InsightItem(
-      insight: insight,
-      isPrivate: isPrivate,
-      semantic: semantic,
     );
   }
 
   Widget _buildReflectionCard(BuildContext context, WidgetRef ref) {
     final reflections =
         ref.read(personalizationServiceProvider).generateBaselineReflections();
-
     if (reflections.isEmpty) return const SizedBox.shrink();
-
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: 280,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outlineVariant, width: 1),
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.auto_awesome_outlined,
-                  size: 16, color: colorScheme.primary),
-              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: semantic.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.auto_awesome_rounded,
+                    size: 16, color: semantic.primary),
+              ),
+              const SizedBox(width: 12),
               Text(
-                "SELF REFLECTION",
+                "MINDSET",
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
+                  letterSpacing: 2,
                   color: semantic.secondaryText,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Expanded(
             child: Text(
               reflections.first,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
+                color: semantic.text,
                 height: 1.4,
               ),
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            "Based on your local history.",
+            "Based on local history.",
             style: TextStyle(
-              fontSize: 11,
-              color: semantic.secondaryText,
-              fontStyle: FontStyle.italic,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: semantic.secondaryText.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -258,11 +248,11 @@ class ScoreCard extends StatelessWidget {
     IconData icon;
 
     if (score >= 80) {
-      scoreColor = semantic.income;
+      scoreColor = semantic.success;
       label = "EXCELLENT";
       icon = Icons.verified_rounded;
     } else if (score >= 60) {
-      scoreColor = Colors.blue;
+      scoreColor = semantic.primary;
       label = "GOOD";
       icon = Icons.trending_up_rounded;
     } else if (score >= 40) {
@@ -279,103 +269,94 @@ class ScoreCard extends StatelessWidget {
       icon = Icons.warning_rounded;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 16, top: 4, bottom: 4),
-      child: HoverWrapper(
-        borderRadius: 24,
-        glowColor: scoreColor,
-        glowOpacity: 0.15,
-        child: Container(
-          width: 280,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: scoreColor.withValues(alpha: 0.1)),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                scoreColor.withValues(alpha: 0.05),
-                Theme.of(context).colorScheme.surface,
-              ],
-            ),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                height: 70,
-                width: 70,
-                child: Stack(
-                  children: [
-                    Center(
-                      child: CircularProgressIndicator(
-                        value: score / 100,
-                        strokeWidth: 6,
-                        backgroundColor:
-                            semantic.divider.withValues(alpha: 0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
-                        strokeCap: StrokeCap.round,
-                      ),
+    return HoverWrapper(
+      borderRadius: 28,
+      glowColor: scoreColor,
+      glowOpacity: 0.1,
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              height: 72,
+              width: 72,
+              child: Stack(
+                children: [
+                  Center(
+                    child: CircularProgressIndicator(
+                      value: score / 100,
+                      strokeWidth: 8,
+                      backgroundColor: semantic.divider,
+                      valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+                      strokeCap: StrokeCap.round,
                     ),
-                    Center(
-                      child: Text(
-                        score.toString(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(icon, size: 12, color: scoreColor),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              color: scoreColor,
-                              letterSpacing: 1,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "Health Score",
+                  ),
+                  Center(
+                    child: Text(
+                      score.toString(),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "AI Analysis of your habits.",
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: semantic.secondaryText,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Icon(icon, size: 12, color: scoreColor),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: scoreColor,
+                            letterSpacing: 1.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Health Score",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        letterSpacing: -0.2),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "AI Analysis",
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: semantic.secondaryText),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -405,125 +386,107 @@ class InsightItem extends ConsumerWidget {
         icon = Icons.warning_rounded;
         break;
       case InsightType.success:
-        accentColor = semantic.income;
+        accentColor = semantic.success;
         icon = Icons.check_circle_rounded;
         break;
       case InsightType.prediction:
-        accentColor = Colors.blue;
-        icon = Icons.trending_up_rounded;
+        accentColor = semantic.primary;
+        icon = Icons.auto_awesome_rounded;
         break;
       default:
-        accentColor = Theme.of(context).colorScheme.primary;
+        accentColor = semantic.primary;
         icon = Icons.lightbulb_rounded;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 16, top: 4, bottom: 4),
-      child: HoverWrapper(
-        borderRadius: 24,
-        glowColor: accentColor,
-        glowOpacity: 0.15,
-        child: Container(
-          width: 280,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: accentColor.withValues(alpha: 0.1)),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                accentColor.withValues(alpha: 0.05),
-                Theme.of(context).colorScheme.surface,
+    return HoverWrapper(
+      borderRadius: 28,
+      glowColor: accentColor,
+      glowOpacity: 0.1,
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, size: 18, color: accentColor),
+                ),
+                Row(
+                  children: [
+                    _buildActionButton(
+                      icon: Icons.access_time_rounded,
+                      tooltip: "Snooze 7 days",
+                      onTap: () async {
+                        await ref
+                            .read(intelligenceServiceProvider)
+                            .snoozeInsight(insight.id, days: 7);
+                        ref.invalidate(insightsProvider);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildActionButton(
+                      icon: Icons.close_rounded,
+                      tooltip: "Dismiss",
+                      onTap: () async {
+                        await ref
+                            .read(intelligenceServiceProvider)
+                            .dismissInsight(insight.id, insight.group);
+                        ref.invalidate(insightsProvider);
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(icon, size: 18, color: accentColor),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            insight.currencyValue != null
-                                ? "${insight.value}: ${CurrencyFormatter.format(insight.currencyValue!, isPrivate: isPrivate)}"
-                                : insight.value,
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              color: accentColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        _buildActionButton(
-                          icon: Icons.access_time_rounded,
-                          tooltip: "Snooze 7 days",
-                          onTap: () async {
-                            await ref
-                                .read(intelligenceServiceProvider)
-                                .snoozeInsight(insight.id, days: 7);
-                            ref.invalidate(insightsProvider);
-                          },
-                        ),
-                        const SizedBox(width: 4),
-                        _buildActionButton(
-                          icon: Icons.close_rounded,
-                          tooltip: "Dismiss",
-                          onTap: () async {
-                            await ref
-                                .read(intelligenceServiceProvider)
-                                .dismissInsight(insight.id, insight.group);
-                            ref.invalidate(insightsProvider);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 20),
+            Text(
+              insight.title.toUpperCase(),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+                color: semantic.secondaryText,
               ),
-              const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 6),
+            Expanded(
+              child: Text(
+                insight.body,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: semantic.text,
+                  height: 1.4,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (insight.currencyValue != null)
               Text(
-                insight.title,
-                style: const TextStyle(
-                  fontSize: 11,
+                CurrencyFormatter.format(insight.currencyValue!,
+                    isPrivate: isPrivate),
+                style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  letterSpacing: 1,
+                  fontSize: 14,
+                  color: accentColor,
                 ),
               ),
-              const SizedBox(height: 6),
-              Expanded(
-                child: Text(
-                  insight.body,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: semantic.secondaryText,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -537,18 +500,15 @@ class InsightItem extends ConsumerWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(8),
         onTap: onTap,
-        child: Tooltip(
-          message: tooltip,
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Icon(
-              icon,
-              size: 16,
-              color: semantic.secondaryText.withValues(alpha: 0.5),
-            ),
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: semantic.divider.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(8),
           ),
+          child: Icon(icon, size: 14, color: semantic.secondaryText),
         ),
       ),
     );

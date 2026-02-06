@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/providers/backup_provider.dart';
@@ -14,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:trueledger/core/config/app_config.dart';
 import 'package:trueledger/domain/usecases/restore_from_local_file_usecase.dart';
 import 'package:trueledger/presentation/providers/usecase_providers.dart';
+import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 final databaseStatsProvider = FutureProvider<Map<String, int>>((ref) {
   return ref.watch(financialRepositoryProvider).getDatabaseStats();
@@ -29,14 +32,13 @@ class TrustCenterScreen extends ConsumerWidget {
     final lastBackup = ref.watch(lastBackupTimeProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title:
-            const Text("Trust", style: TextStyle(fontWeight: FontWeight.w900)),
+        title: const Text("TRUST CENTER"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(
+            20, 16, 20, 48 + MediaQuery.of(context).padding.bottom),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -46,7 +48,7 @@ class TrustCenterScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             _buildGuaranteesGrid(semantic),
             const SizedBox(height: 32),
-            _buildSectionHeader("WHAT WE NEVER DO", semantic),
+            _buildSectionHeader("STRICT POLICIES", semantic),
             const SizedBox(height: 16),
             _buildNeverList(semantic),
             const SizedBox(height: 32),
@@ -59,78 +61,92 @@ class TrustCenterScreen extends ConsumerWidget {
                 crossAxisCount: 2,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.5,
+                childAspectRatio: 1.6,
                 children: [
                   _StatCard(
-                      label: "Total Records",
+                      label: "TOTAL RECORDS",
                       value: stats['total_records'].toString(),
                       semantic: semantic),
                   _StatCard(
-                      label: "Expenses",
+                      label: "EXPENSES",
                       value: stats['variable'].toString(),
-                      semantic: semantic),
+                      semantic: semantic,
+                      color: semantic.overspent),
                   _StatCard(
-                      label: "Income",
+                      label: "INCOME",
                       value: stats['income'].toString(),
-                      semantic: semantic),
+                      semantic: semantic,
+                      color: semantic.income),
                   _StatCard(
-                      label: "Budgets",
+                      label: "BUDGETS",
                       value: stats['budgets'].toString(),
                       semantic: semantic),
                 ],
               ),
-              loading: () => const Center(
-                  child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(),
-              )),
-              error: (e, s) => Text("Error loading stats: $e"),
+              loading: () => Center(
+                  child: CircularProgressIndicator(color: semantic.primary)),
+              error: (e, s) => Text("Error loading stats: $e",
+                  style: TextStyle(color: semantic.overspent)),
             ),
             const SizedBox(height: 32),
             _buildSectionHeader("BACKUP CONFIDENCE", semantic),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: semantic.surfaceCombined,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: semantic.divider),
+                color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: semantic.divider, width: 1.5),
               ),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.check_circle_outline_rounded,
-                          color: semantic.success, size: 20),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: semantic.success.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.check_circle_rounded,
+                            color: semantic.success, size: 20),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("Local Backup Status",
-                                style: TextStyle(fontWeight: FontWeight.w700)),
+                            Text("LOCAL BACKUP STATUS",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    color: semantic.text)),
+                            const SizedBox(height: 2),
                             Text("Last backup: $lastBackup",
                                 style: TextStyle(
                                     color: semantic.secondaryText,
-                                    fontSize: 12)),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const Divider(height: 32),
+                  const Divider(height: 48, thickness: 1.5),
                   Row(
                     children: [
-                      Icon(Icons.update_rounded,
-                          size: 14, color: semantic.secondaryText),
-                      const SizedBox(width: 8),
+                      Icon(Icons.history_toggle_off_rounded,
+                          size: 16, color: semantic.secondaryText),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           "Next automatic backup: At next application launch",
                           style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: semantic.secondaryText,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color:
+                                semantic.secondaryText.withValues(alpha: 0.7),
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -143,8 +159,7 @@ class TrustCenterScreen extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child:
-                      _buildSectionHeader("AVAILABLE LOCAL BACKUPS", semantic),
+                  child: _buildSectionHeader("LOCAL BACKUPS", semantic),
                 ),
                 if (!kIsWeb &&
                     (Platform.isWindows ||
@@ -158,11 +173,9 @@ class TrustCenterScreen extends ConsumerWidget {
                         final backupPath =
                             '${directory.path}/${AppConfig.backupFolderName}';
                         final backupDir = Directory(backupPath);
-
                         if (!await backupDir.exists()) {
                           await backupDir.create(recursive: true);
                         }
-
                         final uri = Uri.file(backupPath);
                         await launchUrl(uri,
                             mode: LaunchMode.externalApplication);
@@ -177,7 +190,8 @@ class TrustCenterScreen extends ConsumerWidget {
                     },
                     icon: const Icon(Icons.folder_open_rounded, size: 16),
                     label: const Text("VIEW FOLDER",
-                        style: TextStyle(fontSize: 10)),
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.w900)),
                   ),
               ],
             ),
@@ -187,11 +201,15 @@ class TrustCenterScreen extends ConsumerWidget {
                     if (backups.isEmpty) {
                       return Center(
                         child: Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: const EdgeInsets.symmetric(vertical: 32),
                           child: Text(
-                            "No local backups found yet.",
+                            "NO LOCAL BACKUPS FOUND YET.",
                             style: TextStyle(
-                                fontSize: 12, color: semantic.secondaryText),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: semantic.secondaryText
+                                    .withValues(alpha: 0.5),
+                                letterSpacing: 1),
                           ),
                         ),
                       );
@@ -200,15 +218,16 @@ class TrustCenterScreen extends ConsumerWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: backups.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final file = backups[index];
                         return _buildBackupItem(context, ref, file, semantic);
                       },
                     );
                   },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  loading: () => Center(
+                      child:
+                          CircularProgressIndicator(color: semantic.primary)),
                   error: (e, _) => Text("Error: $e"),
                 ),
             const SizedBox(height: 48),
@@ -216,11 +235,14 @@ class TrustCenterScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
                   "TrueLedger uses SQLCipher AES-256 for database encryption on supported platforms.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 10, color: semantic.secondaryText),
+                  style: TextStyle(
+                      fontSize: 10,
+                      color: semantic.secondaryText.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -232,13 +254,16 @@ class TrustCenterScreen extends ConsumerWidget {
   }
 
   Widget _buildSectionHeader(String title, AppColors semantic) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 2,
-        color: semantic.secondaryText,
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: semantic.secondaryText,
+          letterSpacing: 1.5,
+        ),
       ),
     );
   }
@@ -248,43 +273,49 @@ class TrustCenterScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "This page describes product-level guarantees enforced by design.",
+          "PRODUCT-LEVEL PRIVACY GUARANTEES.",
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: semantic.secondaryText,
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+            color: semantic.primary,
+            letterSpacing: 1,
           ),
         ),
         const SizedBox(height: 16),
         Text(
-          "TrueLedger is built on the principle that your financial life is yours alone. We believe in absolute privacy, which is why your data never leaves your device unless you choose to move it.",
+          "TrueLedger is built on the principle that your financial life is yours alone. We believe in absolute privacy, which is why your data never leaves your device.",
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: semantic.text,
-            height: 1.6,
+            height: 1.5,
           ),
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.05, end: 0);
   }
 
   Widget _buildGuaranteesGrid(AppColors semantic) {
     const guarantees = [
       (
-        "No Ads",
-        "We will never clutter your experience with advertisements or sponsored content."
+        "NO ADS",
+        "We never clutter your experience with advertisements or sponsored content.",
+        Icons.block_rounded
       ),
       (
-        "No Tracking",
-        "We don't track your behavior, location, or usage patterns. You are not a data point."
+        "NO TRACKING",
+        "We don't track your behavior, location, or usage. You are not a data point.",
+        Icons.visibility_off_rounded
       ),
       (
-        "No Profiling",
-        "Your financial habits are private. We don't build profiles for targeting or selling."
+        "NO PROFILING",
+        "Your financial habits are private. We don't build profiles for targeting.",
+        Icons.psychology_alt_rounded
       ),
       (
-        "100% Local",
-        "Your database exists only on your device. We have no 'cloud' access to your logs."
+        "100% LOCAL",
+        "Your database exists only on your device. We have no access to your logs.",
+        Icons.devices_rounded
       ),
     ];
 
@@ -293,84 +324,94 @@ class TrustCenterScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.1,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1.0,
       ),
       itemCount: guarantees.length,
       itemBuilder: (context, index) {
         final g = guarantees[index];
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: semantic.surfaceCombined,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: semantic.divider),
+            color: semantic.surfaceCombined.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: semantic.divider, width: 1.5),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: semantic.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(g.$3, color: semantic.primary, size: 20),
+              ),
+              const SizedBox(height: 16),
               Text(g.$1,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w900, fontSize: 13)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      color: semantic.text)),
               const SizedBox(height: 8),
               Expanded(
                 child: Text(
                   g.$2,
                   style: TextStyle(
-                      fontSize: 11, color: semantic.secondaryText, height: 1.4),
+                      fontSize: 11,
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w700,
+                      height: 1.4),
                 ),
               ),
             ],
           ),
         );
       },
-    );
+    ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
   }
 
   Widget _buildNeverList(AppColors semantic) {
     final nevers = [
-      "No ads",
       "No analytics or tracking SDKs",
-      "No profiling or behavior scoring",
-      "No cross-user comparison",
-      "No bank scraping",
-      "No selling or sharing user data",
-      "All data stays on the user’s device by default",
+      "No behavior profiling or scoring",
+      "No bank or SMS scraping",
+      "No cloud sync or external storage",
+      "No selling or sharing of user logs",
     ];
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: semantic.divider),
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Column(
         children: nevers
             .map((item) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        width: 4,
-                        height: 4,
+                        width: 6,
+                        height: 6,
                         decoration: BoxDecoration(
-                          color: semantic.secondaryText,
+                          color: semantic.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          item,
+                          item.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
                             color: semantic.text,
-                            height: 1.4,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -385,18 +426,20 @@ class TrustCenterScreen extends ConsumerWidget {
   Widget _buildChangePolicy(AppColors semantic) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
       decoration: BoxDecoration(
-        border: Border.all(color: semantic.divider),
-        borderRadius: BorderRadius.circular(12),
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        border: Border.all(color: semantic.divider, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
-        "Any modification to these guarantees must be documented in release notes.",
+        "ANY MODIFICATION TO THESE GUARANTEES MUST BE DOCUMENTED IN PUBLIC RELEASE NOTES.",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
           color: semantic.secondaryText,
+          letterSpacing: 0.5,
         ),
       ),
     );
@@ -404,48 +447,76 @@ class TrustCenterScreen extends ConsumerWidget {
 
   Widget _buildBackupItem(BuildContext context, WidgetRef ref, BackupFile file,
       AppColors semantic) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: semantic.divider),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.history_rounded, size: 20, color: semantic.secondaryText),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  DateFormat('MMM dd, yyyy • HH:mm').format(file.date),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 13),
-                ),
-                Text(
-                  _formatSize(file.size),
-                  style: TextStyle(color: semantic.secondaryText, fontSize: 11),
-                ),
-              ],
+    return HoverWrapper(
+      onTap: () {},
+      borderRadius: 24,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: semantic.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.inventory_2_rounded,
+                  size: 20, color: semantic.primary),
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.settings_backup_restore_rounded,
-                size: 18, color: semantic.secondaryText),
-            tooltip: "Restore",
-            onPressed: () => _confirmRestore(context, ref, file),
-          ),
-          IconButton(
-            icon: const Icon(Icons.ios_share_rounded, size: 18),
-            onPressed: () {
-              // ignore: deprecated_member_use
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    DateFormat('MMM dd, yyyy • HH:mm')
+                        .format(file.date)
+                        .toUpperCase(),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        color: semantic.text),
+                  ),
+                  Text(
+                    _formatSize(file.size),
+                    style: TextStyle(
+                        color: semantic.secondaryText,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            _buildActionIcon(Icons.settings_backup_restore_rounded,
+                () => _confirmRestore(context, ref, file), semantic),
+            const SizedBox(width: 8),
+            _buildActionIcon(Icons.ios_share_rounded, () {
               Share.shareXFiles([XFile(file.path)],
                   text: 'TrueLedger Auto-Backup (${file.name})');
-            },
-          ),
-        ],
+            }, semantic),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionIcon(
+      IconData icon, VoidCallback onTap, AppColors semantic) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: semantic.divider.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, size: 18, color: semantic.text),
       ),
     );
   }
@@ -456,21 +527,42 @@ class TrustCenterScreen extends ConsumerWidget {
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Restore Data?",
-            style: TextStyle(fontWeight: FontWeight.w900)),
-        content: const Text(
-            "This will REPLACE all your current data with the data from this backup. This action cannot be undone."),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text("CANCEL")),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: semantic.overspent),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("RESTORE NOW"),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: AlertDialog(
+          backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5)),
+          title: Text("RESTORE DATA?",
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1.5,
+                  color: semantic.overspent)),
+          content: const Text(
+            "This will REPLACE all your current data with the data from this backup. This action cannot be undone.",
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
-        ],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("CANCEL",
+                    style: TextStyle(
+                        color: semantic.secondaryText,
+                        fontWeight: FontWeight.w900))),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: semantic.overspent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              child: const Text("RESTORE NOW",
+                  style: TextStyle(fontWeight: FontWeight.w900)),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -491,15 +583,16 @@ class TrustCenterScreen extends ConsumerWidget {
       Navigator.pop(context); // Pop loading
       if (result.isSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Restore completed successfully!")),
+          SnackBar(
+              content: const Text("RESTORE COMPLETED SUCCESSFULLY"),
+              backgroundColor: semantic.success),
         );
-        // Navigate to dashboard and refresh
         Navigator.of(context).popUntil((route) => route.isFirst);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text("Restore failed: ${result.failureOrThrow.message}")),
+              content: Text("RESTORE FAILED: ${result.failureOrThrow.message}"),
+              backgroundColor: semantic.overspent),
         );
       }
     }
@@ -516,18 +609,22 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final AppColors semantic;
+  final Color? color;
 
   const _StatCard(
-      {required this.label, required this.value, required this.semantic});
+      {required this.label,
+      required this.value,
+      required this.semantic,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: semantic.surfaceCombined,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: semantic.divider),
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,12 +633,16 @@ class _StatCard extends StatelessWidget {
           Text(label,
               style: TextStyle(
                   fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: semantic.secondaryText)),
+                  fontWeight: FontWeight.w900,
+                  color: semantic.secondaryText,
+                  letterSpacing: 1)),
           const SizedBox(height: 4),
           Text(value,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: color ?? semantic.text,
+                  letterSpacing: -0.5)),
         ],
       ),
     );

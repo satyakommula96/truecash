@@ -79,7 +79,6 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppColors>()!;
     final displayedTypes = widget.allowedTypes ??
         ['Variable', 'Fixed', 'Income', 'Investment', 'Subscription'];
@@ -88,12 +87,18 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
     final categoriesAsync = ref.watch(categoriesProvider(type));
 
     return Scaffold(
+      backgroundColor: semantic.surfaceCombined,
       appBar: AppBar(
-          title: Text(
-              isLocked ? "NEW ${type.toUpperCase()}" : "NEW LEDGER ENTRY")),
+        backgroundColor: Colors.transparent,
+        title: Text(
+          isLocked ? "NEW ${type.toUpperCase()}" : "NEW LEDGER ENTRY",
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+        ),
+      ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.fromLTRB(
-            32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
+            32, 24, 32, 32 + MediaQuery.of(context).padding.bottom),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -107,6 +112,7 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
               const SizedBox(height: 16),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
                 child: Row(
                   children: displayedTypes.map((t) {
                     final active = type == t;
@@ -121,18 +127,19 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
                           selectedCategory = ''; // Reset when type changes
                         }),
                         selectedColor:
-                            isIncome ? semantic.income : colorScheme.onSurface,
+                            isIncome ? semantic.income : semantic.primary,
                         backgroundColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        showCheckmark: false,
                         side: BorderSide(
                             color: active
                                 ? (isIncome
                                     ? semantic.income
-                                    : colorScheme.onSurface)
-                                : colorScheme.onSurface.withValues(alpha: 0.1)),
+                                    : semantic.primary)
+                                : semantic.divider),
                         labelStyle: TextStyle(
-                            color: active
-                                ? colorScheme.surface
-                                : colorScheme.onSurface,
+                            color: active ? Colors.black : semantic.text,
                             fontWeight: FontWeight.w900,
                             fontSize: 10,
                             letterSpacing: 1),
@@ -153,20 +160,20 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
             TextField(
               controller: amountCtrl,
               keyboardType: TextInputType.number,
+              autofocus: true,
               style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  fontSize: 48,
-                  letterSpacing: -2,
-                  color: type == 'Income'
-                      ? semantic.income
-                      : colorScheme.onSurface),
+                  fontSize: 56,
+                  letterSpacing: -3,
+                  color: type == 'Income' ? semantic.income : semantic.text),
               decoration: InputDecoration(
                   prefixText: "${CurrencyFormatter.symbol} ",
                   border: InputBorder.none,
                   hintText: "0",
                   hintStyle: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.1))),
-            ),
+                      color: semantic.secondaryText.withValues(alpha: 0.1))),
+            ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
+
             // Optimistic Budget Overlay
             Consumer(builder: (context, ref, _) {
               if (type != 'Variable') return const SizedBox.shrink();
@@ -186,20 +193,19 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
                     final limit = budget.monthlyLimit;
                     final progress = (totalAfter / limit).clamp(0.0, 1.0);
                     final isExceeded = totalAfter > limit;
+                    final color =
+                        isExceeded ? semantic.overspent : semantic.income;
 
                     return Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHighest
-                                .withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
+                            color: color.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                                color: isExceeded
-                                    ? semantic.overspent
-                                    : Colors.transparent,
-                                width: 1)),
+                                color: color.withValues(alpha: 0.2),
+                                width: 1.5)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -210,40 +216,44 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
                                     style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w900,
-                                        color: colorScheme.onSurfaceVariant)),
+                                        letterSpacing: 1.5,
+                                        color: semantic.secondaryText)),
                                 Text(
                                     "${((totalAfter / limit) * 100).toStringAsFixed(0)}%",
                                     style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w900,
-                                        color: isExceeded
-                                            ? semantic.overspent
-                                            : semantic.income)),
+                                        color: color)),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            LinearProgressIndicator(
-                              value: progress,
-                              backgroundColor: colorScheme.surface,
-                              color: isExceeded
-                                  ? semantic.overspent
-                                  : semantic.income,
-                              borderRadius: BorderRadius.circular(2),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                minHeight: 6,
+                                backgroundColor:
+                                    semantic.divider.withValues(alpha: 0.1),
+                                color: color,
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Text(
                               isExceeded
-                                  ? "This entry will exceed your ${budget.category} budget by ${CurrencyFormatter.format(totalAfter - limit)}."
-                                  : "Remaining after this: ${CurrencyFormatter.format(limit - totalAfter)}",
+                                  ? "EXCEEDS BUDGET BY ${CurrencyFormatter.format(totalAfter - limit)}"
+                                  : "REMAINING: ${CurrencyFormatter.format(limit - totalAfter)}",
                               style: TextStyle(
-                                  fontSize: 11,
-                                  color: isExceeded
-                                      ? semantic.overspent
-                                      : colorScheme.onSurface),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                  color: color),
                             )
                           ],
                         ),
-                      ).animate().fadeIn(),
+                      )
+                          .animate()
+                          .fadeIn()
+                          .scale(begin: const Offset(0.98, 0.98)),
                     );
                   },
                   orElse: () => const SizedBox.shrink());
@@ -251,35 +261,36 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
             const SizedBox(height: 24),
             InkWell(
               onTap: _pickDate,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: colorScheme.onSurface.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
+                  color: semantic.divider.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.calendar_today_rounded,
-                        size: 16, color: colorScheme.onSurface),
-                    const SizedBox(width: 8),
+                        size: 14, color: semantic.secondaryText),
+                    const SizedBox(width: 10),
                     Text(
                       _selectedDate.day == DateTime.now().day &&
                               _selectedDate.month == DateTime.now().month &&
                               _selectedDate.year == DateTime.now().year
-                          ? "Today"
+                          ? "TODAY"
                           : "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
                       style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
+                          color: semantic.secondaryText,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                          fontSize: 10),
                     ),
                   ],
                 ),
               ),
-            ),
+            ).animate(delay: 200.ms).fadeIn(),
             const SizedBox(height: 48),
             const Text("CATEGORY CLASSIFICATION",
                 style: TextStyle(
@@ -287,83 +298,86 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                     color: Colors.grey)),
-            const SizedBox(height: 16),
-            categoriesAsync.when(
-              data: (categories) {
-                if (categories.isEmpty) {
-                  return TextButton.icon(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const ManageCategoriesScreen())),
-                    icon: const Icon(Icons.add),
-                    label: const Text("MANAGE CATEGORIES"),
-                  );
-                }
+            const SizedBox(height: 20),
+            categoriesAsync
+                .when(
+                  data: (categories) {
+                    if (categories.isEmpty) {
+                      return TextButton.icon(
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const ManageCategoriesScreen())),
+                        icon: const Icon(Icons.add),
+                        label: const Text("MANAGE CATEGORIES"),
+                      );
+                    }
 
-                // If selectedCategory is empty or not in the list, set it to the first one
-                if (selectedCategory.isEmpty ||
-                    !categories.any((c) => c.name == selectedCategory)) {
-                  // We use postFrameCallback to avoid setstate during build
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      setState(() {
-                        selectedCategory = categories.first.name;
+                    if (selectedCategory.isEmpty ||
+                        !categories.any((c) => c.name == selectedCategory)) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted && categories.isNotEmpty) {
+                          setState(() {
+                            selectedCategory = categories.first.name;
+                          });
+                        }
                       });
                     }
-                  });
-                }
 
-                return Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ...categories.map((cat) {
-                      final active = selectedCategory == cat.name;
-                      return ActionChip(
-                        label: Text(cat.name.toUpperCase()),
-                        onPressed: () =>
-                            setState(() => selectedCategory = cat.name),
-                        backgroundColor: active
-                            ? colorScheme.onSurface.withValues(alpha: 0.05)
-                            : Colors.transparent,
-                        side: BorderSide(
-                            color: active
-                                ? colorScheme.onSurface
-                                : colorScheme.onSurface
-                                    .withValues(alpha: 0.05)),
-                        labelStyle: TextStyle(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 9,
-                            letterSpacing: 1),
-                      );
-                    }),
-                    ActionChip(
-                      label: const Icon(Icons.add, size: 16),
-                      onPressed: () async {
-                        final newCat = await Navigator.push<String>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ManageCategoriesScreen(initialType: type),
-                          ),
-                        );
-                        if (newCat != null && mounted) {
-                          setState(() => selectedCategory = newCat);
-                        }
-                      },
-                      backgroundColor: Colors.transparent,
-                      side: BorderSide(
-                          color: colorScheme.onSurface.withValues(alpha: 0.1)),
-                    ),
-                  ],
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Text("Error loading categories: $err"),
-            ),
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        ...categories.map((cat) {
+                          final active = selectedCategory == cat.name;
+                          return ActionChip(
+                            label: Text(cat.name.toUpperCase()),
+                            onPressed: () =>
+                                setState(() => selectedCategory = cat.name),
+                            backgroundColor:
+                                active ? semantic.primary : Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            side: BorderSide(
+                                color: active
+                                    ? semantic.primary
+                                    : semantic.divider),
+                            labelStyle: TextStyle(
+                                color: active ? Colors.black : semantic.text,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 9,
+                                letterSpacing: 1),
+                          );
+                        }),
+                        ActionChip(
+                          label: const Icon(Icons.add, size: 16),
+                          onPressed: () async {
+                            final newCat = await Navigator.push<String>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ManageCategoriesScreen(initialType: type),
+                              ),
+                            );
+                            if (newCat != null && mounted) {
+                              setState(() => selectedCategory = newCat);
+                            }
+                          },
+                          backgroundColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          side: BorderSide(color: semantic.divider),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Text("Error loading categories: $err"),
+                )
+                .animate(delay: 300.ms)
+                .fadeIn(),
             const SizedBox(height: 48),
             const Text("AUDIT NOTES",
                 style: TextStyle(
@@ -374,17 +388,25 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
             const SizedBox(height: 16),
             TextField(
               controller: noteCtrl,
+              style:
+                  TextStyle(fontWeight: FontWeight.w700, color: semantic.text),
               decoration: InputDecoration(
                 hintText: "Optional details...",
                 filled: true,
-                fillColor: colorScheme.onSurface.withValues(alpha: 0.02),
+                fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.divider)),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.divider)),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.primary, width: 2)),
                 hintStyle: TextStyle(
-                    color: colorScheme.onSurface.withValues(alpha: 0.1)),
+                    color: semantic.secondaryText.withValues(alpha: 0.1)),
               ),
-            ),
+            ).animate(delay: 400.ms).fadeIn(),
             const SizedBox(height: 64),
             SizedBox(
               width: double.infinity,
@@ -392,12 +414,11 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
               child: ElevatedButton(
                 onPressed: _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: type == 'Income'
-                      ? semantic.income
-                      : colorScheme.onSurface,
-                  foregroundColor: colorScheme.surface,
+                  backgroundColor:
+                      type == 'Income' ? semantic.income : semantic.primary,
+                  foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(20)),
                   elevation: 0,
                 ),
                 child: const Text("COMMIT TO LEDGER",
@@ -406,7 +427,10 @@ class _AddExpenseState extends ConsumerState<AddExpense> {
                         fontWeight: FontWeight.w900,
                         letterSpacing: 2)),
               ),
-            ),
+            )
+                .animate(delay: 500.ms)
+                .fadeIn()
+                .scale(begin: const Offset(0.9, 0.9)),
           ],
         ),
       ),

@@ -1,7 +1,10 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -12,62 +15,109 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<void> _cancelNotification(int id, String title) async {
+  Future<void> _cancelNotification(
+      int id, String title, AppColors semantic) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancel Notification'),
-        content: Text('Are you sure you want to cancel "$title"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: AlertDialog(
+          backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5)),
+          title: Text('CANCEL NOTIFICATION',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1.2,
+                  color: semantic.text)),
+          content: Text(
+            'Are you sure you want to cancel "$title"?',
+            style: TextStyle(
+                color: semantic.text,
+                fontWeight: FontWeight.w700,
+                fontSize: 13),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Yes'),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('NO',
+                  style: TextStyle(
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: semantic.overspent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              child: const Text('YES',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+            ),
+          ],
+        ),
       ),
     );
 
     if (confirm == true) {
       final notificationService = ref.read(notificationServiceProvider);
       await notificationService.cancelNotification(id);
-      // await _loadNotifications(); // Removed
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Notification "$title" cancelled')),
+          SnackBar(
+            content: Text('NOTIFICATION "$title" CANCELLED'),
+            backgroundColor: semantic.overspent,
+          ),
         );
       }
     }
   }
 
-  Future<void> _cancelAllNotifications() async {
-    // if (_notifications.isEmpty) return; // Removed
-
+  Future<void> _cancelAllNotifications(AppColors semantic) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancel All Notifications'),
-        content:
-            const Text('Are you sure you want to cancel all notifications?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: AlertDialog(
+          backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5)),
+          title: Text('CANCEL ALL NOTIFICATIONS',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1.2,
+                  color: semantic.overspent)),
+          content: const Text(
+            'Are you sure you want to cancel all scheduled notifications?',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Yes, Cancel All'),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('NO',
+                  style: TextStyle(
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: semantic.overspent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              child: const Text('YES, CANCEL ALL',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -76,7 +126,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       await notificationService.cancelAllNotifications();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All notifications cancelled')),
+          SnackBar(
+            content: const Text('ALL NOTIFICATIONS CANCELLED'),
+            backgroundColor: semantic.overspent,
+          ),
         );
       }
     }
@@ -85,44 +138,39 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   IconData _getNotificationIcon(String? title) {
     if (title == null) return Icons.notifications_outlined;
     final lowerTitle = title.toLowerCase();
-    if (lowerTitle.contains('reminder')) {
-      return Icons.alarm_outlined;
-    } else if (lowerTitle.contains('credit') || lowerTitle.contains('bill')) {
-      return Icons.credit_card_outlined;
-    } else if (lowerTitle.contains('daily')) {
-      return Icons.today_outlined;
-    }
-    return Icons.notifications_outlined;
+    if (lowerTitle.contains('reminder')) return Icons.alarm_rounded;
+    if (lowerTitle.contains('credit') || lowerTitle.contains('bill'))
+      return Icons.credit_card_rounded;
+    if (lowerTitle.contains('daily')) return Icons.today_rounded;
+    return Icons.notifications_rounded;
   }
 
-  Color _getNotificationColor(String? title) {
-    if (title == null) return Colors.blue;
+  Color _getNotificationColor(String? title, AppColors semantic) {
+    if (title == null) return semantic.primary;
     final lowerTitle = title.toLowerCase();
-    if (lowerTitle.contains('daily')) {
-      return Colors.green;
-    } else if (lowerTitle.contains('credit') || lowerTitle.contains('bill')) {
-      return Colors.orange;
-    }
-    return Colors.blue;
+    if (lowerTitle.contains('daily')) return semantic.success;
+    if (lowerTitle.contains('credit') || lowerTitle.contains('bill'))
+      return semantic.warning;
+    return semantic.primary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final semantic = Theme.of(context).extension<AppColors>()!;
     final notificationsAsync = ref.watch(pendingNotificationsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scheduled Notifications'),
+        title: const Text('NOTIFICATIONS'),
+        centerTitle: true,
         actions: [
           notificationsAsync.when(
             data: (notifications) {
               if (notifications.isNotEmpty) {
                 return IconButton(
-                  icon: const Icon(Icons.delete_sweep_outlined),
+                  icon: const Icon(Icons.delete_sweep_rounded),
                   tooltip: 'Cancel All',
-                  onPressed: _cancelAllNotifications,
+                  onPressed: () => _cancelAllNotifications(semantic),
                 );
               }
               return const SizedBox();
@@ -131,157 +179,196 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             error: (_, __) => const SizedBox(),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => ref.refresh(pendingNotificationsProvider),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: notificationsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 64,
-                  color: colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Error loading notifications',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: semantic.primary)),
+        error: (error, _) => _buildErrorState(semantic),
         data: (notifications) {
-          if (notifications.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.notifications_off_outlined,
-                    size: 64,
-                    color: colorScheme.outline,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No Scheduled Notifications',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Notifications will appear here once scheduled',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.outline,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+          if (notifications.isEmpty) return _buildEmptyState(semantic);
           return RefreshIndicator(
             onRefresh: () async => ref.refresh(pendingNotificationsProvider),
+            color: semantic.primary,
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
               itemCount: notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                final iconColor = _getNotificationColor(notification.title);
+                final iconColor =
+                    _getNotificationColor(notification.title, semantic);
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surfaceContainerHighest
-                        : colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    leading: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: iconColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        _getNotificationIcon(notification.title),
-                        color: iconColor,
-                        size: 24,
-                      ),
-                    ),
-                    title: Text(
-                      notification.title ?? 'Untitled Notification',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (notification.body != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            notification.body!,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.cancel_outlined,
-                        color: Colors.red.shade400,
-                      ),
-                      tooltip: 'Cancel',
-                      onPressed: () => _cancelNotification(
-                        notification.id,
-                        notification.title ?? 'Notification',
-                      ),
-                    ),
-                  ),
-                );
+                return _buildNotificationItem(
+                    notification, index, iconColor, semantic);
               },
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNotificationItem(
+      dynamic notification, int index, Color color, AppColors semantic) {
+    return HoverWrapper(
+      onTap: () {}, // No action for now
+      borderRadius: 24,
+      glowColor: color.withValues(alpha: 0.3),
+      glowOpacity: 0.05,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                _getNotificationIcon(notification.title),
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (notification.title ?? 'UNTITLED').toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        letterSpacing: 0.5),
+                  ),
+                  if (notification.body != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      notification.body!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: semantic.secondaryText,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            _buildCancelButton(
+                () => _cancelNotification(
+                      notification.id,
+                      notification.title ?? 'Notification',
+                      semantic,
+                    ),
+                semantic),
+          ],
+        ),
+      ),
+    )
+        .animate()
+        .fadeIn(delay: (50 * index).ms)
+        .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuart);
+  }
+
+  Widget _buildCancelButton(VoidCallback onTap, AppColors semantic) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: semantic.overspent.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(Icons.close_rounded, size: 18, color: semantic.overspent),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AppColors semantic) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: semantic.divider.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.notifications_off_rounded,
+              size: 64,
+              color: semantic.secondaryText.withValues(alpha: 0.3),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'NO SCHEDULED ALERTS',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: semantic.text,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Notifications will appear here once scheduled',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: semantic.secondaryText,
+            ),
+          ),
+        ],
+      ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0),
+    );
+  }
+
+  Widget _buildErrorState(AppColors semantic) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: semantic.overspent,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'ERROR LOADING NOTIFICATIONS',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                color: semantic.text,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

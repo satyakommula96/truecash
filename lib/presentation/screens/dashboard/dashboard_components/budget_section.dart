@@ -25,189 +25,186 @@ class BudgetSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isPrivate = ref.watch(privacyProvider);
     if (budgets.isEmpty) {
-      return const Text("No active budgets",
-          style: TextStyle(color: Colors.grey));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Text("No active budgets",
+              style: TextStyle(
+                  color: semantic.secondaryText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600)),
+        ),
+      );
     }
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
-        children: budgets.asMap().entries.map((entry) {
-      final index = entry.key;
-      final b = entry.value;
-      final double progress = (b.spent / b.monthlyLimit).clamp(0.0, 1.0);
-      final bool isOver = b.spent > b.monthlyLimit;
+      children: budgets.asMap().entries.map((entry) {
+        final index = entry.key;
+        final b = entry.value;
+        final double progress = (b.spent / b.monthlyLimit).clamp(0.01, 1.0);
+        final bool isOver = b.spent > b.monthlyLimit;
 
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: HoverWrapper(
-          borderRadius: 20,
-          onTap: () async {
-            await Navigator.push(context,
-                MaterialPageRoute(builder: (_) => EditBudgetScreen(budget: b)));
-            onLoad();
-          },
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.surface,
-                  colorScheme.surface.withValues(alpha: 0.5),
-                ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: HoverWrapper(
+            borderRadius: 28,
+            onTap: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => EditBudgetScreen(budget: b)));
+              onLoad();
+            },
+            glowColor: isOver ? semantic.overspent : semantic.primary,
+            glowOpacity: 0.1,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: semantic.divider, width: 1.5),
               ),
-              borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: semantic.divider.withValues(alpha: 0.5)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(b.category.toUpperCase(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    b.category.toUpperCase(),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 13,
+                                        color: semantic.text,
+                                        letterSpacing: 0.5),
                                     maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                              if (b.isStable) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        semantic.success.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                        color: semantic.success
-                                            .withValues(alpha: 0.3)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.verified,
-                                          size: 10, color: semantic.success),
-                                      const SizedBox(width: 2),
-                                      Text("STABLE",
-                                          style: TextStyle(
-                                              fontSize: 8,
-                                              fontWeight: FontWeight.bold,
-                                              color: semantic.success)),
-                                    ],
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
+                                if (b.isStable) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: semantic.success
+                                          .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.verified_rounded,
+                                            size: 10, color: semantic.success),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "STABLE",
+                                          style: TextStyle(
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.w900,
+                                              color: semantic.success),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
-                          if (b.lastReviewedAt != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Text(
-                                "Last reviewed: ${DateFormat('dd MMM').format(b.lastReviewedAt!)}",
-                                style: TextStyle(
-                                    fontSize: 9, color: semantic.secondaryText),
-                              ),
                             ),
+                            if (b.lastReviewedAt != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  "Analyzed ${DateFormat('dd MMM').format(b.lastReviewedAt!)}",
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: semantic.secondaryText),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            CurrencyFormatter.format(b.spent,
+                                isPrivate: isPrivate),
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: isOver
+                                    ? semantic.overspent
+                                    : semantic.text),
+                          ),
+                          Text(
+                            "of ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: semantic.secondaryText),
+                          ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Flexible(
-                      flex: 0,
-                      child: Semantics(
-                        container: true,
-                        child: Text(
-                          "${CurrencyFormatter.format(b.spent, isPrivate: isPrivate)} / ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: isOver
-                                  ? semantic.overspent
-                                  : semantic.secondaryText,
-                              fontWeight: FontWeight.w700),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  LayoutBuilder(builder: (context, constraints) {
+                    return Stack(
+                      children: [
+                        Container(
+                          height: 10,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: semantic.divider,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                LayoutBuilder(builder: (context, constraints) {
-                  return Stack(
-                    children: [
-                      Container(
-                        height: 10,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: semantic.divider.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      Container(
-                        height: 10,
-                        width: constraints.maxWidth * progress,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: isOver
-                                  ? [
-                                      semantic.overspent,
-                                      semantic.overspent.withValues(alpha: 0.7)
-                                    ]
-                                  : [
-                                      colorScheme.primary,
-                                      colorScheme.primary.withValues(alpha: 0.7)
-                                    ],
-                            ),
-                            borderRadius: BorderRadius.circular(5),
+                        AnimatedContainer(
+                          duration: 800.ms,
+                          curve: Curves.easeOutQuint,
+                          height: 10,
+                          width: constraints.maxWidth * progress,
+                          decoration: BoxDecoration(
+                            color:
+                                isOver ? semantic.overspent : semantic.primary,
+                            borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
                                 color: (isOver
                                         ? semantic.overspent
-                                        : colorScheme.primary)
-                                    .withValues(alpha: 0.4),
-                                blurRadius: 6,
+                                        : semantic.primary)
+                                    .withValues(alpha: 0.2),
+                                blurRadius: 10,
                                 offset: const Offset(0, 2),
                               )
-                            ]),
-                      )
-                          .animate()
-                          .shimmer(duration: 2.seconds, color: semantic.shimmer)
-                          .scaleX(
-                              begin: 0,
-                              end: 1,
-                              duration: 1.seconds,
-                              curve: Curves.easeOutQuint,
-                              alignment: Alignment.centerLeft),
-                    ],
-                  );
-                }),
-              ],
+                            ],
+                          ),
+                        ).animate().shimmer(
+                            duration: 2.seconds,
+                            color:
+                                (isOver ? semantic.overspent : semantic.primary)
+                                    .withValues(alpha: 0.2)),
+                      ],
+                    );
+                  }),
+                ],
+              ),
             ),
-          ),
-        )
-            .animate()
-            .fadeIn(delay: (100 * index).ms, duration: 600.ms)
-            .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
-      );
-    }).toList());
+          )
+              .animate()
+              .fadeIn(delay: (60 * index).ms, duration: 600.ms)
+              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutQuint),
+        );
+      }).toList(),
+    );
   }
 }

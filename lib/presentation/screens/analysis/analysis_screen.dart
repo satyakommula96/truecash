@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:trueledger/core/theme/theme.dart';
 
 import 'package:trueledger/presentation/providers/analysis_provider.dart';
@@ -21,11 +22,12 @@ class AnalysisScreen extends ConsumerWidget {
     final analysisAsync = ref.watch(analysisProvider);
     final isPrivate = ref.watch(privacyProvider);
     final semantic = Theme.of(context).extension<AppColors>()!;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return analysisAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(
+        backgroundColor: semantic.surfaceCombined,
+        body: Center(child: CircularProgressIndicator(color: semantic.primary)),
+      ),
       error: (err, stack) => Scaffold(body: Center(child: Text("Error: $err"))),
       data: (data) {
         final budgets = data.budgets;
@@ -37,20 +39,32 @@ class AnalysisScreen extends ConsumerWidget {
         }
 
         return Scaffold(
-          appBar: AppBar(title: const Text("ANALYSIS & BUDGETS")),
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            title: const Text("ANALYSIS"),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            flexibleSpace: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               await Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const AddBudgetScreen()));
               reload();
             },
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-            child: const Icon(Icons.add),
+            backgroundColor: semantic.primary,
+            foregroundColor: Colors.white,
+            elevation: 8,
+            child: const Icon(Icons.add_rounded, size: 28),
           ),
           body: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
-                20, 20, 20, 100 + MediaQuery.of(context).padding.bottom),
+                20, MediaQuery.of(context).padding.top + 80, 20, 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -58,55 +72,35 @@ class AnalysisScreen extends ConsumerWidget {
                   _buildInsightCard(context, trendData, semantic, isPrivate)
                       .animate()
                       .fadeIn(duration: 600.ms)
-                      .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
+                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuint),
                   const SizedBox(height: 32),
                 ],
                 _buildAnnualReflectionBanner(context, semantic)
                     .animate()
-                    .fadeIn(delay: 100.ms),
-                const SizedBox(height: 32),
-                Text("SPENDING TREND",
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                            color: semantic.secondaryText))
-                    .animate()
                     .fadeIn(delay: 200.ms),
-                const SizedBox(height: 16),
+                const SizedBox(height: 48),
+                _buildSectionHeader(
+                    semantic, "MONTHLY TREND", "SPENDING & INCOME"),
+                const SizedBox(height: 20),
                 TrendChart(
                         trendData: trendData,
                         semantic: semantic,
                         isPrivate: isPrivate)
                     .animate()
                     .fadeIn(delay: 400.ms, duration: 600.ms)
-                    .slideX(begin: 0.1, end: 0, curve: Curves.easeOutQuint),
-                const SizedBox(height: 32),
-                Text("SPENDING BY CATEGORY",
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                            color: semantic.secondaryText))
-                    .animate()
-                    .fadeIn(delay: 600.ms),
-                const SizedBox(height: 16),
+                    .slideY(begin: 0.05, end: 0, curve: Curves.easeOutQuint),
+                const SizedBox(height: 48),
+                _buildSectionHeader(semantic, "DISTRIBUTION", "BY CATEGORY"),
+                const SizedBox(height: 24),
                 _buildCategoryBreakdown(
                     context, categoryData, semantic, isPrivate),
-                const SizedBox(height: 32),
-                Text("LIVE TRACKING",
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                            color: semantic.secondaryText))
-                    .animate()
-                    .fadeIn(delay: 800.ms),
+                const SizedBox(height: 48),
+                _buildSectionHeader(semantic, "BUDGETS", "LIVE TRACKING"),
                 const SizedBox(height: 24),
                 BudgetSection(
                         budgets: budgets, semantic: semantic, onLoad: reload)
                     .animate()
-                    .fadeIn(delay: 1000.ms),
+                    .fadeIn(delay: 600.ms),
               ],
             ),
           ),
@@ -115,14 +109,46 @@ class AnalysisScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSectionHeader(AppColors semantic, String title, String sub) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          sub.toUpperCase(),
+          style: TextStyle(
+              fontSize: 10,
+              color: semantic.secondaryText,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          title,
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: semantic.text,
+              letterSpacing: -0.5),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCategoryBreakdown(BuildContext context,
       List<Map<String, dynamic>> data, AppColors semantic, bool isPrivate) {
     if (data.isEmpty) {
-      return const Text("No spending data yet.",
-          style: TextStyle(color: Colors.grey));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Text("No spending data yet",
+              style: TextStyle(
+                  color: semantic.secondaryText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600)),
+        ),
+      );
     }
 
-    // Find max value for progress bar calculation
     final maxVal = data.fold<int>(0,
         (prev, e) => (e['total'] as int) > prev ? (e['total'] as int) : prev);
 
@@ -134,7 +160,7 @@ class AnalysisScreen extends ConsumerWidget {
         final progress = maxVal == 0 ? 0.0 : total / maxVal;
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -142,19 +168,27 @@ class AnalysisScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(item['category'],
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface),
-                        overflow: TextOverflow.ellipsis),
+                    child: Text(
+                      item['category'].toString().toUpperCase(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                          color: semantic.text,
+                          letterSpacing: 0.5),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  Text(CurrencyFormatter.format(total, isPrivate: isPrivate),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w900, fontSize: 13)),
+                  Text(
+                    CurrencyFormatter.format(total, isPrivate: isPrivate),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        color: semantic.text),
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               LayoutBuilder(builder: (context, constraints) {
                 return Stack(
                   children: [
@@ -162,37 +196,29 @@ class AnalysisScreen extends ConsumerWidget {
                       height: 8,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: semantic.divider.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(4),
+                        color: semantic.divider.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    Container(
+                    AnimatedContainer(
+                      duration: 800.ms,
+                      curve: Curves.easeOutQuint,
                       height: 8,
-                      width: constraints.maxWidth * progress,
+                      width: constraints.maxWidth * progress.clamp(0.02, 1.0),
                       decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              semantic.expense,
-                              semantic.expense.withValues(alpha: 0.7)
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: semantic.expense.withValues(alpha: 0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            )
-                          ]),
-                    )
-                        .animate()
-                        .shimmer(duration: 1200.ms, color: semantic.shimmer)
-                        .scaleX(
-                            begin: 0,
-                            end: 1,
-                            duration: 800.ms,
-                            curve: Curves.easeOutQuint,
-                            alignment: Alignment.centerLeft),
+                        color: semantic.primary.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: semantic.primary.withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          )
+                        ],
+                      ),
+                    ).animate().shimmer(
+                        duration: 2.seconds,
+                        color: semantic.primary.withValues(alpha: 0.2)),
                   ],
                 );
               })
@@ -200,7 +226,7 @@ class AnalysisScreen extends ConsumerWidget {
           ),
         )
             .animate()
-            .fadeIn(delay: (20 * index).clamp(0, 400).ms, duration: 400.ms)
+            .fadeIn(delay: (40 * index).ms)
             .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint);
       }).toList(),
     );
@@ -215,59 +241,77 @@ class AnalysisScreen extends ConsumerWidget {
     final isIncrease = diff > 0;
 
     return HoverWrapper(
-      borderRadius: 16,
+      borderRadius: 24,
       glowColor: isIncrease ? semantic.overspent : semantic.income,
-      glowOpacity: 0.15,
+      glowOpacity: 0.1,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-              colors: isIncrease
-                  ? [
-                      semantic.overspent.withValues(alpha: 0.2),
-                      semantic.overspent.withValues(alpha: 0.05)
-                    ]
-                  : [
-                      semantic.income.withValues(alpha: 0.2),
-                      semantic.income.withValues(alpha: 0.05)
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight),
-          borderRadius: BorderRadius.circular(16),
+          color: (isIncrease ? semantic.overspent : semantic.income)
+              .withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-              color: isIncrease
-                  ? semantic.overspent.withValues(alpha: 0.3)
-                  : semantic.income.withValues(alpha: 0.3)),
+              color: (isIncrease ? semantic.overspent : semantic.income)
+                  .withValues(alpha: 0.2),
+              width: 1.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: (isIncrease ? semantic.overspent : semantic.income)
+                        .withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
                     isIncrease
-                        ? Icons.warning_amber_rounded
-                        : Icons.thumb_up_alt_outlined,
-                    color: isIncrease ? semantic.overspent : semantic.income),
-                const SizedBox(width: 12),
-                Text("MONTHLY INSIGHT",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: semantic.secondaryText)),
+                        ? Icons.trending_up_rounded
+                        : Icons.trending_down_rounded,
+                    color: isIncrease ? semantic.overspent : semantic.income,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  "INSIGHT",
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      color: semantic.secondaryText),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-                isIncrease
-                    ? "Spending is up by ${CurrencyFormatter.format(diff.abs(), isPrivate: isPrivate)} compared to last month."
-                    : "Great job! Spending decreased by ${CurrencyFormatter.format(diff.abs(), isPrivate: isPrivate)}.",
+            const SizedBox(height: 20),
+            RichText(
+              text: TextSpan(
                 style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface)),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: semantic.text,
+                    height: 1.5),
+                children: [
+                  TextSpan(
+                      text: isIncrease
+                          ? "Spending is up by "
+                          : "Great job! Spending decreased by "),
+                  TextSpan(
+                    text: CurrencyFormatter.format(diff.abs(),
+                        isPrivate: isPrivate),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color:
+                            isIncrease ? semantic.overspent : semantic.income),
+                  ),
+                  const TextSpan(text: " compared to last month."),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -276,31 +320,31 @@ class AnalysisScreen extends ConsumerWidget {
 
   Widget _buildAnnualReflectionBanner(
       BuildContext context, AppColors semantic) {
-    return GestureDetector(
+    return HoverWrapper(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => AnnualReflectionScreen(year: DateTime.now().year),
-        ),
+            builder: (_) => AnnualReflectionScreen(year: DateTime.now().year)),
       ),
+      borderRadius: 24,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: semantic.surfaceCombined,
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider.withValues(alpha: 0.5)),
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: semantic.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.auto_awesome_rounded,
-                  color: Colors.deepPurple),
+              child: Icon(Icons.auto_awesome_rounded,
+                  color: semantic.primary, size: 24),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -310,20 +354,19 @@ class AnalysisScreen extends ConsumerWidget {
                   Text(
                     "YEAR-IN-REVIEW",
                     style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                      color: semantic.secondaryText,
-                    ),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        color: semantic.secondaryText),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "View your ${DateTime.now().year} annual reflection",
+                    "View your ${DateTime.now().year} reflection",
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: semantic.text,
+                        letterSpacing: -0.2),
                   ),
                 ],
               ),
@@ -332,6 +375,9 @@ class AnalysisScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ).animate().shimmer(
+        delay: 1.seconds,
+        duration: 2.seconds,
+        color: semantic.primary.withValues(alpha: 0.15));
   }
 }

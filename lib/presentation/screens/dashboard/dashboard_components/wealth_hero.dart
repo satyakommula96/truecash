@@ -56,12 +56,11 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
   @override
   Widget build(BuildContext context) {
     final isPrivate = ref.watch(privacyProvider);
-    final colorScheme = Theme.of(context).colorScheme;
-    final appColors = Theme.of(context).extension<AppColors>();
+    final semantic = Theme.of(context).extension<AppColors>()!;
     final isNegative = widget.summary.netWorth < 0;
-    final displayColor = isNegative
-        ? (appColors?.overspent ?? colorScheme.error)
-        : colorScheme.primary;
+
+    // Premium Mesh Gradient logic
+    final displayColor = isNegative ? semantic.overspent : semantic.primary;
 
     final isTouch = Theme.of(context).platform == TargetPlatform.iOS ||
         Theme.of(context).platform == TargetPlatform.android;
@@ -70,148 +69,202 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
       alignment: Alignment.topCenter,
       children: [
         AnimatedContainer(
-          duration: 300.ms,
-          curve: Curves.easeOutQuint,
+          duration: 400.ms,
+          curve: Curves.easeOutQuart,
           // ignore: deprecated_member_use
           transform: Matrix4.identity()
             // ignore: deprecated_member_use
-            ..scale(_isHovered ? 1.02 : 1.0)
+            ..scale(_isHovered ? 1.015 : 1.0)
             // ignore: deprecated_member_use
-            ..translate(0.0, _isHovered ? -4.0 : 0.0),
+            ..translate(0.0, _isHovered ? -2.0 : 0.0),
           width: double.infinity,
-          height: 240,
+          height: 220,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                displayColor.withValues(alpha: 0.95),
-                displayColor.withValues(alpha: 0.8),
+                displayColor.withValues(alpha: 0.9),
+                displayColor.withValues(alpha: 0.7),
+                displayColor.withValues(alpha: 0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: _isHovered
-                  ? Colors.white.withValues(alpha: 0.5)
-                  : Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                  color: displayColor.withValues(alpha: _isHovered ? 0.4 : 0.3),
-                  blurRadius: _isHovered ? 40 : 24,
-                  offset: Offset(0, _isHovered ? 20 : 12)),
+                color: displayColor.withValues(alpha: _isHovered ? 0.25 : 0.15),
+                blurRadius: _isHovered ? 40 : 20,
+                offset: Offset(0, _isHovered ? 15 : 10),
+              ),
             ],
           ),
-          child: Stack(
-            children: [
-              // Abstract Background Shapes
-              Positioned(
-                right: -50,
-                top: -50,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.05),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: -30,
-                bottom: -30,
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.03),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: widget.onTapNetWorth,
-                              child: _buildHeaderPill(context, "NET WORTH",
-                                  Icons.account_balance_wallet_rounded),
-                            ),
-                          ),
-                        ),
-                        if (widget.activeStreak > 0) ...[
-                          const SizedBox(width: 12),
-                          Flexible(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Builder(builder: (context) {
-                                final pillContent = _buildHeaderPill(
-                                  context,
-                                  widget.hasLoggedToday
-                                      ? "${widget.activeStreak} DAY STREAK"
-                                      : "${widget.activeStreak} DAY STREAK",
-                                  Icons.whatshot_rounded,
-                                  isAlt: true,
-                                  color: widget.hasLoggedToday
-                                      ? Colors.orange
-                                      : Colors.blueGrey.shade300,
-                                );
-
-                                Widget pill;
-                                if (!widget.hasLoggedToday) {
-                                  pill = pillContent;
-                                } else {
-                                  pill = pillContent.animate();
-                                }
-                                return pill;
-                              }),
-                            ),
-                          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: Stack(
+              children: [
+                // Organic background shapes for mesh effect
+                Positioned(
+                  right: -80,
+                  top: -80,
+                  child: Container(
+                    width: 280,
+                    height: 280,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0.15),
+                          Colors.white.withValues(alpha: 0),
                         ],
-                      ],
+                      ),
                     ),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TweenAnimationBuilder<double>(
-                          tween: Tween<double>(
-                              begin: 0,
-                              end: widget.summary.netWorth.toDouble()),
-                          duration: 1500.ms,
-                          curve: Curves.easeOutExpo,
-                          builder: (context, value, child) {
-                            return FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                  CurrencyFormatter.format(value.toInt(),
-                                      compact: false, isPrivate: isPrivate),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 40,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -1.5,
-                                      height: 1.0),
-                                  maxLines: 1),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  ],
+                  )
+                      .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true))
+                      .move(
+                          duration: 4.seconds,
+                          begin: const Offset(0, 0),
+                          end: const Offset(-20, 20))
+                      .scale(
+                          duration: 4.seconds,
+                          begin: const Offset(1, 1),
+                          end: const Offset(1.1, 1.1)),
                 ),
-              ),
-            ],
+                Positioned(
+                  left: -50,
+                  bottom: -50,
+                  child: Container(
+                    width: 220,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0.08),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  )
+                      .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true))
+                      .move(
+                          duration: 5.seconds,
+                          begin: const Offset(0, 0),
+                          end: const Offset(30, -10))
+                      .scale(
+                          duration: 5.seconds,
+                          begin: const Offset(1.1, 1.1),
+                          end: const Offset(0.9, 0.9)),
+                ),
+                // Gloss / Shine Effect Overlay
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.1),
+                            Colors.white.withValues(alpha: 0),
+                            Colors.white.withValues(alpha: 0.05),
+                            Colors.white.withValues(alpha: 0),
+                          ],
+                          stops: const [0.1, 0.4, 0.5, 0.8],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildHeaderPill(
+                            context,
+                            "NET WORTH",
+                            Icons.account_balance_wallet_rounded,
+                            onTap: widget.onTapNetWorth,
+                            semantic: semantic,
+                          ),
+                          if (widget.activeStreak > 0)
+                            _buildHeaderPill(
+                              context,
+                              "${widget.activeStreak} DAY STREAK",
+                              Icons.whatshot_rounded,
+                              onTap: widget.onTapStreak,
+                              isAlt: true,
+                              semantic: semantic,
+                              color: widget.hasLoggedToday
+                                  ? Colors.orange
+                                  : Colors.white.withValues(alpha: 0.5),
+                              showPulse: !widget.hasLoggedToday,
+                            ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(
+                        "CURRENT BALANCE",
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TweenAnimationBuilder<double>(
+                        tween: Tween<double>(
+                          begin: 0,
+                          end: widget.summary.netWorth.toDouble(),
+                        ),
+                        duration: 2.seconds,
+                        curve: Curves.easeOutExpo,
+                        builder: (context, value, child) {
+                          final text = CurrencyFormatter.format(
+                            value.toInt(),
+                            compact: false,
+                            isPrivate: isPrivate,
+                          );
+                          return FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [Colors.white, Colors.white70],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds),
+                              child: Text(
+                                text,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 52,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -2,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         ConfettiWidget(
@@ -230,51 +283,71 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
       ],
     );
 
-    if (isTouch) {
-      return mainContent.animate();
-    }
+    if (isTouch) return mainContent.animate().fadeIn(duration: 600.ms);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
-      child: mainContent,
-    ).animate();
+      child: mainContent.animate().fadeIn(duration: 600.ms),
+    );
   }
 
-  Widget _buildHeaderPill(BuildContext context, String text, IconData icon,
-      {bool isAlt = false, Color? color}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+  Widget _buildHeaderPill(
+    BuildContext context,
+    String text,
+    IconData icon, {
+    VoidCallback? onTap,
+    bool isAlt = false,
+    Color? color,
+    required AppColors semantic,
+    bool showPulse = false,
+  }) {
+    final pill = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-          color: color != null
-              ? color.withValues(alpha: 0.2)
-              : (isAlt
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.1)),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-              color: color != null
-                  ? color.withValues(alpha: 0.4)
-                  : Colors.white.withValues(alpha: 0.1))),
+        color: color != null
+            ? color.withValues(alpha: 0.15)
+            : Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color?.withValues(alpha: 0.3) ??
+              Colors.white.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon,
-              size: 14, color: color ?? Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(text,
-                style: TextStyle(
-                    color: color ?? Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 10,
-                    letterSpacing: 0),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1),
+          Icon(
+            icon,
+            size: 14,
+            color: color ?? Colors.white.withValues(alpha: 0.9),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(
+              color: color ?? Colors.white.withValues(alpha: 0.9),
+              fontWeight: FontWeight.w900,
+              fontSize: 10,
+              letterSpacing: 1.2,
+            ),
           ),
         ],
       ),
-    ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack);
+    );
+
+    return GestureDetector(
+      onTap: onTap,
+      child: showPulse
+          ? pill
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .scale(
+                  duration: 800.ms,
+                  begin: const Offset(1, 1),
+                  end: const Offset(1.05, 1.05))
+          : pill.animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
+    );
   }
 }

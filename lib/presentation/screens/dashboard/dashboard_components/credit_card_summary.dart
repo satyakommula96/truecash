@@ -26,56 +26,56 @@ class CreditCardSummary extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const CreditCardsScreen()));
         onLoad();
       },
-      borderRadius: 24,
-      glowColor: Colors.blue,
+      borderRadius: 28,
+      glowColor: semantic.primary,
       glowOpacity: 0.1,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider.withValues(alpha: 0.5)),
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.surface,
-              semantic.surfaceCombined.withValues(alpha: 0.3),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+                color: semantic.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.credit_card_rounded,
-                  size: 20, color: Colors.blue),
+              child: Icon(Icons.credit_card_rounded,
+                  size: 22, color: semantic.primary),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("CREDIT CARDS",
-                      style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.blue,
-                          letterSpacing: 1.5)),
-                  const SizedBox(height: 4),
-                  Text(CurrencyFormatter.format(summary.creditCardDebt),
-                      style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -1)),
+                  Text(
+                    "CREDIT CARDS",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: semantic.secondaryText,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    CurrencyFormatter.format(summary.creditCardDebt),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      color: semantic.text,
+                      letterSpacing: -1,
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: semantic.secondaryText),
+            Icon(Icons.chevron_right_rounded,
+                color: semantic.secondaryText.withValues(alpha: 0.5)),
           ],
         ),
       ),

@@ -18,74 +18,109 @@ class UpcomingBills extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (bills.isEmpty) {
-      return const Text("Clean slate",
-          style: TextStyle(color: Colors.grey, fontSize: 12));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text("All bills are clear",
+              style: TextStyle(
+                  color: semantic.secondaryText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600)),
+        ),
+      );
     }
-    final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-            children: bills.asMap().entries.map((entry) {
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: bills.asMap().entries.map((entry) {
           final index = entry.key;
           final b = entry.value;
+          final isOverdue = DateHelper.isOverdue(b['due'].toString());
+
           return Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: EdgeInsets.only(right: 16, left: index == 0 ? 0 : 0),
             child: HoverWrapper(
-              borderRadius: 12,
+              borderRadius: 24,
+              glowColor: isOverdue ? semantic.overspent : semantic.primary,
+              glowOpacity: 0.1,
               child: Container(
-                  width: 150,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: semantic.divider)),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(b['type'].toString(),
-                            style: TextStyle(
-                                fontSize: 8,
-                                color: semantic.secondaryText,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 4),
-                        Text(b['title'].toString().toUpperCase(),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 13),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 12),
-                        Semantics(
-                          container: true,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(CurrencyFormatter.format(b['amount']),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w900, fontSize: 15)),
-                          ),
+                width: 160,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: semantic.divider, width: 1.5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color:
+                            (isOverdue ? semantic.overspent : semantic.primary)
+                                .withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        b['type'].toString().toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 8,
+                          color:
+                              isOverdue ? semantic.overspent : semantic.primary,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
                         ),
-                        Semantics(
-                          container: true,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                DateHelper.formatDue(b['due'].toString()),
-                                style: TextStyle(
-                                    fontSize: 9,
-                                    color: semantic.secondaryText)),
-                          ),
-                        )
-                      ])),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      b['title'].toString(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          color: semantic.text),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 16),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        CurrencyFormatter.format(b['amount']),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                            color: semantic.text),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateHelper.formatDue(b['due'].toString()),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: isOverdue
+                            ? semantic.overspent
+                            : semantic.secondaryText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             )
                 .animate()
                 .fadeIn(delay: (100 * index).ms, duration: 600.ms)
                 .slideX(begin: 0.2, end: 0, curve: Curves.easeOutQuint),
           );
-        }).toList()));
+        }).toList(),
+      ),
+    );
   }
 }

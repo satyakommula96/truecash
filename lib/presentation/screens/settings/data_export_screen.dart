@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/core/utils/web_saver.dart';
 import 'package:trueledger/core/services/file_service.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
@@ -19,6 +21,8 @@ import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/data/datasources/database.dart';
 import 'package:trueledger/core/services/backup_encryption_service.dart';
 import 'package:trueledger/presentation/providers/backup_provider.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class DataExportScreen extends ConsumerStatefulWidget {
   const DataExportScreen({super.key});
@@ -33,10 +37,9 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 
   Future<void> _exportCompleteData() async {
     setState(() => _isExporting = true);
+    final semantic = Theme.of(context).extension<AppColors>()!;
     try {
       final repo = ref.read(financialRepositoryProvider);
-
-      // Ensure dashboard data is ready for comprehensive insights
       final dashboardData = await ref.read(dashboardProvider.future);
       final intelligenceService = ref.read(intelligenceServiceProvider);
 
@@ -45,22 +48,18 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         trendData: dashboardData.trendData,
         budgets: dashboardData.budgets,
         categorySpending: dashboardData.categorySpending,
-        requestedSurface: InsightSurface.details, // Get all insights for export
+        requestedSurface: InsightSurface.details,
         forceRefresh: true,
       );
 
       final data = await repo.generateBackup();
-
-      // Capture Insight Metadata (History/Dismissals)
       final prefs = ref.read(sharedPreferencesProvider);
       final insightHistory = prefs.getString('insight_display_history');
       final insightKindHistory = prefs.getString('insight_kind_history');
 
-      // Compatibility: Update version to 2.0 for comprehensive export
       data['version'] = '2.0';
       data['insights'] = insights.map((e) => e.toJson()).toList();
       data['insights_meta'] = {
-        // Persist history so dismissals/snoozes are respected on restore
         'display_history':
             insightHistory != null ? jsonDecode(insightHistory) : {},
         'kind_history':
@@ -74,25 +73,21 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
       };
 
       final jsonString = const JsonEncoder.withIndent('  ').convert(data);
-
       String finalOutput;
       String actualFileName =
           "trueledger_full_export_${DateTime.now().millisecondsSinceEpoch}.json";
 
       if (_encryptFullExport) {
-        String? password = await _showBackupPasswordDialog();
+        String? password = await _showBackupPasswordDialog(semantic);
         if (password == null || password.isEmpty) {
           setState(() => _isExporting = false);
           return;
         }
 
-        // Encrypt Data
         final encryptedData =
             BackupEncryptionService.encryptData(jsonString, password);
-
-        // Wrap in container JSON
         final container = {
-          'version': '2.0', // Container version
+          'version': '2.0',
           'encrypted': true,
           'data': encryptedData,
           'date': DateTime.now().toIso8601String(),
@@ -120,7 +115,10 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           await fileService.writeAsString(outputFile, finalOutput);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Export saved to $outputFile")),
+              SnackBar(
+                content: Text("EXPORT SAVED TO $outputFile".toUpperCase()),
+                backgroundColor: semantic.primary,
+              ),
             );
           }
         }
@@ -130,7 +128,6 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         final directory = await getTemporaryDirectory();
         final file = File('${directory.path}/$actualFileName');
         await file.writeAsString(finalOutput);
-        // ignore: deprecated_member_use
         await Share.shareXFiles([XFile(file.path)],
             subject: _encryptFullExport
                 ? 'TrueLedger Encrypted Export'
@@ -143,9 +140,8 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Full data export completed successfully"),
-            backgroundColor: Colors.green[700],
-            behavior: SnackBarBehavior.floating,
+            content: const Text("FULL DATA EXPORT COMPLETED"),
+            backgroundColor: semantic.success,
           ),
         );
       }
@@ -153,9 +149,8 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Export failed: $e"),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
+            content: Text("EXPORT FAILED: $e".toUpperCase()),
+            backgroundColor: semantic.overspent,
           ),
         );
       }
@@ -164,137 +159,86 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
     }
   }
 
-  Future<void> _backupData() async {
-    final repo = ref.read(financialRepositoryProvider);
-
-    // 1. Ask for encryption password
-    String? password = await _showBackupPasswordDialog();
-    if (password == null || password.isEmpty) return;
-
-    setState(() => _isExporting = true);
-
-    try {
-      // 2. Gather Data
-      final rawData = {
-        'vars': await repo.getAllValues('variable_expenses'),
-        'income': await repo.getAllValues('income_sources'),
-        'fixed': await repo.getAllValues('fixed_expenses'),
-        'invs': await repo.getAllValues('investments'),
-        'subs': await repo.getAllValues('subscriptions'),
-        'cards': await repo.getAllValues('credit_cards'),
-        'loans': await repo.getAllValues('loans'),
-        'goals': await repo.getAllValues('saving_goals'),
-        'budgets': await repo.getAllValues('budgets'),
-        'backup_date': DateTime.now().toIso8601String(),
-        'version': '1.0' // Inner version
-      };
-
-      final jsonString = jsonEncode(rawData);
-
-      // 3. Encrypt Data
-      final encryptedData =
-          BackupEncryptionService.encryptData(jsonString, password);
-
-      // 4. Wrap in container JSON
-      final container = {
-        'version': '2.0', // Container version
-        'encrypted': true,
-        'data': encryptedData,
-        'date': DateTime.now().toIso8601String(),
-      };
-      final finalOutput = jsonEncode(container);
-
-      final fileName =
-          "trueledger_backup_enc_${DateTime.now().millisecondsSinceEpoch}.json";
-
-      if (kIsWeb) {
-        final bytes = utf8.encode(finalOutput);
-        await saveFileWeb(bytes, fileName);
-        await ref.read(lastBackupTimeProvider.notifier).updateLastBackupTime();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Backup download started")));
-        }
-      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        final outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Save Encrypted Backup',
-          fileName: fileName,
-          type: FileType.custom,
-          allowedExtensions: ['json'],
-        );
-
-        if (outputFile != null) {
-          final fileService = ref.read(fileServiceProvider);
-          await fileService.writeAsString(outputFile, finalOutput);
-          await ref
-              .read(lastBackupTimeProvider.notifier)
-              .updateLastBackupTime();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Encrypted backup saved to $outputFile")));
-          }
-        }
-      } else {
-        final directory = await getTemporaryDirectory();
-        final file = File('${directory.path}/$fileName');
-        final fileService = ref.read(fileServiceProvider);
-        await fileService.writeAsString(file.path, finalOutput);
-        await ref.read(lastBackupTimeProvider.notifier).updateLastBackupTime();
-        if (mounted) {
-          // ignore: deprecated_member_use
-          await Share.shareXFiles([XFile(file.path)],
-              text: 'TrueLedger Encrypted Backup');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Backup failed: $e")),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isExporting = false);
-    }
-  }
-
-  Future<String?> _showBackupPasswordDialog() async {
+  Future<String?> _showBackupPasswordDialog(AppColors semantic) async {
     String input = "";
     bool obscure = true;
     return showDialog<String>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text("Encrypt Backup"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("Enter a password to encrypt this backup file.",
-                  style: TextStyle(fontSize: 13)),
-              const SizedBox(height: 16),
-              TextField(
-                autofocus: true,
-                obscureText: obscure,
-                onChanged: (v) => input = v,
-                decoration: InputDecoration(
-                    labelText: "Password",
-                    border: const OutlineInputBorder(),
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5),
+            ),
+            title: Text("ENCRYPT BACKUP",
+                style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    letterSpacing: 1.5,
+                    color: semantic.text)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Enter a password to encrypt this file.",
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: semantic.text,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 20),
+                TextField(
+                  autofocus: true,
+                  obscureText: obscure,
+                  style: TextStyle(
+                      color: semantic.text, fontWeight: FontWeight.w900),
+                  onChanged: (v) => input = v,
+                  decoration: InputDecoration(
+                    labelText: "PASSWORD",
+                    labelStyle: TextStyle(
+                        color: semantic.secondaryText,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1),
+                    filled: true,
+                    fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16)),
                     suffixIcon: IconButton(
                       icon: Icon(
-                          obscure ? Icons.visibility : Icons.visibility_off),
+                          obscure
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                          color: semantic.secondaryText),
                       onPressed: () => setState(() => obscure = !obscure),
-                    )),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text("CANCEL",
+                      style: TextStyle(
+                          color: semantic.secondaryText,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12))),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, input),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: semantic.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12))),
+                child: const Text("CREATE BACKUP",
+                    style:
+                        TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("CANCEL")),
-            FilledButton(
-                onPressed: () => Navigator.pop(ctx, input),
-                child: const Text("CREATE BACKUP")),
-          ],
         ),
       ),
     );
@@ -302,6 +246,7 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 
   Future<void> _exportCSV(String type) async {
     setState(() => _isExporting = true);
+    final semantic = Theme.of(context).extension<AppColors>()!;
     try {
       final repo = ref.read(financialRepositoryProvider);
       List<List<dynamic>> rows = [];
@@ -370,17 +315,14 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         fileName =
             "trueledger_budgets_${DateTime.now().millisecondsSinceEpoch}.csv";
       } else if (type == 'insights') {
-        // Fetch dashboard data and generate full insights list
         final dashboardData = await ref.read(dashboardProvider.future);
         final intelligenceService = ref.read(intelligenceServiceProvider);
-
         final insights = intelligenceService.generateInsights(
           summary: dashboardData.summary,
           trendData: dashboardData.trendData,
           budgets: dashboardData.budgets,
           categorySpending: dashboardData.categorySpending,
-          requestedSurface:
-              InsightSurface.details, // Show all priorities in export
+          requestedSurface: InsightSurface.details,
           forceRefresh: true,
         );
 
@@ -397,9 +339,8 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("No $type data found to export."),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              behavior: SnackBarBehavior.floating,
+              content: Text("NO DATA FOUND TO EXPORT"),
+              backgroundColor: semantic.secondaryText,
             ),
           );
         }
@@ -412,7 +353,7 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         await saveFileWeb(utf8.encode(csv), fileName);
       } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
         final outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Save ${type.capitalize()} Export',
+          dialogTitle: 'Save CSV Export',
           fileName: fileName,
           type: FileType.custom,
           allowedExtensions: ['csv'],
@@ -424,7 +365,9 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                  content: Text("${type.capitalize()} saved to $outputFile")),
+                content: Text("${type.toUpperCase()} SAVED TO $outputFile"),
+                backgroundColor: semantic.primary,
+              ),
             );
           }
         }
@@ -434,18 +377,16 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         final directory = await getTemporaryDirectory();
         final file = File('${directory.path}/$fileName');
         await file.writeAsString(csv);
-        // ignore: deprecated_member_use
         await Share.shareXFiles([XFile(file.path)],
-            subject: 'TrueLedger ${type.capitalize()} Export',
+            subject: 'TrueLedger ${type.toUpperCase()} Export',
             text: 'Sharing my TrueLedger $type export.');
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("${type.capitalize()} exported successfully"),
-            backgroundColor: Colors.blue[700],
-            behavior: SnackBarBehavior.floating,
+            content: Text("${type.toUpperCase()} EXPORTED SUCCESSFUL"),
+            backgroundColor: semantic.success,
           ),
         );
       }
@@ -453,9 +394,8 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("CSV Export failed: $e"),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
+            content: Text("CSV EXPORT FAILED: $e".toUpperCase()),
+            backgroundColor: semantic.overspent,
           ),
         );
       }
@@ -465,6 +405,7 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
   }
 
   Future<void> _restoreData() async {
+    final semantic = Theme.of(context).extension<AppColors>()!;
     final result = await FilePicker.platform.pickFiles(type: FileType.any);
     if (result == null || result.files.isEmpty) return;
 
@@ -480,18 +421,15 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 
     try {
       final container = jsonDecode(fileContent) as Map<String, dynamic>;
-      // Check for encryption
       Map<String, dynamic> data;
       if (container['encrypted'] == true) {
-        // 1. Try Auto-Decryption with Device Key (for auto-backups)
         try {
           final deviceKey = await AppDatabase.getEncryptionKey();
           final decryptedJson =
               BackupEncryptionService.decryptData(container['data'], deviceKey);
           data = jsonDecode(decryptedJson) as Map<String, dynamic>;
         } catch (_) {
-          // 2. Fallback: Ask user for password
-          String? password = await _showPasswordDialog();
+          String? password = await _showRestorePasswordDialog(semantic);
           if (password == null) return;
 
           try {
@@ -503,7 +441,6 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           }
         }
       } else {
-        // Legacy or unencrypted export
         data = container;
       }
 
@@ -517,32 +454,56 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Restore Data?"),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "This will REPLACE all your current entries, budgets, and cards with those from the backup file.",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 12),
-              Text(
-                "• Your current state will be AUTO-BACKUPED before proceeding.\n• This action can be undone immediately after restore.",
-                style: TextStyle(fontSize: 13),
-              ),
+        builder: (ctx) => BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: AlertDialog(
+            backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5),
+            ),
+            title: Text("RESTORE DATA?",
+                style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    letterSpacing: 1.5,
+                    color: semantic.overspent)),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "This will REPLACE all your current data with the backup file.",
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "• Current state will be AUTO-BACKUPED.\n• Action can be UNDONE immediately.",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text("CANCEL",
+                      style: TextStyle(
+                          color: semantic.secondaryText,
+                          fontWeight: FontWeight.w900))),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: semantic.overspent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                  child: const Text("RESTORE",
+                      style: TextStyle(fontWeight: FontWeight.w900))),
             ],
           ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text("CANCEL")),
-            FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text("RESTORE")),
-          ],
         ),
       );
 
@@ -551,12 +512,11 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         final repo = ref.read(financialRepositoryProvider);
         final restoreUseCase = ref.read(restoreBackupUseCaseProvider);
 
-        // Immediate safety backup for in-app UNDO
         Map<String, dynamic>? safetyBackup;
         try {
           safetyBackup = await repo.generateBackup();
         } catch (e) {
-          debugPrint("In-memory safety backup failed: $e");
+          debugPrint("Safety backup failed: $e");
         }
 
         final result = await restoreUseCase.call(RestoreBackupParams(
@@ -564,7 +524,6 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           merge: false,
         ));
 
-        // Restore Insight Metadata
         if (data.containsKey('insights_meta')) {
           final meta = data['insights_meta'];
           final prefs = ref.read(sharedPreferencesProvider);
@@ -578,7 +537,6 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           }
         }
 
-        // When data is replaced, pre-existing notification schedules are stale.
         final notificationService = ref.read(notificationServiceProvider);
         await notificationService.cancelAllNotifications();
 
@@ -587,7 +545,7 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
           if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text("Restore Successful!"),
+                content: const Text("RESTORE SUCCESSFUL"),
                 duration: const Duration(seconds: 8),
                 action: safetyBackup != null
                     ? SnackBarAction(
@@ -599,8 +557,7 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text(
-                                          "Restore undone. Data recovered.")));
+                                      content: Text("RESTORE UNDONE")));
                             }
                           } catch (e) {
                             debugPrint("Undo failed: $e");
@@ -609,12 +566,12 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
                     : null,
               ),
             );
-            Navigator.pop(context, true); // Go back to refresh
+            Navigator.pop(context, true);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content:
-                      Text("Restore Failed: ${result.failureOrThrow.message}")),
+                      Text("RESTORE FAILED: ${result.failureOrThrow.message}")),
             );
           }
         }
@@ -622,41 +579,77 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error during restore: $e")),
+          SnackBar(content: Text("ERROR DURING RESTORE: $e")),
         );
       }
     }
   }
 
-  Future<String?> _showPasswordDialog() async {
+  Future<String?> _showRestorePasswordDialog(AppColors semantic) async {
     String input = "";
     bool obscure = true;
     return showDialog<String>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text("Decrypt Backup"),
-          content: TextField(
-            autofocus: true,
-            obscureText: obscure,
-            onChanged: (v) => input = v,
-            decoration: InputDecoration(
-              labelText: "Password",
-              suffixIcon: IconButton(
-                icon: Icon(obscure ? Icons.visibility : Icons.visibility_off),
-                onPressed: () => setState(() => obscure = !obscure),
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+                side: BorderSide(color: semantic.divider, width: 1.5)),
+            title: Text("DECRYPT BACKUP",
+                style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    letterSpacing: 1.5,
+                    color: semantic.text)),
+            content: TextField(
+              autofocus: true,
+              obscureText: obscure,
+              style:
+                  TextStyle(color: semantic.text, fontWeight: FontWeight.w900),
+              onChanged: (v) => input = v,
+              decoration: InputDecoration(
+                labelText: "PASSWORD",
+                labelStyle: TextStyle(
+                    color: semantic.secondaryText,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1),
+                filled: true,
+                fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      obscure
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
+                      color: semantic.secondaryText),
+                  onPressed: () => setState(() => obscure = !obscure),
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text("CANCEL",
+                      style: TextStyle(
+                          color: semantic.secondaryText,
+                          fontWeight: FontWeight.w900))),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, input),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: semantic.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                  child: const Text("DECRYPT",
+                      style: TextStyle(fontWeight: FontWeight.w900))),
+            ],
           ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text("CANCEL")),
-            FilledButton(
-                onPressed: () => Navigator.pop(ctx, input),
-                child: const Text("DECRYPT")),
-          ],
         ),
       ),
     );
@@ -664,67 +657,65 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppColors>()!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Data & Export"),
+        title: const Text("DATA & EXPORT"),
         centerTitle: true,
       ),
       body: Stack(
         children: [
           ListView(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.fromLTRB(
+                20, 16, 20, 48 + MediaQuery.of(context).padding.bottom),
             children: [
-              _buildHeader(context),
+              _buildHeader(semantic),
               const SizedBox(height: 32),
-              _buildOneTapSection(context),
+              _buildOneTapSection(semantic),
               const SizedBox(height: 32),
-              _buildRestoreSection(context),
+              _buildRestoreSection(semantic),
               const SizedBox(height: 32),
-              Text(
-                "INDIVIDUAL REPORTS (CSV)",
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: colorScheme.outline,
-                      letterSpacing: 1.2,
-                    ),
-              ),
-              const SizedBox(height: 16),
+              _buildSectionHeader("INDIVIDUAL REPORTS (CSV)", semantic),
+              const SizedBox(height: 12),
               _buildExportOption(
-                context: context,
-                title: "Transactions",
+                title: "TRANSACTIONS",
                 subtitle: "Expenses, income and investments",
                 icon: Icons.list_alt_rounded,
                 color: Colors.blue,
                 onTap: () => _exportCSV('transactions'),
+                semantic: semantic,
               ),
               const SizedBox(height: 16),
               _buildExportOption(
-                context: context,
-                title: "Budgets",
+                title: "BUDGETS",
                 subtitle: "Monthly limits and category targets",
                 icon: Icons.pie_chart_outline_rounded,
                 color: Colors.orange,
                 onTap: () => _exportCSV('budgets'),
+                semantic: semantic,
               ),
               const SizedBox(height: 16),
               _buildExportOption(
-                context: context,
-                title: "AI Insights",
+                title: "AI INSIGHTS",
                 subtitle: "Financial patterns and health analysis",
                 icon: Icons.auto_awesome_outlined,
                 color: Colors.purple,
                 onTap: () => _exportCSV('insights'),
+                semantic: semantic,
               ),
-              const SizedBox(height: 40),
-              _buildOwnershipNotice(context),
+              const SizedBox(height: 48),
+              _buildOwnershipNotice(semantic),
             ],
           ),
           if (_isExporting)
-            Container(
-              color: Colors.black26,
-              child: const Center(
-                child: CircularProgressIndicator(),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                color: Colors.black12,
+                child: Center(
+                  child: CircularProgressIndicator(color: semantic.primary),
+                ),
               ),
             ),
         ],
@@ -732,231 +723,287 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Column(
-      children: [
-        Icon(
-          Icons.file_upload_outlined,
-          size: 64,
-          color: Theme.of(context).colorScheme.primary,
+  Widget _buildSectionHeader(String title, AppColors semantic) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: semantic.secondaryText,
+          letterSpacing: 1.5,
         ),
-        const SizedBox(height: 16),
-        Text(
-          "Your Data, Your Control",
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          "Export your financial records anytime. We believe in complete data portability and ownership.",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildOneTapSection(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildHeader(AppColors semantic) {
     return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorScheme.primary, colorScheme.primaryContainer],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withAlpha(77),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: semantic.primary.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.rocket_launch_rounded, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
-                    "ONE-TAP EXPORT",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "Download your entire financial footprint including history, budgets, and insights in a machine-readable JSON format.\n\nExport is local-only. No cloud sync or external services.",
-                style: TextStyle(color: Colors.white, fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              Theme(
-                data: Theme.of(context).copyWith(
-                  unselectedWidgetColor: Colors.white70,
-                ),
-                child: CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: _encryptFullExport,
-                  onChanged: (v) =>
-                      setState(() => _encryptFullExport = v ?? false),
-                  title: const Text(
-                    "Encrypt this export",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  subtitle: const Text(
-                    "Highly recommended for sensitive data",
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
-                  ),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  activeColor: Colors.white,
-                  checkColor: colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isExporting ? null : _exportCompleteData,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleEdges(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    _encryptFullExport
-                        ? "Secure Export (JSON)"
-                        : "Export Everything (JSON)",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
+          child: Icon(
+            Icons.file_copy_rounded,
+            size: 48,
+            color: semantic.primary,
           ),
         ),
         const SizedBox(height: 16),
-        _buildExportOption(
-          context: context,
-          title: "Secure Backup",
-          subtitle: "Creates an encrypted data package",
-          icon: Icons.cloud_upload_outlined,
-          color: Colors.blueAccent,
-          onTap: _backupData,
+        Text(
+          "YOUR DATA, YOUR CONTROL",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+            color: semantic.text,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Export your financial records anytime. We believe in complete data portability and ownership.",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: semantic.secondaryText,
+              fontSize: 13,
+              fontWeight: FontWeight.w700),
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
   }
 
-  Widget _buildRestoreSection(BuildContext context) {
-    return _buildExportOption(
-      context: context,
-      title: "Restore Data",
-      subtitle: "Import from standard or encrypted backups",
-      icon: Icons.restore_page_outlined,
-      color: Colors.orange,
+  Widget _buildOneTapSection(AppColors semantic) {
+    return HoverWrapper(
+      onTap: _exportCompleteData,
+      borderRadius: 28,
+      glowColor: semantic.primary.withValues(alpha: 0.3),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [semantic.primary, semantic.primary.withValues(alpha: 0.7)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: semantic.primary.withValues(alpha: 0.25),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(51),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.rocket_launch_rounded,
+                      color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 16),
+                const Text(
+                  "ONE-TAP EXPORT",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Download your entire financial footprint including history, budgets, and insights in a machine-readable JSON format.",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  height: 1.5),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: Theme(
+                    data: ThemeData(unselectedWidgetColor: Colors.white70),
+                    child: CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: _encryptFullExport,
+                      onChanged: (v) =>
+                          setState(() => _encryptFullExport = v ?? false),
+                      title: const Text("ENCRYPT FILENAME",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900)),
+                      activeColor: Colors.white,
+                      checkColor: semantic.primary,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "EXPORT NOW",
+                    style: TextStyle(
+                        color: semantic.primary,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
+  }
+
+  Widget _buildRestoreSection(AppColors semantic) {
+    return HoverWrapper(
       onTap: _restoreData,
+      borderRadius: 28,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: semantic.overspent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(Icons.settings_backup_restore_rounded,
+                  color: semantic.overspent, size: 24),
+            ),
+            const SizedBox(width: 20),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("RESTORE BACKUP",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 0.5)),
+                  SizedBox(height: 4),
+                  Text("Import data from a previous export",
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded,
+                color: semantic.divider, size: 24),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildExportOption({
-    required BuildContext context,
     required String title,
     required String subtitle,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
+    required AppColors semantic,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border:
-                Border.all(color: Theme.of(context).dividerColor.withAlpha(25)),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withAlpha(25),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(icon, color: color),
+    return HoverWrapper(
+      onTap: onTap,
+      borderRadius: 24,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: semantic.divider, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Text(
-                      subtitle,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                    ),
-                  ],
-                ),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                          letterSpacing: 0.5)),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: semantic.secondaryText)),
+                ],
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
-            ],
-          ),
+            ),
+            Icon(Icons.download_rounded, color: semantic.divider, size: 20),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildOwnershipNotice(BuildContext context) {
+  Widget _buildOwnershipNotice(AppColors semantic) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey.withAlpha(12),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withAlpha(25)),
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+            color: semantic.divider, width: 1.5, style: BorderStyle.none),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded,
-                  size: 18, color: Colors.grey[600]),
-              const SizedBox(width: 8),
-              const Text(
-                "Privacy Note",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "These files contain sensitive financial data. Keep them in a safe place or delete them after use. TrueLedger never stores or sees your exported files.",
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          Icon(Icons.info_outline_rounded,
+              size: 20, color: semantic.secondaryText),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              "TrueLedger never retains a copy of your data on its servers. You are the sole custodian of your financial history.",
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: semantic.secondaryText,
+                  height: 1.4),
+            ),
           ),
         ],
       ),
@@ -965,10 +1012,5 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
 }
 
 extension StringExtension on String {
-  String capitalize() => this[0].toUpperCase() + substring(1);
-}
-
-class RoundedRectangleEdges extends RoundedRectangleBorder {
-  const RoundedRectangleEdges(
-      {super.borderRadius = BorderRadius.zero, super.side = BorderSide.none});
+  String capitalize() => "${this[0].toUpperCase()}${substring(1)}";
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
@@ -22,18 +23,32 @@ class _ScenarioScreenState extends ConsumerState<ScenarioScreen> {
     final dashboardAsync = ref.watch(dashboardProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: semantic.surfaceCombined,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Scenario Mode",
-            style: TextStyle(fontWeight: FontWeight.w900)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+        title: Text(
+          "Scenario Mode",
+          style: TextStyle(
+              fontWeight: FontWeight.w900, color: semantic.text, fontSize: 18),
+        ),
         centerTitle: true,
       ),
       body: dashboardAsync.when(
         data: (data) {
           final catSpending = data.categorySpending;
           if (catSpending.isEmpty) {
-            return const Center(
-                child: Text("Start logging to use Scenario Mode"));
+            return Center(
+              child: Text("Start logging to use Scenario Mode",
+                  style: TextStyle(color: semantic.secondaryText)),
+            );
           }
 
           _selectedCategory ??= catSpending.first['category'] as String;
@@ -47,104 +62,175 @@ class _ScenarioScreenState extends ConsumerState<ScenarioScreen> {
           final yearlySaving = monthlySaving * 12;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.fromLTRB(
+                24, MediaQuery.of(context).padding.top + 80, 24, 60),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "WHAT IF SCANARIO",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
-                    color: semantic.secondaryText,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Simulate your financial future by adjusting today's habits.",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: semantic.text,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Selector
-                Text("Select Category",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        color: semantic.secondaryText)),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: semantic.surfaceCombined,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: semantic.divider),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedCategory,
-                      isExpanded: true,
-                      items: catSpending.map((c) {
-                        final name = c['category'] as String;
-                        return DropdownMenuItem(
-                          value: name,
-                          child: Text(name),
-                        );
-                      }).toList(),
-                      onChanged: (val) =>
-                          setState(() => _selectedCategory = val),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "SIMULATION",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 4,
+                        color: semantic.primary,
+                      ),
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Reduction Slider
-                Text("Reduction Amount: ${(_reductionPercent * 100).toInt()}%",
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
-                Slider(
-                  value: _reductionPercent,
-                  onChanged: (val) => setState(() => _reductionPercent = val),
-                  min: 0.0,
-                  max: 1.0,
-                  divisions: 20,
-                  activeColor: Colors.blue,
-                ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "What if you\nsaved more?",
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        height: 1.1,
+                        letterSpacing: -1.0,
+                      ),
+                    ),
+                  ],
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms)
+                    .slideX(begin: -0.1, end: 0, curve: Curves.easeOutQuint),
 
                 const SizedBox(height: 48),
 
-                // Impact Card
+                // Selector Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: semantic.divider, width: 1.5),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "SELECT CATEGORY",
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                            color: semantic.secondaryText),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: semantic.divider.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedCategory,
+                            isExpanded: true,
+                            dropdownColor: semantic.surfaceCombined,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                color: semantic.text,
+                                fontSize: 16),
+                            items: catSpending.map((c) {
+                              final name = c['category'] as String;
+                              return DropdownMenuItem(
+                                value: name,
+                                child: Text(name),
+                              );
+                            }).toList(),
+                            onChanged: (val) =>
+                                setState(() => _selectedCategory = val),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate(delay: 100.ms).fadeIn(),
+
+                const SizedBox(height: 24),
+
+                // Slider Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: semantic.divider, width: 1.5),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "REDUCTION PERCENT",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                                color: semantic.secondaryText),
+                          ),
+                          Text(
+                            "${(_reductionPercent * 100).toInt()}%",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                color: semantic.primary),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 6,
+                          activeTrackColor: semantic.primary,
+                          inactiveTrackColor: semantic.divider,
+                          thumbColor: semantic.primary,
+                          overlayColor: semantic.primary.withValues(alpha: 0.1),
+                          valueIndicatorColor: semantic.primary,
+                        ),
+                        child: Slider(
+                          value: _reductionPercent,
+                          onChanged: (val) =>
+                              setState(() => _reductionPercent = val),
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate(delay: 200.ms).fadeIn(),
+
+                const SizedBox(height: 48),
+
+                // Impact Card (The Wow element)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue, Colors.blue.withValues(alpha: 0.8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: semantic.primary,
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withValues(alpha: 0.3),
-                        blurRadius: 24,
-                        offset: const Offset(0, 12),
+                        color: semantic.primary.withValues(alpha: 0.3),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
                       ),
                     ],
                   ),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         "PROJECTED YEARLY SAVINGS",
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 11,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: 1,
+                          letterSpacing: 2,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -152,36 +238,38 @@ class _ScenarioScreenState extends ConsumerState<ScenarioScreen> {
                         CurrencyFormatter.format(yearlySaving, compact: false),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 42,
+                          fontSize: 48,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: -1,
+                          letterSpacing: -2,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          "If you reduce your $_selectedCategory spending by ${(_reductionPercent * 100).toInt()}%, you'll have ${CurrencyFormatter.format(monthlySaving)} extra every month.",
+                          "Cutting your $_selectedCategory bills by ${(_reductionPercent * 100).toInt()}% frees up ${CurrencyFormatter.format(monthlySaving)} every single month.",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                             height: 1.5,
                           ),
                         ),
                       ),
                     ],
                   ),
-                ).animate().fadeIn().scale(delay: 200.ms),
+                )
+                    .animate(delay: 300.ms)
+                    .fadeIn(duration: 800.ms)
+                    .scale(curve: Curves.easeOutBack),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
 
-                // Wealth Impact
                 Text(
                   "WEALTH IMPACT",
                   style: TextStyle(
@@ -191,52 +279,84 @@ class _ScenarioScreenState extends ConsumerState<ScenarioScreen> {
                     color: semantic.secondaryText,
                   ),
                 ),
-                const SizedBox(height: 16),
-                _ImpactRow(
+                const SizedBox(height: 24),
+                _ImpactTile(
+                  semantic: semantic,
                   label: "1 Year Progress",
                   value: "+${CurrencyFormatter.format(yearlySaving)}",
-                  color: semantic.income,
-                ),
-                const SizedBox(height: 12),
-                _ImpactRow(
-                  label: "5 Year Progress",
+                  icon: Icons.auto_graph_rounded,
+                ).animate(delay: 400.ms).fadeIn().slideY(begin: 0.1, end: 0),
+                const SizedBox(height: 16),
+                _ImpactTile(
+                  semantic: semantic,
+                  label: "5 Year Milestones",
                   value: "+${CurrencyFormatter.format(yearlySaving * 5)}",
-                  color: semantic.income,
-                ),
+                  icon: Icons.account_balance_rounded,
+                ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.1, end: 0),
               ],
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text("Error: $err")),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: semantic.primary)),
+        error: (err, stack) => Center(
+            child: Text("Simulation failed: $err",
+                style: TextStyle(color: semantic.overspent))),
       ),
     );
   }
 }
 
-class _ImpactRow extends StatelessWidget {
+class _ImpactTile extends StatelessWidget {
+  final AppColors semantic;
   final String label;
   final String value;
-  final Color color;
+  final IconData icon;
 
-  const _ImpactRow(
-      {required this.label, required this.value, required this.color});
+  const _ImpactTile({
+    required this.semantic,
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).extension<AppColors>()!.surfaceCombined,
-        borderRadius: BorderRadius.circular(20),
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
-          Text(value,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: semantic.success.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 20, color: semantic.success),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
               style: TextStyle(
-                  fontWeight: FontWeight.w900, color: color, fontSize: 18)),
+                  fontWeight: FontWeight.w800,
+                  color: semantic.text,
+                  fontSize: 14),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: semantic.success,
+                fontSize: 18,
+                letterSpacing: -0.5),
+          ),
         ],
       ),
     );

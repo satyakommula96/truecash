@@ -1,66 +1,75 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Semantic Colors mapped from the USER's HTML sample tokens
+  // New Design System 2.0 - Premium Slate & Indigo Palette
   static AppColors darkColors = AppColors(
-    income: const Color(0xFF34D399), // --green (Dark)
-    expense: const Color(0xFFE5E7EB), // --text-primary (Dark)
-    overspent: const Color(0xFFF87171), // --danger (Dark)
-    warning: const Color(0xFFFBBF24), // --warning (Dark)
-    divider: const Color(0xFF334155), // --border (Dark)
-    secondaryText: const Color(0xFF9CA3AF), // --text-secondary (Dark)
-    surfaceCombined: const Color(0xFF1E293B),
-    shimmer: Colors.white12,
-    text: const Color(0xFFE5E7EB),
-    success: const Color(0xFF34D399),
+    income: const Color(0xFF10B981), // Emerald 500
+    expense: const Color(0xFFE2E8F0), // Slate 200 (for general text)
+    overspent: const Color(0xFFF43F5E), // Rose 500
+    warning: const Color(0xFFF59E0B), // Amber 500
+    divider: const Color(0xFF1E293B), // Slate 800
+    secondaryText: const Color(0xFF94A3B8), // Slate 400
+    surfaceCombined: const Color(0xFF0F172A), // Slate 900
+    shimmer: Colors.white10,
+    text: const Color(0xFFF8FAFC), // Slate 50
+    success: const Color(0xFF10B981), // Emerald 500
+    primary: const Color(0xFF6366F1), // Indigo 500
   );
 
   static AppColors lightColors = AppColors(
-    income: const Color(0xFF2ECC71), // --green (Light)
-    expense: const Color(0xFF1F2933), // --text-primary (Light)
-    overspent: const Color(0xFFE74C3C), // --danger (Light)
-    warning: const Color(0xFFF39C12), // --warning (Light)
-    divider: const Color(0xFFE5E7EB), // --border (Light)
-    secondaryText: const Color(0xFF6B7280), // --text-secondary (Light)
-    surfaceCombined: const Color(0xFFEFF6FF),
+    income: const Color(0xFF059669), // Emerald 600
+    expense: const Color(0xFF1E293B), // Slate 800
+    overspent: const Color(0xFFE11D48), // Rose 600
+    warning: const Color(0xFFD97706), // Amber 600
+    divider: const Color(0xFFE2E8F0), // Slate 200
+    secondaryText: const Color(0xFF64748B), // Slate 500
+    surfaceCombined: const Color(0xFFF1F5F9), // Slate 100
     shimmer: Colors.black12,
-    text: const Color(0xFF1F2933),
-    success: const Color(0xFF2ECC71),
+    text: const Color(0xFF0F172A), // Slate 900
+    success: const Color(0xFF059669),
+    primary: const Color(0xFF4F46E5), // Indigo 600
   );
-
-  // ... (ThemeData logic remains same, but AppColors structure updates below)
 
   static ThemeData get darkTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
         extensions: [darkColors],
-        colorScheme: const ColorScheme.dark(
-          primary:
-              Color(0xFF34D399), // Primary action color (Green from sample)
+        colorScheme: ColorScheme.dark(
+          primary: darkColors.primary,
           onPrimary: Colors.white,
-          surface: Color(0xFF1E293B), // --bg (Dark)
-          onSurface: Color(0xFFE5E7EB),
-          outline: Color(0xFF334155), // --border (Dark)
+          surface: darkColors.surfaceCombined,
+          onSurface: darkColors.text,
+          outline: darkColors.divider,
+          error: darkColors.overspent,
         ),
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-        appBarTheme: const AppBarTheme(
+        scaffoldBackgroundColor: const Color(0xFF020617), // Slate 950
+        appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: false,
           titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFFE5E7EB)),
-          iconTheme: IconThemeData(color: Color(0xFFE5E7EB)),
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: darkColors.text,
+            letterSpacing: -1,
+          ),
+          iconTheme: IconThemeData(color: darkColors.text),
         ),
         fontFamily: 'Outfit',
         cardTheme: CardThemeData(
-          color: const Color(0xFF1E293B),
+          color: darkColors.surfaceCombined,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFF334155), width: 1),
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: darkColors.divider, width: 1.5),
           ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: darkColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
@@ -77,33 +86,43 @@ class AppTheme {
         useMaterial3: true,
         brightness: Brightness.light,
         extensions: [lightColors],
-        colorScheme: const ColorScheme.light(
-          primary:
-              Color(0xFF2ECC71), // Primary action color (Green from sample)
+        colorScheme: ColorScheme.light(
+          primary: lightColors.primary,
           onPrimary: Colors.white,
-          surface: Color(0xFFF6F7F9), // --bg (Light)
-          onSurface: Color(0xFF1F2933),
-          outline: Color(0xFFE5E7EB), // --border (Light)
+          surface: lightColors.surfaceCombined,
+          onSurface: lightColors.text,
+          outline: lightColors.divider,
+          error: lightColors.overspent,
         ),
-        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-        appBarTheme: const AppBarTheme(
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC), // Slate 50
+        appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: false,
           titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1F2933)),
-          iconTheme: IconThemeData(color: Color(0xFF1F2933)),
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: lightColors.text,
+            letterSpacing: -1,
+          ),
+          iconTheme: IconThemeData(color: lightColors.text),
         ),
         fontFamily: 'Outfit',
         cardTheme: CardThemeData(
-          color: const Color(0xFFF6F7F9),
-          elevation: 0,
+          color: Colors.white,
+          elevation: 2,
+          shadowColor: lightColors.divider.withOpacity(0.4),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: lightColors.divider, width: 1),
           ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: lightColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
@@ -128,6 +147,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color shimmer;
   final Color text;
   final Color success;
+  final Color primary;
 
   AppColors({
     required this.income,
@@ -140,20 +160,23 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.shimmer,
     required this.text,
     required this.success,
+    required this.primary,
   });
 
   @override
-  ThemeExtension<AppColors> copyWith(
-      {Color? income,
-      Color? expense,
-      Color? overspent,
-      Color? warning,
-      Color? divider,
-      Color? secondaryText,
-      Color? surfaceCombined,
-      Color? shimmer,
-      Color? text,
-      Color? success}) {
+  ThemeExtension<AppColors> copyWith({
+    Color? income,
+    Color? expense,
+    Color? overspent,
+    Color? warning,
+    Color? divider,
+    Color? secondaryText,
+    Color? surfaceCombined,
+    Color? shimmer,
+    Color? text,
+    Color? success,
+    Color? primary,
+  }) {
     return AppColors(
       income: income ?? this.income,
       expense: expense ?? this.expense,
@@ -165,6 +188,7 @@ class AppColors extends ThemeExtension<AppColors> {
       shimmer: shimmer ?? this.shimmer,
       text: text ?? this.text,
       success: success ?? this.success,
+      primary: primary ?? this.primary,
     );
   }
 
@@ -182,6 +206,7 @@ class AppColors extends ThemeExtension<AppColors> {
       shimmer: Color.lerp(shimmer, other.shimmer, t)!,
       text: Color.lerp(text, other.text, t)!,
       success: Color.lerp(success, other.success, t)!,
+      primary: Color.lerp(primary, other.primary, t)!,
     );
   }
 }

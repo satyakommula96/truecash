@@ -27,20 +27,13 @@ class SummaryCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: 24,
       glowColor: valueColor,
-      glowOpacity: 0.15,
+      glowOpacity: 0.1,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              valueColor.withValues(alpha: 0.1),
-              valueColor.withValues(alpha: 0.02),
-            ],
-          ),
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: valueColor.withValues(alpha: 0.2)),
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,39 +41,37 @@ class SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(label.toUpperCase(),
-                      style: TextStyle(
-                          fontSize: 10,
-                          color: semantic.secondaryText,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1),
-                ),
-                const SizedBox(width: 4),
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: valueColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, size: 14, color: valueColor),
+                  child: Icon(icon, size: 16, color: valueColor),
+                ),
+                Text(
+                  label.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: semantic.secondaryText,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Semantics(
-              container: true,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(value,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: valueColor,
-                        letterSpacing: -0.5)),
+            const SizedBox(height: 20),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: semantic.text,
+                  letterSpacing: -0.5,
+                ),
               ),
             ),
           ],
@@ -112,67 +103,63 @@ class FullWidthSummaryCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: 24,
       glowColor: valueColor,
-      glowOpacity: 0.15,
+      glowOpacity: 0.1,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              valueColor.withValues(alpha: 0.1),
-              valueColor.withValues(alpha: 0.02),
-            ],
-          ),
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: valueColor.withValues(alpha: 0.2)),
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: valueColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                valueColor == semantic.income
+                    ? Icons.account_balance_wallet_rounded
+                    : Icons.receipt_long_rounded,
+                size: 20,
+                color: valueColor,
+              ),
+            ),
+            const SizedBox(width: 16),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: valueColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      valueColor == semantic.income
-                          ? Icons.account_balance_wallet_outlined
-                          : Icons.receipt_long_outlined,
-                      size: 16,
-                      color: valueColor,
+                  Text(
+                    label.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(label.toUpperCase(),
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: semantic.secondaryText,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            Semantics(
-              container: true,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(value,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: valueColor,
-                        letterSpacing: -0.5)),
-              ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: semantic.secondaryText.withValues(alpha: 0.5),
             ),
           ],
         ),

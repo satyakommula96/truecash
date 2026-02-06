@@ -1,21 +1,22 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:trueledger/main.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/providers/user_provider.dart';
 import 'package:trueledger/core/providers/version_provider.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
 import 'package:trueledger/core/providers/shared_prefs_provider.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
 import 'package:trueledger/presentation/screens/settings/trust_center.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
@@ -25,93 +26,85 @@ import 'package:trueledger/domain/services/intelligence_service.dart';
 import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/presentation/providers/insights_provider.dart';
 import 'package:trueledger/presentation/providers/analysis_provider.dart';
+import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  Future<void> _showNamePicker(BuildContext context, WidgetRef ref) async {
+  Future<void> _showNamePicker(
+      BuildContext context, WidgetRef ref, AppColors semantic) async {
     final currentName = ref.read(userProvider);
     final controller = TextEditingController(text: currentName);
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Set User Name"),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: "Enter your name",
-            labelText: "Name",
-          ),
-          maxLength: 20,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("CANCEL"),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                ref.read(userProvider.notifier).setName(controller.text.trim());
-              }
-              Navigator.pop(context);
-            },
-            child: const Text("SAVE"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showThemePicker(BuildContext context, WidgetRef ref) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    if (!context.mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Select Theme"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text("System Default"),
-              leading: const Icon(Icons.settings_suggest_rounded),
-              onTap: () {
-                themeNotifier.value = ThemeMode.system;
-                prefs.setString('theme_mode', 'system');
-                Navigator.pop(context);
-              },
-              trailing: themeNotifier.value == ThemeMode.system
-                  ? const Icon(Icons.check, color: Colors.blue)
-                  : null,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: AlertDialog(
+          backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5)),
+          title: Text("SET USER NAME",
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1.5,
+                  color: semantic.text)),
+          content: TextField(
+            controller: controller,
+            style: TextStyle(color: semantic.text, fontWeight: FontWeight.w900),
+            decoration: InputDecoration(
+              hintText: "Enter your name",
+              hintStyle: TextStyle(
+                  color: semantic.secondaryText.withValues(alpha: 0.5)),
+              labelText: "NAME",
+              labelStyle: TextStyle(
+                  color: semantic.secondaryText,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2),
+              filled: true,
+              fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: semantic.divider, width: 1.5)),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: semantic.divider, width: 1.5)),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: semantic.primary, width: 2)),
             ),
-            ListTile(
-              title: const Text("Light Mode"),
-              leading: const Icon(Icons.light_mode_rounded),
-              onTap: () {
-                themeNotifier.value = ThemeMode.light;
-                prefs.setString('theme_mode', 'light');
-                Navigator.pop(context);
-              },
-              trailing: themeNotifier.value == ThemeMode.light
-                  ? const Icon(Icons.check, color: Colors.blue)
-                  : null,
+            maxLength: 20,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("CANCEL",
+                  style: TextStyle(
+                      color: semantic.secondaryText,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12)),
             ),
-            ListTile(
-              title: const Text("Dark Mode"),
-              leading: const Icon(Icons.dark_mode_rounded),
-              onTap: () {
-                themeNotifier.value = ThemeMode.dark;
-                prefs.setString('theme_mode', 'dark');
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  ref
+                      .read(userProvider.notifier)
+                      .setName(controller.text.trim());
+                }
                 Navigator.pop(context);
               },
-              trailing: themeNotifier.value == ThemeMode.dark
-                  ? const Icon(Icons.check, color: Colors.blue)
-                  : null,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: semantic.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12))),
+              child: const Text("SAVE",
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
             ),
           ],
         ),
@@ -119,7 +112,90 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _showCurrencyPicker(BuildContext context) async {
+  Future<void> _showThemePicker(
+      BuildContext context, WidgetRef ref, AppColors semantic) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: AlertDialog(
+          backgroundColor: semantic.surfaceCombined.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+              side: BorderSide(color: semantic.divider, width: 1.5)),
+          title: Text("SELECT THEME",
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1.5,
+                  color: semantic.text)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildThemeTile("System Default", Icons.settings_suggest_rounded,
+                  ThemeMode.system, ref, prefs, semantic, context),
+              const SizedBox(height: 8),
+              _buildThemeTile("Light Mode", Icons.light_mode_rounded,
+                  ThemeMode.light, ref, prefs, semantic, context),
+              const SizedBox(height: 8),
+              _buildThemeTile("Dark Mode", Icons.dark_mode_rounded,
+                  ThemeMode.dark, ref, prefs, semantic, context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeTile(String label, IconData icon, ThemeMode mode,
+      WidgetRef ref, dynamic prefs, AppColors semantic, BuildContext context) {
+    final isSelected = themeNotifier.value == mode;
+    return InkWell(
+      onTap: () {
+        themeNotifier.value = mode;
+        prefs.setString('theme_mode', mode.toString().split('.').last);
+        Navigator.pop(context);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? semantic.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: isSelected
+                  ? semantic.primary.withValues(alpha: 0.3)
+                  : Colors.transparent),
+        ),
+        child: Row(
+          children: [
+            Icon(icon,
+                color: isSelected ? semantic.primary : semantic.secondaryText),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(label.toUpperCase(),
+                  style: TextStyle(
+                      color: isSelected ? semantic.primary : semantic.text,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                      letterSpacing: 0.5)),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded,
+                  color: semantic.primary, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showCurrencyPicker(
+      BuildContext context, AppColors semantic) async {
     String searchQuery = "";
     showModalBottomSheet(
       context: context,
@@ -131,8 +207,9 @@ class SettingsScreen extends ConsumerWidget {
         maxChildSize: 0.9,
         builder: (_, controller) => Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            color: semantic.surfaceCombined,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(color: semantic.divider, width: 1.5),
           ),
           child: Column(
             children: [
@@ -141,25 +218,26 @@ class SettingsScreen extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: semantic.divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(24.0),
                 child: Row(
                   children: [
                     Text(
-                      "Select Currency",
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      "SELECT CURRENCY",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.text,
+                        letterSpacing: 1,
+                      ),
                     ),
                     const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    _buildIconButton(
+                        Icons.close, () => Navigator.pop(context), semantic),
                   ],
                 ),
               ),
@@ -171,20 +249,36 @@ class SettingsScreen extends ConsumerWidget {
                     return Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
                           child: TextField(
+                            style: TextStyle(
+                                color: semantic.text,
+                                fontWeight: FontWeight.w900),
                             decoration: InputDecoration(
                               hintText: "Search currency...",
-                              prefixIcon: const Icon(Icons.search),
+                              hintStyle: TextStyle(
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.5)),
+                              prefixIcon: Icon(Icons.search_rounded,
+                                  color: semantic.secondaryText),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: semantic.divider, width: 1.5),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: semantic.divider, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: semantic.primary, width: 2),
                               ),
                               filled: true,
-                              fillColor: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey[900]
-                                  : Colors.grey[100],
+                              fillColor: semantic.surfaceCombined
+                                  .withValues(alpha: 0.3),
                             ),
                             onChanged: (val) {
                               setModalState(() {
@@ -193,10 +287,11 @@ class SettingsScreen extends ConsumerWidget {
                             },
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         Expanded(
                           child: ListView(
                             controller: controller,
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                             children: CurrencyFormatter.currencies.entries
                                 .where((e) =>
                                     e.key.toLowerCase().contains(searchQuery) ||
@@ -205,44 +300,83 @@ class SettingsScreen extends ConsumerWidget {
                                         .contains(searchQuery))
                                 .map((entry) {
                               final isSelected = currentCurrency == entry.key;
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: isSelected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainerHighest,
-                                  child: Text(
-                                    entry.value,
-                                    style: TextStyle(
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: InkWell(
+                                  onTap: () {
+                                    CurrencyFormatter.setCurrency(entry.key);
+                                    Navigator.pop(context);
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
                                       color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                      fontWeight: FontWeight.bold,
+                                          ? semantic.primary
+                                              .withValues(alpha: 0.1)
+                                          : semantic.surfaceCombined
+                                              .withValues(alpha: 0.3),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: isSelected
+                                              ? semantic.primary
+                                                  .withValues(alpha: 0.3)
+                                              : semantic.divider,
+                                          width: 1.5),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 48,
+                                          height: 48,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? semantic.primary
+                                                : semantic.divider,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            entry.value,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                entry.key,
+                                                style: TextStyle(
+                                                    color: semantic.text,
+                                                    fontWeight: FontWeight.w900,
+                                                    fontSize: 16),
+                                              ),
+                                              Text(
+                                                _getCurrencyName(entry.key),
+                                                style: TextStyle(
+                                                    color:
+                                                        semantic.secondaryText,
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (isSelected)
+                                          Icon(Icons.check_circle_rounded,
+                                              color: semantic.primary),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                title: Text(
-                                  entry.key,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                subtitle: Text(_getCurrencyName(
-                                    entry.key)), // Helper for full names
-                                trailing: isSelected
-                                    ? Icon(Icons.check_circle,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary)
-                                    : null,
-                                onTap: () {
-                                  CurrencyFormatter.setCurrency(entry.key);
-                                  Navigator.pop(context);
-                                },
                               );
                             }).toList(),
                           ),
@@ -255,6 +389,22 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton(
+      IconData icon, VoidCallback onTap, AppColors semantic) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: semantic.divider.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, size: 20, color: semantic.text),
       ),
     );
   }
@@ -294,31 +444,86 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _seedData(BuildContext context, WidgetRef ref) async {
+  Future<void> _seedData(
+      BuildContext context, WidgetRef ref, AppColors semantic) async {
     final option = await showDialog<String>(
         context: context,
-        builder: (context) => SimpleDialog(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        builder: (context) => BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: SimpleDialog(
+                backgroundColor:
+                    semantic.surfaceCombined.withValues(alpha: 0.9),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                    side: BorderSide(color: semantic.divider, width: 1.5)),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("SELECT DATA SCENARIO",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            letterSpacing: 1.2,
+                            color: semantic.text)),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Fictional data for demonstration only.",
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: semantic.secondaryText),
+                    ),
+                  ],
+                ),
                 children: [
-                  const Text("Select Data Scenario"),
-                  const SizedBox(height: 4),
-                  Text(
-                    "This data is fictional and for demonstration only.",
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  SimpleDialogOption(
+                    onPressed: () => Navigator.pop(context, 'roadmap'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: semantic.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                              color: semantic.primary.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: semantic.primary.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(Icons.star_rounded,
+                                  color: semantic.primary, size: 20),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("COMPLETE DEMO",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 13,
+                                          color: semantic.text)),
+                                  Text("All features, including Streaks",
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: semantic.secondaryText)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              children: [
-                SimpleDialogOption(
-                  onPressed: () => Navigator.pop(context, 'roadmap'),
-                  child: const ListTile(
-                    leading: Icon(Icons.star_rounded, color: Colors.purple),
-                    title: Text("Complete Demo"),
-                    subtitle: Text("All features, including Streaks"),
-                  ),
-                ),
-              ],
             ));
 
     if (option != null) {
@@ -327,51 +532,69 @@ class SettingsScreen extends ConsumerWidget {
       try {
         if (option == 'roadmap') {
           await repo.seedRoadmapData();
-        } else if (option == 'positive') {
-          await repo.seedHealthyProfile();
-        } else if (option == 'negative') {
-          await repo.seedAtRiskProfile();
         }
 
         if (context.mounted) {
-          final scenarioName = option == 'roadmap'
-              ? "Complete Demo"
-              : option == 'positive'
-                  ? "Healthy Profile"
-                  : option == 'negative'
-                      ? "At-Risk Profile"
-                      : option.toUpperCase();
+          final scenarioName =
+              option == 'roadmap' ? "COMPLETE DEMO" : option.toUpperCase();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Generated $scenarioName data scenario")));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("GENERATED $scenarioName DATA SCENARIO"),
+            backgroundColor: semantic.primary,
+          ));
           Navigator.pop(context, true);
         }
-      } catch (e, stack) {
+      } catch (e) {
         debugPrint("Data seeding failed: $e");
-        if (kDebugMode) {
-          debugPrint(stack.toString());
-          throw Exception("Data seeding failed: $e\n$stack");
-        }
       }
     }
   }
 
-  Future<void> _resetData(BuildContext context, WidgetRef ref) async {
+  Future<void> _resetData(
+      BuildContext context, WidgetRef ref, AppColors semantic) async {
     final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-              title: const Text("Delete All Data?"),
-              content: const Text(
-                  "This action cannot be undone. All entries, budgets, and cards will be wiped."),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text("CANCEL")),
-                TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text("DELETE ALL",
-                        style: TextStyle(color: Colors.red))),
-              ],
+        builder: (context) => BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: AlertDialog(
+                backgroundColor:
+                    semantic.surfaceCombined.withValues(alpha: 0.9),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                    side: BorderSide(color: semantic.divider, width: 1.5)),
+                title: Text("DELETE ALL DATA?",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        letterSpacing: 1.2,
+                        color: semantic.overspent)),
+                content: Text(
+                  "This action cannot be undone. All entries, budgets, and cards will be wiped.",
+                  style: TextStyle(
+                      color: semantic.text,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text("CANCEL",
+                          style: TextStyle(
+                              color: semantic.secondaryText,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12))),
+                  ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: semantic.overspent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      child: const Text("DELETE ALL",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 12))),
+                ],
+              ),
             ));
 
     if (confirmed == true) {
@@ -379,37 +602,29 @@ class SettingsScreen extends ConsumerWidget {
         final repo = ref.read(financialRepositoryProvider);
         final notificationService = ref.read(notificationServiceProvider);
 
-        // Clear all data sources
         await repo.clearData();
         ref.read(intelligenceServiceProvider).resetAll();
         await notificationService.cancelAllNotifications();
 
-        // Invalidate all providers
         ref.invalidate(dashboardProvider);
         ref.invalidate(insightsProvider);
         ref.invalidate(analysisProvider);
 
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("All data has been reset")));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text("ALL DATA HAS BEEN RESET"),
+            backgroundColor: semantic.overspent,
+          ));
           Navigator.pop(context, true);
         }
-      } catch (e, stack) {
+      } catch (e) {
         debugPrint("Reset failed: $e");
-        if (kDebugMode) {
-          throw Exception("Application Reset failed: $e\n$stack");
-        }
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Reset failed: ${e.toString()}")));
-        }
       }
     }
   }
 
   String _generateRecoveryKey() {
-    const chars =
-        'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed similar looking chars
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final rnd = Random();
     return List.generate(14, (index) {
       if (index == 4 || index == 9) return '-';
@@ -417,186 +632,314 @@ class SettingsScreen extends ConsumerWidget {
     }).join();
   }
 
-  Future<void> _showRecoveryKeyDialog(BuildContext context, String key) async {
+  Future<void> _showRecoveryKeyDialog(
+      BuildContext context, String key, AppColors semantic) async {
     bool checked = false;
     await showDialog(
         barrierDismissible: false,
         context: context,
         builder: (ctx) {
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              title: const Text("Recovery Key Generated"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                      "SAVE THIS KEY SECURELY.\n\nIf you forget your PIN, this is the ONLY way to recover your data without resetting.\n\nIf you lose this key, your data cannot be recovered."),
-                  const SizedBox(height: 16),
-                  InkWell(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: key));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Copied to clipboard")));
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                            color: Colors.grey.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                                color: Colors.grey.withValues(alpha: 0.3))),
-                        child: Text(key,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2))),
-                  ),
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text("I have safely saved this key",
-                          style: TextStyle(fontSize: 14)),
-                      value: checked,
-                      onChanged: (v) => setState(() => checked = v ?? false))
+          return BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                backgroundColor:
+                    semantic.surfaceCombined.withValues(alpha: 0.9),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                    side: BorderSide(color: semantic.divider, width: 1.5)),
+                title: Text("RECOVERY KEY GENERATED",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        letterSpacing: 1.2,
+                        color: semantic.text)),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "SAVE THIS KEY SECURELY.\n\nIf you forget your PIN, this is the ONLY way to recover your data without resetting.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: semantic.secondaryText),
+                    ),
+                    const SizedBox(height: 24),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: key));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("COPIED TO CLIPBOARD"),
+                                duration: Duration(seconds: 1)));
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          decoration: BoxDecoration(
+                              color: semantic.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                  color:
+                                      semantic.primary.withValues(alpha: 0.3))),
+                          child: Text(key,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  color: semantic.primary,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2))),
+                    ),
+                    const SizedBox(height: 24),
+                    CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: semantic.primary,
+                        title: Text("I HAVE SAFELY SAVED THIS KEY",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: semantic.text,
+                                letterSpacing: 0.5)),
+                        value: checked,
+                        onChanged: (v) => setState(() => checked = v ?? false))
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Share.share(
+                            "TrueLedger Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
+                      },
+                      child: Text("SHARE SECURELY",
+                          style: TextStyle(
+                              color: semantic.primary,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12))),
+                  ElevatedButton(
+                      onPressed: checked ? () => Navigator.pop(ctx) : null,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: semantic.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      child: const Text("DONE",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 12))),
                 ],
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      // ignore: deprecated_member_use
-                      Share.share(
-                          "TrueLedger Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
-                    },
-                    child: const Text("SHARE SECURELY")),
-                TextButton(
-                    onPressed: checked ? () => Navigator.pop(ctx) : null,
-                    child: const Text("DONE"))
-              ],
-            );
-          });
+              );
+            }),
+          );
         });
   }
 
-  Future<bool> _verifyPin(BuildContext context, String correctPin) async {
+  Future<bool> _verifyPin(
+      BuildContext context, String correctPin, AppColors semantic) async {
     String input = "";
     return await showDialog<bool>(
             context: context,
             builder: (ctx) {
               bool obscure = true;
-              return StatefulBuilder(
-                builder: (context, setState) {
-                  return AlertDialog(
-                    title: const Text("Verify PIN"),
-                    content: TextField(
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      obscureText: obscure,
-                      maxLength: correctPin.length,
-                      onChanged: (v) => input = v,
-                      decoration: InputDecoration(
-                        hintText: "Enter current PIN",
-                        suffixIcon: IconButton(
-                          icon: Icon(obscure
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded),
-                          onPressed: () => setState(() => obscure = !obscure),
+              return BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    return AlertDialog(
+                      backgroundColor:
+                          semantic.surfaceCombined.withValues(alpha: 0.9),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                          side:
+                              BorderSide(color: semantic.divider, width: 1.5)),
+                      title: Text("VERIFY PIN",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
+                              letterSpacing: 1.5,
+                              color: semantic.text)),
+                      content: TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.number,
+                        obscureText: obscure,
+                        maxLength: correctPin.length,
+                        style: TextStyle(
+                            color: semantic.text, fontWeight: FontWeight.w900),
+                        onChanged: (v) => input = v,
+                        decoration: InputDecoration(
+                          hintText: "Enter current PIN",
+                          filled: true,
+                          fillColor:
+                              semantic.surfaceCombined.withValues(alpha: 0.3),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(color: semantic.divider)),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                                obscure
+                                    ? Icons.visibility_rounded
+                                    : Icons.visibility_off_rounded,
+                                color: semantic.secondaryText),
+                            onPressed: () => setState(() => obscure = !obscure),
+                          ),
                         ),
                       ),
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text("CANCEL")),
-                      TextButton(
-                          onPressed: () =>
-                              Navigator.pop(ctx, input == correctPin),
-                          child: const Text("VERIFY")),
-                    ],
-                  );
-                },
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text("CANCEL",
+                                style: TextStyle(
+                                    color: semantic.secondaryText,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12))),
+                        ElevatedButton(
+                            onPressed: () =>
+                                Navigator.pop(ctx, input == correctPin),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: semantic.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12))),
+                            child: const Text("VERIFY",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12))),
+                      ],
+                    );
+                  },
+                ),
               );
             }) ??
         false;
   }
 
-  Future<void> _setupPin(BuildContext context) async {
+  Future<void> _setupPin(BuildContext context, AppColors semantic) async {
     const storage = FlutterSecureStorage();
     final currentPin = await storage.read(key: 'app_pin');
 
     if (!context.mounted) return;
 
     if (currentPin != null) {
-      // PIN is set - Show management options
       await showDialog(
           context: context,
-          builder: (ctx) => AlertDialog(
-                title: const Text("App Security"),
-                content: const Text("Manage your security settings."),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text("CANCEL",
-                          style: TextStyle(color: Colors.grey))),
-                  TextButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        // Verify PIN first
-                        bool verified = await _verifyPin(context, currentPin);
-                        if (verified && context.mounted) {
-                          final key = await storage.read(key: 'recovery_key') ??
-                              "No key found (Legacy)";
-                          if (context.mounted) {
-                            _showRecoveryKeyDialog(context, key);
+          builder: (ctx) => BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: AlertDialog(
+                  backgroundColor:
+                      semantic.surfaceCombined.withValues(alpha: 0.9),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                      side: BorderSide(color: semantic.divider, width: 1.5)),
+                  title: Text("APP SECURITY",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 1.5,
+                          color: semantic.text)),
+                  content: Text("Manage your security settings.",
+                      style: TextStyle(
+                          color: semantic.text,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13)),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text("CANCEL",
+                            style: TextStyle(
+                                color: semantic.secondaryText,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12))),
+                    TextButton(
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          bool verified =
+                              await _verifyPin(context, currentPin, semantic);
+                          if (verified && context.mounted) {
+                            final key =
+                                await storage.read(key: 'recovery_key') ??
+                                    "No key found (Legacy)";
+                            if (context.mounted) {
+                              _showRecoveryKeyDialog(context, key, semantic);
+                            }
                           }
-                        }
-                      },
-                      child: const Text("VIEW RECOVERY KEY",
-                          style: TextStyle(fontWeight: FontWeight.bold))),
-                  TextButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
+                        },
+                        child: Text("VIEW RECOVERY KEY",
+                            style: TextStyle(
+                                color: semantic.primary,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12))),
+                    TextButton(
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          bool verified =
+                              await _verifyPin(context, currentPin, semantic);
+                          if (!verified) return;
+                          if (!context.mounted) return;
 
-                        // Verify PIN first before removing
-                        bool verified = await _verifyPin(context, currentPin);
-                        if (!verified) return;
+                          final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (c) => BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 12, sigmaY: 12),
+                                    child: AlertDialog(
+                                        backgroundColor: semantic
+                                            .surfaceCombined
+                                            .withValues(alpha: 0.9),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(32),
+                                            side: BorderSide(
+                                                color: semantic.divider,
+                                                width: 1.5)),
+                                        title: Text("REMOVE SECURITY PIN?",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 14,
+                                                color: semantic.overspent)),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(c, false),
+                                              child: Text("CANCEL",
+                                                  style: TextStyle(
+                                                      color: semantic
+                                                          .secondaryText,
+                                                      fontWeight:
+                                                          FontWeight.w900))),
+                                          ElevatedButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(c, true),
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      semantic.overspent),
+                                              child: const Text("REMOVE",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w900))),
+                                        ]),
+                                  ));
 
-                        if (!context.mounted) return;
-
-                        final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (c) => AlertDialog(
-                                    title: const Text("Remove Security PIN?"),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(c, false),
-                                          child: const Text("CANCEL")),
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(c, true),
-                                          child: const Text("REMOVE",
-                                              style: TextStyle(
-                                                  color: Colors.red))),
-                                    ]));
-
-                        if (confirm == true) {
-                          await storage.delete(key: 'app_pin');
-                          await storage.delete(key: 'recovery_key');
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("PIN Removed")));
+                          if (confirm == true) {
+                            await storage.delete(key: 'app_pin');
+                            await storage.delete(key: 'recovery_key');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: const Text("PIN REMOVED"),
+                                backgroundColor: semantic.overspent,
+                              ));
+                            }
                           }
-                        }
-                      },
-                      child: const Text("REMOVE PIN",
-                          style: TextStyle(color: Colors.red))),
-                ],
+                        },
+                        child: Text("REMOVE PIN",
+                            style: TextStyle(
+                                color: semantic.overspent,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12))),
+                  ],
+                ),
               ));
     } else {
-      // Set new PIN
       String newPin = "";
       int targetLength = 4;
 
@@ -604,148 +947,215 @@ class SettingsScreen extends ConsumerWidget {
           context: context,
           builder: (ctx) {
             bool obscure = true;
-            return StatefulBuilder(builder: (context, setState) {
-              return AlertDialog(
-                title: Text("Set $targetLength-Digit PIN"),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      maxLength: targetLength,
-                      obscureText: obscure,
-                      onChanged: (val) => newPin = val,
-                      decoration: InputDecoration(
-                        hintText: "Enter PIN",
-                        suffixIcon: IconButton(
-                          icon: Icon(obscure
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded),
-                          onPressed: () => setState(() => obscure = !obscure),
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: StatefulBuilder(builder: (context, setState) {
+                return AlertDialog(
+                  backgroundColor:
+                      semantic.surfaceCombined.withValues(alpha: 0.9),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                      side: BorderSide(color: semantic.divider, width: 1.5)),
+                  title: Text("SET $targetLength-DIGIT PIN",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 1.5,
+                          color: semantic.text)),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        autofocus: true,
+                        keyboardType: TextInputType.number,
+                        maxLength: targetLength,
+                        obscureText: obscure,
+                        style: TextStyle(
+                            color: semantic.text, fontWeight: FontWeight.w900),
+                        onChanged: (val) => newPin = val,
+                        decoration: InputDecoration(
+                          hintText: "Enter PIN",
+                          hintStyle: TextStyle(
+                              color: semantic.secondaryText
+                                  .withValues(alpha: 0.5)),
+                          filled: true,
+                          fillColor:
+                              semantic.surfaceCombined.withValues(alpha: 0.3),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(color: semantic.divider)),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                                obscure
+                                    ? Icons.visibility_rounded
+                                    : Icons.visibility_off_rounded,
+                                color: semantic.secondaryText),
+                            onPressed: () => setState(() => obscure = !obscure),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                      const SizedBox(height: 12),
+                      _buildPillAction(
+                          targetLength == 4
+                              ? "USE 6-DIGIT PIN"
+                              : "USE 4-DIGIT PIN", () {
+                        setState(() {
+                          targetLength = targetLength == 4 ? 6 : 4;
+                          newPin = "";
+                        });
+                      }, semantic),
+                    ],
+                  ),
+                  actions: [
                     TextButton(
-                        onPressed: () {
-                          setState(() {
-                            targetLength = targetLength == 4 ? 6 : 4;
-                            newPin = "";
-                          });
-                        },
-                        child: Text(targetLength == 4
-                            ? "Use 6-Digit PIN"
-                            : "Use 4-Digit PIN"))
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text("CANCEL")),
-                  TextButton(
-                      onPressed: () async {
-                        if (newPin.length == targetLength) {
-                          // 1. Generate Key
-                          final key = _generateRecoveryKey();
-
-                          // 2. Save Both
-                          await storage.write(key: 'app_pin', value: newPin);
-                          await storage.write(key: 'recovery_key', value: key);
-
-                          // 3. Close PIN dialog
-                          if (ctx.mounted) Navigator.pop(ctx);
-
-                          // 4. Show Key Dialog
-                          if (context.mounted) {
-                            await _showRecoveryKeyDialog(context, key);
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text("CANCEL",
+                            style: TextStyle(
+                                color: semantic.secondaryText,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12))),
+                    ElevatedButton(
+                        onPressed: () async {
+                          if (newPin.length == targetLength) {
+                            final key = _generateRecoveryKey();
+                            await storage.write(key: 'app_pin', value: newPin);
+                            await storage.write(
+                                key: 'recovery_key', value: key);
+                            if (ctx.mounted) Navigator.pop(ctx);
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text("PIN Enabled Securely")));
+                              await _showRecoveryKeyDialog(
+                                  context, key, semantic);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: const Text("PIN ENABLED SECURELY"),
+                                  backgroundColor: semantic.primary,
+                                ));
+                              }
                             }
                           }
-                        }
-                      },
-                      child: const Text("SAVE")),
-                ],
-              );
-            });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: semantic.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12))),
+                        child: const Text("SAVE",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 12))),
+                  ],
+                );
+              }),
+            );
           });
     }
   }
 
+  Widget _buildPillAction(String text, VoidCallback onTap, AppColors semantic) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: semantic.divider.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(text,
+            style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: semantic.text)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppColors>()!;
+    final userName = ref.watch(userProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings & Tools")),
+      appBar: AppBar(
+        title: const Text("SETTINGS"),
+        centerTitle: true,
+      ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
+            20, 16, 20, 48 + MediaQuery.of(context).padding.bottom),
         children: [
           _buildOption(
             context,
-            "User Name",
-            ref.watch(userProvider),
+            "USER NAME",
+            userName,
             Icons.person_outline_rounded,
-            Colors.blue,
-            () => _showNamePicker(context, ref),
+            semantic.primary,
+            () => _showNamePicker(context, ref, semantic),
+            semantic,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
+          _buildSectionHeader("SECURITY & TRUST", semantic),
+          const SizedBox(height: 12),
           _buildOption(
             context,
-            "Trust",
+            "TRUST CENTER",
             "Explicit guarantees & data health",
             Icons.verified_user_outlined,
-            Colors.green,
+            semantic.success,
             () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const TrustCenterScreen())),
+            semantic,
           ),
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "Appearance",
+            "APP SECURITY",
+            "Set PIN for access",
+            Icons.lock_outline_rounded,
+            semantic.overspent,
+            () => _setupPin(context, semantic),
+            semantic,
+          ),
+          const SizedBox(height: 20),
+          _buildSectionHeader("CUSTOMIZATION", semantic),
+          const SizedBox(height: 12),
+          _buildOption(
+            context,
+            "APPEARANCE",
             "Switch between Light, Dark, or System theme",
             Icons.dark_mode_outlined,
-            Colors.indigo,
-            () => _showThemePicker(context, ref),
+            semantic.primary,
+            () => _showThemePicker(context, ref, semantic),
+            semantic,
           ),
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "Personalization",
+            "PERSONALIZATION",
             "Adaptive defaults & presets",
             Icons.auto_awesome_outlined,
-            Colors.pink,
+            Colors.pinkAccent,
             () => Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
                         const PersonalizationSettingsScreen())),
+            semantic,
           ),
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "App Security",
-            "Set PIN for access",
-            Icons.lock_outline_rounded,
-            Colors.deepPurple,
-            () => _setupPin(context),
-          ),
-          const SizedBox(height: 16),
-          _buildOption(
-            context,
-            "Currency",
-            "Choose your preferred currency (${CurrencyFormatter.symbol})",
+            "CURRENCY",
+            "Preferred currency (${CurrencyFormatter.symbol})",
             Icons.payments_outlined,
             Colors.teal,
-            () => _showCurrencyPicker(context),
+            () => _showCurrencyPicker(context, semantic),
+            semantic,
           ),
           const SizedBox(height: 16),
           _buildOption(
             context,
-            "Manage Categories",
+            "MANAGE CATEGORIES",
             "Add, edit, or remove your personal categories",
             Icons.category_outlined,
             Colors.orange,
@@ -753,113 +1163,151 @@ class SettingsScreen extends ConsumerWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const ManageCategoriesScreen())),
+            semantic,
           ),
-
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
+          _buildSectionHeader("DATA TOOLS", semantic),
+          const SizedBox(height: 12),
           _buildOption(
             context,
-            "Data & Export",
+            "DATA & EXPORT",
             "One-tap export (history, budgets, insights)",
             Icons.ios_share_rounded,
-            colorScheme.primary,
+            semantic.primary,
             () => Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => const DataExportScreen())),
+            semantic,
           ),
           const SizedBox(height: 16),
           if (kDebugMode) ...[
             _buildOption(
               context,
-              "Seed Sample Data",
+              "SEED SAMPLE DATA",
               "Populate app with demo entries",
               Icons.science_rounded,
               Colors.amber,
-              () => _seedData(context, ref),
+              () => _seedData(context, ref, semantic),
+              semantic,
             ),
             const SizedBox(height: 16),
           ],
           _buildOption(
             context,
-            "Reset Application",
+            "RESET APPLICATION",
             "Clear all data and start fresh",
             Icons.refresh_rounded,
-            Colors.redAccent,
-            () => _resetData(context, ref),
+            semantic.overspent,
+            () => _resetData(context, ref, semantic),
+            semantic,
           ),
-          const SizedBox(height: 48), // ... rest of build
-
-          Center(
-            child: Column(
-              children: [
-                const Text("TRUELEDGER",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        color: Colors.grey)),
-                ref.watch(appVersionProvider).when(
-                      data: (version) => Text("Version $version",
-                          style: const TextStyle(
-                              fontSize: 10, color: Colors.grey)),
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const Text("Version 1.1.0",
-                          style: TextStyle(fontSize: 10, color: Colors.grey)),
-                    ),
-                const SizedBox(height: 12),
-                const Text(
-                  "TrueLedger stores all data locally on your device.\nNo data is transmitted or stored on external servers.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const TrustCenterScreen())),
-                  child: const Text(
-                    "Our Trust Guarantees",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () => launchUrl(Uri.parse(
-                      "https://satyakommula96.github.io/trueledger/privacy/")),
-                  child: const Text(
-                    "Privacy Policy",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const SizedBox(height: 48),
+          _buildFooter(ref, semantic, context),
         ],
       ),
     );
   }
 
-  Widget _buildOption(BuildContext context, String title, String sub,
-      IconData icon, Color color, VoidCallback onTap) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildSectionHeader(String title, AppColors semantic) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: semantic.secondaryText,
+          letterSpacing: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter(WidgetRef ref, AppColors semantic, BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          Text("TRUELEDGER",
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12,
+                  letterSpacing: 4,
+                  color: semantic.secondaryText.withValues(alpha: 0.5))),
+          const SizedBox(height: 8),
+          ref.watch(appVersionProvider).when(
+                data: (version) => Text("VERSION $version",
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.secondaryText.withValues(alpha: 0.4))),
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => Text("VERSION 1.1.0",
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: semantic.secondaryText.withValues(alpha: 0.4))),
+              ),
+          const SizedBox(height: 24),
+          Text(
+            "TrueLedger stores all data locally on your device.\nNo data is transmitted or stored on external servers.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 10,
+                color: semantic.secondaryText.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildFooterLink("TRUST GUARANTEES", () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const TrustCenterScreen()));
+              }, semantic),
+              const SizedBox(width: 24),
+              _buildFooterLink("PRIVACY POLICY", () {
+                launchUrl(Uri.parse(
+                    "https://satyakommula96.github.io/trueledger/privacy/"));
+              }, semantic),
+            ],
+          ),
+        ],
+      ).animate().fadeIn(delay: 400.ms),
+    );
+  }
+
+  Widget _buildFooterLink(String text, VoidCallback onTap, AppColors semantic) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          color: semantic.primary,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.5,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOption(BuildContext context, String title, String sub,
+      IconData icon, Color color, VoidCallback onTap, AppColors semantic) {
+    return HoverWrapper(
+      onTap: onTap,
+      borderRadius: 28,
+      glowColor: color.withValues(alpha: 0.3),
+      glowOpacity: 0.05,
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withValues(alpha: 0.1)),
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
         child: Row(
           children: [
@@ -868,23 +1316,32 @@ class SettingsScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16)),
-              child: Icon(icon, color: color),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(title.toUpperCase(),
+                      style: TextStyle(
+                          color: semantic.text,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 0.5)),
+                  const SizedBox(height: 4),
                   Text(sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: semantic.secondaryText)),
                 ],
               ),
             ),
+            Icon(Icons.chevron_right_rounded,
+                color: semantic.divider, size: 24),
           ],
         ),
       ),

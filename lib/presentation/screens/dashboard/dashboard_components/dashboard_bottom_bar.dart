@@ -16,85 +16,75 @@ class DashboardBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppColors>()!;
+    final padding = MediaQuery.of(context).padding;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(
-          24, 0, 24, 32 + MediaQuery.of(context).padding.bottom),
-      child: SizedBox(
-        height: 64,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              height: 64,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: colorScheme.surface.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10)),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: _buildActionIcon(
-                        context,
-                        Icons.account_balance_rounded,
-                        "LOANS",
-                        const Color(0xFF10B981), // Emerald Green
-                        () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const LoansScreen())),
-                        semantic),
-                  ),
-                  Expanded(
-                    child: _buildActionIcon(
-                        context,
-                        Icons.credit_card_outlined,
-                        "CARDS",
-                        const Color(0xFF6366F1), // Indigo/Blue
-                        () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CreditCardsScreen())),
-                        semantic),
-                  ),
-                  Expanded(
-                    child: _buildActionIcon(
-                        context,
-                        Icons.analytics_outlined,
-                        "ANALYSIS",
-                        const Color(0xFFA855F7), // Purple/Violet
-                        () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const AnalysisScreen())),
-                        semantic),
-                  ),
-                  Expanded(
-                    child: _buildActionIcon(
-                        context,
-                        Icons.history_outlined,
-                        "HISTORY",
-                        const Color(0xFFF59E0B), // Amber/Orange
-                        () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const MonthlyHistoryScreen())),
-                        semantic),
-                  ),
-                ],
-              ),
+      padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + padding.bottom),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            height: 72,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: semantic.surfaceCombined.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: semantic.divider, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _buildActionIcon(
+                  context,
+                  Icons.account_balance_rounded,
+                  "Accounts",
+                  semantic.income,
+                  () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const LoansScreen())),
+                  semantic,
+                ),
+                _buildActionIcon(
+                  context,
+                  Icons.credit_card_rounded,
+                  "Cards",
+                  semantic.primary,
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const CreditCardsScreen())),
+                  semantic,
+                ),
+                _buildActionIcon(
+                  context,
+                  Icons.auto_graph_rounded,
+                  "Analysis",
+                  const Color(0xFFA855F7),
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const AnalysisScreen())),
+                  semantic,
+                ),
+                _buildActionIcon(
+                  context,
+                  Icons.history_toggle_off_rounded,
+                  "History",
+                  semantic.warning,
+                  () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const MonthlyHistoryScreen())),
+                  semantic,
+                ),
+              ],
             ),
           ),
         ),
@@ -104,29 +94,29 @@ class DashboardBottomBar extends StatelessWidget {
 
   Widget _buildActionIcon(BuildContext context, IconData icon, String label,
       Color iconColor, VoidCallback onTap, AppColors semantic) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 24, color: iconColor),
-          const SizedBox(height: 4),
-          Flexible(
-            child: Semantics(
-              container: true,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(label,
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: semantic.secondaryText,
-                        letterSpacing: 0.5)),
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 24, color: iconColor.withValues(alpha: 0.9)),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: semantic.secondaryText,
+                  letterSpacing: 0.2,
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

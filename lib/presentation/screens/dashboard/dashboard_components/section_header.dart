@@ -17,44 +17,61 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(sub.toUpperCase(),
-                style: TextStyle(
-                    fontSize: 9,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sub.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 10,
                     color: semantic.secondaryText,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5)),
-            const SizedBox(height: 4),
-            Text(title,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  letterSpacing: -0.5,
-                )),
-          ],
-        ),
-        if (onAdd != null)
-          Material(
-            color: semantic.surfaceCombined.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              onTap: onAdd,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Icon(Icons.add_rounded,
-                    size: 20, color: Theme.of(context).colorScheme.primary),
-              ),
+                    color: semantic.text,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+              ],
             ),
           ),
-      ],
+          if (onAdd != null)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onAdd,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: semantic.divider, width: 1.5),
+                    color: semantic.surfaceCombined.withValues(alpha: 0.3),
+                  ),
+                  child: Icon(
+                    Icons.add_rounded,
+                    size: 22,
+                    color: semantic.text,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

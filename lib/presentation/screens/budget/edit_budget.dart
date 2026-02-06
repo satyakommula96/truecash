@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/usecase_providers.dart';
 
 import 'package:trueledger/domain/usecases/budget_usecases.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class EditBudgetScreen extends ConsumerStatefulWidget {
   final Budget budget;
@@ -28,95 +30,136 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = Theme.of(context).extension<AppColors>()!;
+
     return Scaffold(
+      backgroundColor: semantic.surfaceCombined,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Row(
           children: [
             Flexible(
               child: Text(
-                "Edit ${widget.budget.category} Budget",
+                "EDIT ${widget.budget.category.toUpperCase()}",
                 overflow: TextOverflow.ellipsis,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
               ),
             ),
             if (widget.budget.isStable) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                  border:
-                      Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                  color: semantic.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: semantic.success.withValues(alpha: 0.3)),
                 ),
-                child: const Text("STABLE",
-                    style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green)),
+                child: Text(
+                  "STABLE",
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: semantic.success),
+                ),
               ),
             ],
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            icon: Icon(Icons.delete_outline_rounded, color: semantic.overspent),
             onPressed: _delete,
           )
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
             24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              "MONTHLY CEILING",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: limitCtrl,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Monthly Limit",
-                prefixText: "${CurrencyFormatter.symbol} ",
-                filled: true,
-                fillColor: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 48,
+                letterSpacing: -2,
+                color: semantic.text,
               ),
-            ),
-            const SizedBox(height: 40),
+              decoration: InputDecoration(
+                prefixText: "${CurrencyFormatter.symbol} ",
+                border: InputBorder.none,
+                hintText: "0",
+                hintStyle: TextStyle(
+                    color: semantic.secondaryText.withValues(alpha: 0.1)),
+              ),
+            ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
+            const SizedBox(height: 64),
             SizedBox(
               width: double.infinity,
-              height: 60,
+              height: 64,
               child: OutlinedButton(
                 onPressed: _markReviewed,
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 2),
+                  side: BorderSide(color: semantic.primary, width: 2),
                 ),
-                child: const Text("MARK AS REVIEWED",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  "MARK AS REVIEWED",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    letterSpacing: 2,
+                    color: semantic.primary,
+                  ),
+                ),
               ),
-            ),
+            )
+                .animate(delay: 200.ms)
+                .fadeIn()
+                .scale(begin: const Offset(0.9, 0.9)),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              height: 60,
+              height: 64,
               child: ElevatedButton(
                 onPressed: _update,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: semantic.primary,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
+                  elevation: 0,
                 ),
-                child: const Text("UPDATE BUDGET",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text(
+                  "UPDATE BUDGET",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    letterSpacing: 2,
+                  ),
+                ),
               ),
-            ),
+            )
+                .animate(delay: 300.ms)
+                .fadeIn()
+                .scale(begin: const Offset(0.9, 0.9)),
           ],
         ),
       ),
