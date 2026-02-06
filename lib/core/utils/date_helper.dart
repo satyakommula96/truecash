@@ -106,6 +106,14 @@ class DateHelper {
     return null;
   }
 
+  static bool isOverdue(String due) {
+    final next = getNextOccurrence(due);
+    if (next == null) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return next.isBefore(today);
+  }
+
   static bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }

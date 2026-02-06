@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/screens/transactions/month_detail.dart';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class MonthlyHistoryScreen extends ConsumerStatefulWidget {
@@ -22,13 +21,11 @@ class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
   List<Map<String, dynamic>> monthSummaries = [];
   List<int> availableYears = [];
   int selectedYear = DateTime.now().year;
-
   bool _isLoading = true;
 
   Future<void> load() async {
     final repo = ref.read(financialRepositoryProvider);
 
-    // Lazy load years if empty
     if (availableYears.isEmpty) {
       final years = await repo.getAvailableYears();
       if (mounted) {
@@ -58,256 +55,309 @@ class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppColors>()!;
+    final isPrivate = ref.watch(privacyProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("LEDGER HISTORY")),
+      appBar: AppBar(
+        title: const Text("LEDGER HISTORY"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Column(
         children: [
-          // Modern Year Selector
-          if (availableYears.isNotEmpty)
-            SizedBox(
-              height: 68,
-              child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: availableYears.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final year = availableYears[index];
-                  final isSelected = year == selectedYear;
-                  return GestureDetector(
-                    onTap: () {
-                      if (!isSelected) {
-                        setState(() {
-                          selectedYear = year;
-                          _isLoading = true;
-                        });
-                        load();
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOutQuint,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? colorScheme.primary
-                            : colorScheme.surface.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                            color: isSelected
-                                ? Colors.transparent
-                                : semantic.divider),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                    color: colorScheme.primary
-                                        .withValues(alpha: 0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4))
-                              ]
-                            : null,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        "$year",
-                        style: TextStyle(
-                          color: isSelected
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-          // Main Content
+          if (availableYears.isNotEmpty) _buildYearSelector(semantic),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      Expanded(
-                        child: monthSummaries.isEmpty
-                            ? Center(
-                                child: Text("NO PERIODS TRACKED.",
-                                    style: TextStyle(
-                                        color: semantic.secondaryText,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold)))
-                            : ListView.builder(
-                                padding: EdgeInsets.fromLTRB(24, 0, 24,
-                                    24 + MediaQuery.of(context).padding.bottom),
-                                itemCount: monthSummaries.length,
-                                itemBuilder: (_, i) {
-                                  final s = monthSummaries[i];
-                                  final positive = s['net'] >= 0;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: HoverWrapper(
-                                      onTap: () async {
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (_) =>
-                                                    MonthDetailScreen(
-                                                        month: s['month'])));
-                                        load();
-                                      },
-                                      borderRadius: 16,
-                                      glowColor: positive
-                                          ? semantic.income
-                                          : semantic.warning,
-                                      glowOpacity: 0.1,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: colorScheme.surface,
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                            border: Border.all(
-                                                color: semantic.divider
-                                                    .withValues(alpha: 0.5))),
-                                        padding: const EdgeInsets.all(24),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                        _formatMonth(
-                                                            s['month']),
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            fontSize: 18,
-                                                            letterSpacing: -0.5,
-                                                            color: colorScheme
-                                                                .onSurface),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis),
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  Flexible(
-                                                    child: Semantics(
-                                                      container: true,
-                                                      child: FittedBox(
-                                                        fit: BoxFit.scaleDown,
-                                                        child: Text(
-                                                            CurrencyFormatter
-                                                                .format(
-                                                                    s['net']),
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w800,
-                                                                color: positive
-                                                                    ? semantic
-                                                                        .income
-                                                                    : semantic
-                                                                        .warning,
-                                                                fontSize: 16)),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ]),
-                                            const SizedBox(height: 20),
-                                            Divider(
-                                                height: 1,
-                                                color: semantic.divider
-                                                    .withValues(alpha: 0.3)),
-                                            const SizedBox(height: 20),
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: _buildStatItem(
-                                                        "INCOME",
-                                                        CurrencyFormatter
-                                                            .format(
-                                                                s['income']),
-                                                        semantic),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: _buildStatItem(
-                                                        "EXPENDITURE",
-                                                        CurrencyFormatter
-                                                            .format(
-                                                                s['expenses']),
-                                                        semantic),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: _buildStatItem(
-                                                        "INVESTED",
-                                                        CurrencyFormatter
-                                                            .format(
-                                                                s['invested']),
-                                                        semantic),
-                                                  ),
-                                                ]),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                        .animate()
-                                        .fadeIn(
-                                            delay: (100 * i).clamp(0, 500).ms,
-                                            duration: 600.ms)
-                                        .slideY(
-                                            begin: 0.1,
-                                            end: 0,
-                                            curve: Curves.easeOutQuint),
-                                  );
-                                },
-                              ),
-                      ),
-                    ],
-                  ),
+                ? Center(
+                    child: CircularProgressIndicator(color: semantic.primary))
+                : _buildHistoryList(semantic, isPrivate),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, AppColors semantic) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Semantics(
-        container: true,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(label,
-              style: TextStyle(
-                  fontSize: 8,
+  Widget _buildYearSelector(AppColors semantic) {
+    return SizedBox(
+      height: 72,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: availableYears.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final year = availableYears[index];
+          final isSelected = year == selectedYear;
+          return GestureDetector(
+            onTap: () {
+              if (!isSelected) {
+                setState(() {
+                  selectedYear = year;
+                  _isLoading = true;
+                });
+                load();
+              }
+            },
+            child: AnimatedContainer(
+              duration: 400.ms,
+              curve: Curves.easeOutQuart,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? semantic.primary
+                    : semantic.surfaceCombined.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: isSelected ? Colors.transparent : semantic.divider,
+                  width: 1.5,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: semantic.primary.withValues(alpha: 0.25),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        )
+                      ]
+                    : null,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                "$year",
+                style: TextStyle(
+                  color: isSelected ? Colors.white : semantic.text,
                   fontWeight: FontWeight.w900,
-                  color: semantic.secondaryText,
-                  letterSpacing: 1.2)),
-        ),
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      const SizedBox(height: 6),
-      Semantics(
-        container: true,
-        child: FittedBox(
+    );
+  }
+
+  Widget _buildHistoryList(AppColors semantic, bool isPrivate) {
+    if (monthSummaries.isEmpty) {
+      return Center(
+        child: Text(
+          "NO PERIODS TRACKED.",
+          style: TextStyle(
+            color: semantic.secondaryText,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.fromLTRB(
+          24, 0, 24, 24 + MediaQuery.of(context).padding.bottom),
+      itemCount: monthSummaries.length,
+      itemBuilder: (_, i) {
+        final s = monthSummaries[i];
+        final netValue = (s['net'] as num? ?? 0).toInt();
+        final income = (s['income'] as num? ?? 0).toInt();
+        final expenses = (s['expenses'] as num? ?? 0).toInt();
+        final invested = (s['invested'] as num? ?? 0).toInt();
+        final positive = netValue >= 0;
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: HoverWrapper(
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MonthDetailScreen(month: s['month']),
+                ),
+              );
+              load();
+            },
+            borderRadius: 28,
+            glowColor: positive ? semantic.income : semantic.overspent,
+            glowOpacity: 0.05,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: semantic.surfaceCombined.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: semantic.divider, width: 1.5),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color:
+                              (positive ? semantic.income : semantic.overspent)
+                                  .withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          positive
+                              ? Icons.trending_up_rounded
+                              : Icons.trending_down_rounded,
+                          color:
+                              positive ? semantic.income : semantic.overspent,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatMonth(s['month']),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                color: semantic.text,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            Text(
+                              positive ? "SURPLUS PERIOD" : "DEFICIT PERIOD",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                color: (positive
+                                        ? semantic.income
+                                        : semantic.overspent)
+                                    .withValues(alpha: 0.7),
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          CurrencyFormatter.format(netValue,
+                              isPrivate: isPrivate),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            color:
+                                positive ? semantic.income : semantic.overspent,
+                            fontSize: 22,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    height: 1.5,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          semantic.divider.withValues(alpha: 0),
+                          semantic.divider,
+                          semantic.divider.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatItem(
+                          "INCOME",
+                          CurrencyFormatter.format(income,
+                              isPrivate: isPrivate),
+                          Icons.arrow_downward_rounded,
+                          semantic.income,
+                          semantic,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildStatItem(
+                          "SPENDING",
+                          CurrencyFormatter.format(expenses,
+                              isPrivate: isPrivate),
+                          Icons.arrow_upward_rounded,
+                          semantic.overspent,
+                          semantic,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildStatItem(
+                          "INVESTED",
+                          CurrencyFormatter.format(invested,
+                              isPrivate: isPrivate),
+                          Icons.account_balance_rounded,
+                          semantic.primary,
+                          semantic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+            .animate()
+            .fadeIn(
+              delay: (80 * i).clamp(0, 400).ms,
+              duration: 600.ms,
+            )
+            .slideY(
+              begin: 0.1,
+              end: 0,
+              curve: Curves.easeOutQuart,
+            );
+      },
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon, Color color,
+      AppColors semantic) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 10, color: color.withValues(alpha: 0.7)),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
+                color: semantic.secondaryText,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+          child: Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 15,
+              color: semantic.text,
+              letterSpacing: -0.2,
+            ),
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
   String _formatMonth(String yyyyMm) {

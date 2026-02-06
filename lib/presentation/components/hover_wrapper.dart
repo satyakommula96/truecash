@@ -10,6 +10,7 @@ class HoverWrapper extends StatefulWidget {
   final Color? glowColor;
   final double borderRadius;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   const HoverWrapper({
     super.key,
@@ -22,6 +23,7 @@ class HoverWrapper extends StatefulWidget {
     this.glowColor,
     this.borderRadius = 16,
     this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -39,6 +41,7 @@ class _HoverWrapperState extends State<HoverWrapper> {
     if (isTouch) {
       return GestureDetector(
         onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
         behavior: HitTestBehavior.opaque,
         child: widget.child,
       );
@@ -51,6 +54,7 @@ class _HoverWrapperState extends State<HoverWrapper> {
           widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
       child: GestureDetector(
         onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
         child: AnimatedContainer(
           duration: widget.duration,
           curve: Curves.easeOutQuint,

@@ -23,7 +23,6 @@ class WeeklySummary extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isPrivacy = ref.watch(privacyProvider);
-    final colorScheme = Theme.of(context).colorScheme;
 
     final diff = thisWeekSpend - lastWeekSpend;
     final percentChange =
@@ -51,124 +50,75 @@ class WeeklySummary extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              semantic.surfaceCombined,
-              semantic.surfaceCombined.withValues(alpha: 0.6),
-            ],
-          ),
+          color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider.withValues(alpha: 0.1)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: semantic.divider, width: 1.5),
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Positioned(
-              right: -10,
-              top: -10,
-              child: Icon(
-                Icons.bar_chart_rounded,
-                size: 64,
-                color: colorScheme.primary.withValues(alpha: 0.04),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.view_week_rounded,
-                        size: 12,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "WEEK",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: semantic.secondaryText,
-                      ),
-                    ),
-                  ],
-                ).animate().fadeIn(duration: 400.ms),
-                const SizedBox(height: 16),
-                Semantics(
-                  container: true,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      CurrencyFormatter.format(thisWeekSpend,
-                          isPrivate: isPrivacy),
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.8,
-                        color: colorScheme.onSurface,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: 100.ms)
-                        .slideX(begin: -0.1, end: 0, curve: Curves.easeOut),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: semantic.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.view_week_rounded,
+                    size: 12,
+                    color: semantic.primary,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: changeColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
+                const SizedBox(width: 8),
+                Text(
+                  "WEEK",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: semantic.secondaryText,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(changeStatusIcon, size: 10, color: changeColor),
-                      const SizedBox(width: 4),
-                      Semantics(
-                        container: true,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            isUp
-                                ? "+$percentChange%"
-                                : isDown
-                                    ? "-$percentChange%"
-                                    : "—",
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: changeColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                CurrencyFormatter.format(thisWeekSpend, isPrivate: isPrivacy),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
+                  color: semantic.text,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(changeStatusIcon, size: 14, color: changeColor),
+                const SizedBox(width: 4),
+                Text(
+                  isUp
+                      ? "+$percentChange%"
+                      : isDown
+                          ? "-$percentChange%"
+                          : "Stable",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: changeColor,
                   ),
-                ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
+                ),
               ],
             ),
           ],
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
   }
 }

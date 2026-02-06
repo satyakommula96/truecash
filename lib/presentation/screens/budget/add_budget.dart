@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/providers/category_provider.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
+import 'package:trueledger/core/theme/theme.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class AddBudgetScreen extends ConsumerStatefulWidget {
   const AddBudgetScreen({super.key});
@@ -20,19 +22,53 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final semantic = Theme.of(context).extension<AppColors>()!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("New Budget")),
-      body: Padding(
+      backgroundColor: semantic.surfaceCombined,
+      appBar: AppBar(
+        title: const Text("NEW BUDGET"),
+        backgroundColor: Colors.transparent,
+      ),
+      body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
             24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: categoryCtrl,
-              decoration:
-                  const InputDecoration(labelText: "Category (e.g. Food)"),
+            const Text(
+              "CATEGORY IDENTIFIER",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                color: Colors.grey,
+              ),
             ),
             const SizedBox(height: 16),
+            TextField(
+              controller: categoryCtrl,
+              style:
+                  TextStyle(fontWeight: FontWeight.w900, color: semantic.text),
+              decoration: InputDecoration(
+                hintText: "e.g. DINING",
+                filled: true,
+                fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: semantic.divider),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: semantic.divider),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: semantic.primary, width: 2),
+                ),
+              ),
+            ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
+            const SizedBox(height: 20),
             Consumer(
               builder: (context, ref, child) {
                 final categoriesAsync =
@@ -51,24 +87,19 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                             onPressed: () => setState(() {
                               categoryCtrl.text = cat.name;
                             }),
-                            backgroundColor: active
-                                ? Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.05)
-                                : Colors.transparent,
+                            backgroundColor:
+                                active ? semantic.primary : Colors.transparent,
                             side: BorderSide(
                                 color: active
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.05)),
+                                    ? semantic.primary
+                                    : semantic.divider),
                             labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: active ? Colors.black : semantic.text,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 9,
                                 letterSpacing: 1),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           );
                         }),
                         ActionChip(
@@ -77,7 +108,8 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                             final newCat = await Navigator.push<String>(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ManageCategoriesScreen(
+                                builder: (context) =>
+                                    const ManageCategoriesScreen(
                                   initialType: 'Variable',
                                 ),
                               ),
@@ -89,12 +121,9 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                             }
                           },
                           backgroundColor: Colors.transparent,
-                          side: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.1),
-                          ),
+                          side: BorderSide(color: semantic.divider),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                       ],
                     );
@@ -103,25 +132,61 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                   error: (err, stack) => const SizedBox.shrink(),
                 );
               },
+            ).animate(delay: 200.ms).fadeIn(),
+            const SizedBox(height: 48),
+            const Text(
+              "MONTHLY CEILING",
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                color: Colors.grey,
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             TextField(
               controller: limitCtrl,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Monthly Limit",
-                prefixText: "${CurrencyFormatter.symbol} ",
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 48,
+                letterSpacing: -2,
+                color: semantic.text,
               ),
-            ),
-            const SizedBox(height: 40),
+              decoration: InputDecoration(
+                prefixText: "${CurrencyFormatter.symbol} ",
+                border: InputBorder.none,
+                hintText: "0",
+                hintStyle: TextStyle(
+                    color: semantic.secondaryText.withValues(alpha: 0.1)),
+              ),
+            ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.05, end: 0),
+            const SizedBox(height: 64),
             SizedBox(
               width: double.infinity,
-              height: 60,
+              height: 64,
               child: ElevatedButton(
                 onPressed: _save,
-                child: const Text("CREATE BUDGET"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: semantic.primary,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  "ESTABLISH BUDGET",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    letterSpacing: 2,
+                  ),
+                ),
               ),
-            ),
+            )
+                .animate(delay: 400.ms)
+                .fadeIn()
+                .scale(begin: const Offset(0.9, 0.9)),
           ],
         ),
       ),

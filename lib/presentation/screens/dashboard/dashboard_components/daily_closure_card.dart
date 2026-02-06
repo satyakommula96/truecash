@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 import 'package:trueledger/presentation/providers/day_closure_provider.dart';
@@ -51,28 +50,33 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
 
     if (!isNight && !widget.forceShow) return const SizedBox.shrink();
 
-    // If day is already closed ritualistically, show a smaller "Success" state or shrink
     if (isClosed) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         decoration: BoxDecoration(
           color: widget.semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(24),
-          border:
-              Border.all(color: widget.semantic.divider.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: widget.semantic.divider, width: 1.5),
         ),
         child: Row(
           children: [
-            Icon(Icons.check_circle_rounded,
-                color: widget.semantic.success, size: 20),
-            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: widget.semantic.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.check_circle_rounded,
+                  color: widget.semantic.success, size: 16),
+            ),
+            const SizedBox(width: 16),
             Flexible(
               child: Text(
-                "Day ritual complete. See you tomorrow!",
+                "Ritual complete. Rest well.",
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                   color: widget.semantic.secondaryText,
                 ),
               ),
@@ -90,132 +94,113 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: widget.semantic.surfaceCombined,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: widget.semantic.divider),
+            color: widget.semantic.surfaceCombined.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: widget.semantic.divider, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: widget.semantic.success.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: (widget.transactionCount > 0
-                                    ? widget.semantic.success
-                                    : widget.semantic.warning)
-                                .withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.nightlight_round,
-                            size: 16,
-                            color: widget.transactionCount > 0
-                                ? widget.semantic.success
-                                : widget.semantic.warning,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Flexible(
-                          child: Text(
-                            "DAY CLOSURE",
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                              color: widget.semantic.secondaryText,
-                            ),
-                          ),
-                        ),
-                      ],
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: widget.semantic.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.nightlight_round,
+                        size: 12, color: widget.semantic.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      "DAY RITUAL",
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                        color: widget.semantic.primary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               if (widget.transactionCount > 0)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Review your day",
+                      "Daily Review",
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: widget.semantic.text,
-                        height: 1.2,
-                        letterSpacing: -0.5,
+                        height: 1.1,
+                        letterSpacing: -1.0,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Text(
-                      "You logged ${widget.transactionCount} expenses today.",
+                      "You've logged ${widget.transactionCount} entries today.",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 15,
                         color: widget.semantic.secondaryText,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     if (widget.dailyBudget > 0) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                            horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: (isUnderBudget
                                   ? widget.semantic.success
                                   : widget.semantic.overspent)
-                              .withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
+                              .withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               isUnderBudget
-                                  ? Icons.check_circle_outline
-                                  : Icons.warning_amber_rounded,
-                              size: 14,
+                                  ? Icons.check_circle_rounded
+                                  : Icons.warning_rounded,
+                              size: 16,
                               color: isUnderBudget
                                   ? widget.semantic.success
                                   : widget.semantic.overspent,
                             ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                isUnderBudget
-                                    ? "${CurrencyFormatter.format(diff)} under daily budget"
-                                    : "${CurrencyFormatter.format(diff)} over daily budget",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: isUnderBudget
-                                      ? widget.semantic.success
-                                      : widget.semantic.overspent,
-                                ),
+                            const SizedBox(width: 10),
+                            Text(
+                              isUnderBudget
+                                  ? "${CurrencyFormatter.format(diff)} under target"
+                                  : "${CurrencyFormatter.format(diff)} over target",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: isUnderBudget
+                                    ? widget.semantic.success
+                                    : widget.semantic.overspent,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ],
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -225,18 +210,17 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
                           ref.read(dayClosureProvider.notifier).closeDay();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.semantic.success,
+                          backgroundColor: widget.semantic.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                              borderRadius: BorderRadius.circular(20)),
                           elevation: 0,
                         ),
                         child: const Text(
-                          "Mark day as complete",
+                          "Finish Daily Review",
                           style: TextStyle(
-                              fontWeight: FontWeight.w900, fontSize: 14),
+                              fontWeight: FontWeight.w900, fontSize: 15),
                         ),
                       ),
                     ),
@@ -247,43 +231,43 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "No expenses today?",
+                      "Still Day?",
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 28,
                         fontWeight: FontWeight.w900,
                         color: widget.semantic.text,
-                        height: 1.2,
-                        letterSpacing: -0.5,
+                        height: 1.1,
+                        letterSpacing: -1.0,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Text(
-                      "Did you forget to log something? If not, you've mastered your spend today!",
+                      "No transactions logged today. If you're all set, we'll see you tomorrow.",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 15,
                         color: widget.semantic.secondaryText,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          ref.read(dayClosureProvider.notifier).closeDay();
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: widget.semantic.divider),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: TextButton(
+                        onPressed: () =>
+                            ref.read(dayClosureProvider.notifier).closeDay(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(
+                                color: widget.semantic.divider, width: 1.5),
                           ),
                         ),
                         child: Text(
-                          "Confident. Close day.",
+                          "Close Day",
                           style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
                               color: widget.semantic.text),
                         ),
                       ),
@@ -292,11 +276,10 @@ class _DailyClosureCardState extends ConsumerState<DailyClosureCard> {
                 ),
             ],
           ),
-        ).animate().fadeIn(duration: 600.ms).slideY(
-              begin: 0.1,
-              end: 0,
-              curve: Curves.easeOutQuint,
-            ),
+        )
+            .animate()
+            .fadeIn(duration: 600.ms)
+            .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuint),
         ConfettiWidget(
           confettiController: _confettiController,
           blastDirectionality: BlastDirectionality.explosive,

@@ -21,53 +21,69 @@ class MonthDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: TextField(
             onChanged: onSearchChanged,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              color: semantic.text,
+              letterSpacing: 0,
+            ),
             decoration: InputDecoration(
               hintText: "SEARCH LEDGER...",
               hintStyle: TextStyle(
-                  color: semantic.secondaryText.withValues(alpha: 0.5),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1),
-              prefixIcon:
-                  Icon(Icons.search, size: 16, color: semantic.secondaryText),
+                color: semantic.secondaryText.withValues(alpha: 0.4),
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+              ),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                size: 18,
+                color: semantic.secondaryText.withValues(alpha: 0.6),
+              ),
               filled: true,
-              fillColor: colorScheme.surface,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: semantic.divider)),
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(color: semantic.divider, width: 1.5),
+              ),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: semantic.divider)),
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(color: semantic.divider, width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(
+                    color: semantic.primary.withValues(alpha: 0.5), width: 1.5),
+              ),
             ),
           ),
         ),
         if (showFilters)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 _buildFilterChip(
-                    context, "All", Icons.apps_rounded, Colors.blue),
-                const SizedBox(width: 8),
+                    context, "All", Icons.apps_rounded, semantic.primary),
+                const SizedBox(width: 10),
                 _buildFilterChip(context, "Expenses",
                     Icons.trending_down_rounded, semantic.overspent),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 _buildFilterChip(context, "Income", Icons.trending_up_rounded,
                     semantic.income),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 _buildFilterChip(
                     context, "Fixed", Icons.lock_clock_rounded, Colors.orange),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 _buildFilterChip(context, "Variable",
                     Icons.shopping_bag_rounded, Colors.purple),
               ],
@@ -86,28 +102,35 @@ class MonthDetailHeader extends StatelessWidget {
     final child = GestureDetector(
       onTap: () => onFilterChanged(label),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutQuart,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected
+              ? color
+              : semantic.surfaceCombined.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? color : color.withValues(alpha: 0.1),
+            color: isSelected ? Colors.transparent : semantic.divider,
             width: 1.5,
           ),
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: color.withValues(alpha: 0.25),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: isSelected ? Colors.white : color),
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? Colors.white : color,
+            ),
             const SizedBox(width: 8),
             Text(
               label.toUpperCase(),
@@ -115,7 +138,7 @@ class MonthDetailHeader extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
                 color: isSelected ? Colors.white : color,
-                letterSpacing: 1,
+                letterSpacing: 1.2,
               ),
             ),
           ],

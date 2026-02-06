@@ -19,7 +19,7 @@ class TrendChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (trendData.isEmpty) return const SizedBox.shrink();
-    final colorScheme = Theme.of(context).colorScheme;
+
     final maxValSpend = (trendData
         .map((e) => (e['spending'] ?? e['total']) as num)
         .reduce((a, b) => a > b ? a : b)).toDouble();
@@ -30,40 +30,39 @@ class TrendChart extends StatelessWidget {
         (maxValSpend > maxValIncome ? maxValSpend : maxValIncome) * 1.2;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colorScheme.surface,
-            colorScheme.surface.withValues(alpha: 0.5),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: semantic.divider.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildLegendItem(semantic.income, "INCOME"),
-              const SizedBox(width: 16),
-              _buildLegendItem(semantic.overspent, "SPENDING"),
+              Text(
+                "TRENDS",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: semantic.secondaryText,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              Row(
+                children: [
+                  _buildLegendItem(semantic.income, "INCOME"),
+                  const SizedBox(width: 16),
+                  _buildLegendItem(semantic.overspent, "SPENDING"),
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
           Container(
-            height: 180,
-            padding: const EdgeInsets.only(right: 12),
+            height: 200,
+            padding: const EdgeInsets.only(right: 0),
             child: LineChart(
               LineChartData(
                 minX: 0,
@@ -71,63 +70,77 @@ class TrendChart extends StatelessWidget {
                 maxX: (trendData.length - 1).toDouble(),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (_) => Colors.blueGrey,
+                    getTooltipColor: (_) => semantic.surfaceCombined,
+                    tooltipBorderRadius: BorderRadius.circular(12),
+                    tooltipBorder: BorderSide(color: semantic.divider),
                     getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                       return touchedBarSpots.map((barSpot) {
                         final isIncome = barSpot.barIndex == 0;
                         return LineTooltipItem(
-                          "${isIncome ? 'Income' : 'Spend'}: ${CurrencyFormatter.format(barSpot.y, isPrivate: isPrivate)}",
+                          CurrencyFormatter.format(barSpot.y,
+                              isPrivate: isPrivate),
                           TextStyle(
-                              color: isIncome
-                                  ? semantic.income
-                                  : semantic.overspent,
-                              fontWeight: FontWeight.bold),
+                            color:
+                                isIncome ? semantic.income : semantic.overspent,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                          ),
                         );
                       }).toList();
                     },
                   ),
                 ),
                 gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: maxVal / 3,
-                    getDrawingHorizontalLine: (v) =>
-                        FlLine(color: semantic.divider, strokeWidth: 1)),
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: maxVal / 3,
+                  getDrawingHorizontalLine: (v) => FlLine(
+                    color: semantic.divider.withValues(alpha: 0.5),
+                    strokeWidth: 1,
+                  ),
+                ),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 24,
-                          interval: 1,
-                          getTitlesWidget: (value, meta) {
-                            int index = value.toInt();
-                            if (index < 0 || index >= trendData.length) {
-                              return const SizedBox();
-                            }
-                            String month = trendData[index]['month']
-                                .toString()
-                                .split('-')[1];
-                            const months = [
-                              'JAN',
-                              'FEB',
-                              'MAR',
-                              'APR',
-                              'MAY',
-                              'JUN',
-                              'JUL',
-                              'AUG',
-                              'SEP',
-                              'OCT',
-                              'NOV',
-                              'DEC'
-                            ];
-                            return Text(months[int.parse(month) - 1],
-                                style: TextStyle(
-                                    color: semantic.secondaryText,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold));
-                          })),
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 24,
+                      interval: 1,
+                      getTitlesWidget: (value, meta) {
+                        int index = value.toInt();
+                        if (index < 0 || index >= trendData.length) {
+                          return const SizedBox();
+                        }
+                        String monthStr =
+                            trendData[index]['month'].toString().split('-')[1];
+                        const months = [
+                          'JAN',
+                          'FEB',
+                          'MAR',
+                          'APR',
+                          'MAY',
+                          'JUN',
+                          'JUL',
+                          'AUG',
+                          'SEP',
+                          'OCT',
+                          'NOV',
+                          'DEC'
+                        ];
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            months[int.parse(monthStr) - 1],
+                            style: TextStyle(
+                              color: semantic.secondaryText,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   leftTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false)),
                   rightTitles: const AxisTitles(
@@ -137,19 +150,28 @@ class TrendChart extends StatelessWidget {
                 ),
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
-                  // Income Line
                   LineChartBarData(
                     spots: trendData.asMap().entries.map((e) {
                       return FlSpot(e.key.toDouble(),
                           (e.value['income'] as num? ?? 0).toDouble());
                     }).toList(),
                     isCurved: true,
+                    curveSmoothness: 0.35,
                     color: semantic.income,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
+                    barWidth: 4,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) =>
+                          FlDotCirclePainter(
+                        radius: 4,
+                        color: semantic.income,
+                        strokeWidth: 2,
+                        strokeColor: semantic.surfaceCombined,
+                      ),
+                    ),
                     belowBarData: BarAreaData(show: false),
                   ),
-                  // Spending Line
                   LineChartBarData(
                     spots: trendData.asMap().entries.map((e) {
                       return FlSpot(
@@ -158,15 +180,26 @@ class TrendChart extends StatelessWidget {
                               .toDouble());
                     }).toList(),
                     isCurved: true,
+                    curveSmoothness: 0.35,
                     color: semantic.overspent,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: true),
+                    barWidth: 4,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) =>
+                          FlDotCirclePainter(
+                        radius: 4,
+                        color: semantic.overspent,
+                        strokeWidth: 2,
+                        strokeColor: semantic.surfaceCombined,
+                      ),
+                    ),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          semantic.overspent.withValues(alpha: 0.2),
-                          semantic.overspent.withValues(alpha: 0.0)
+                          semantic.overspent.withValues(alpha: 0.15),
+                          semantic.overspent.withValues(alpha: 0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -182,7 +215,7 @@ class TrendChart extends StatelessWidget {
         ],
       ),
     ).animate().fadeIn(duration: 800.ms).scale(
-        begin: const Offset(0.95, 0.95),
+        begin: const Offset(0.98, 0.98),
         end: const Offset(1, 1),
         curve: Curves.easeOutBack);
   }
@@ -195,13 +228,16 @@ class TrendChart extends StatelessWidget {
           height: 8,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 4),
-        Text(label,
-            style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                color: color.withValues(alpha: 0.8),
-                letterSpacing: 1)),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            color: semantic.secondaryText,
+            letterSpacing: 0.5,
+          ),
+        ),
       ],
     );
   }
