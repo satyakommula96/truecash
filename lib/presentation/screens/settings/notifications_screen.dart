@@ -139,8 +139,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (title == null) return Icons.notifications_outlined;
     final lowerTitle = title.toLowerCase();
     if (lowerTitle.contains('reminder')) return Icons.alarm_rounded;
-    if (lowerTitle.contains('credit') || lowerTitle.contains('bill'))
+    if (lowerTitle.contains('credit') || lowerTitle.contains('bill')) {
       return Icons.credit_card_rounded;
+    }
     if (lowerTitle.contains('daily')) return Icons.today_rounded;
     return Icons.notifications_rounded;
   }
@@ -149,8 +150,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (title == null) return semantic.primary;
     final lowerTitle = title.toLowerCase();
     if (lowerTitle.contains('daily')) return semantic.success;
-    if (lowerTitle.contains('credit') || lowerTitle.contains('bill'))
+    if (lowerTitle.contains('credit') || lowerTitle.contains('bill')) {
       return semantic.warning;
+    }
     return semantic.primary;
   }
 

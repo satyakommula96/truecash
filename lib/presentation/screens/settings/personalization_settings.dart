@@ -225,7 +225,7 @@ class _PersonalizationSettingsScreenState
             ),
             Switch.adaptive(
               value: enabled,
-              activeColor: semantic.primary,
+              activeTrackColor: semantic.primary,
               onChanged: (v) => _updateSettings(
                   _settings.copyWith(personalizationEnabled: v)),
             ),
@@ -291,7 +291,7 @@ class _PersonalizationSettingsScreenState
             const SizedBox(width: 12),
             Switch.adaptive(
               value: value,
-              activeColor: semantic.primary,
+              activeTrackColor: semantic.primary,
               onChanged: onChanged,
             ),
           ],

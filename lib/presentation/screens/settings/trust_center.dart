@@ -496,8 +496,9 @@ class TrustCenterScreen extends ConsumerWidget {
                 () => _confirmRestore(context, ref, file), semantic),
             const SizedBox(width: 8),
             _buildActionIcon(Icons.ios_share_rounded, () {
-              Share.shareXFiles([XFile(file.path)],
-                  text: 'TrueLedger Auto-Backup (${file.name})');
+              SharePlus.instance.share(ShareParams(
+                  files: [XFile(file.path)],
+                  text: 'TrueLedger Auto-Backup (${file.name})'));
             }, semantic),
           ],
         ),

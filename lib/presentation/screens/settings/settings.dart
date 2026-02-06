@@ -709,8 +709,10 @@ class SettingsScreen extends ConsumerWidget {
                 actions: [
                   TextButton(
                       onPressed: () {
-                        Share.share(
-                            "TrueLedger Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.");
+                        SharePlus.instance.share(ShareParams(
+                          text:
+                              "TrueLedger Recovery Key: $key\n\nKEEP THIS KEY SAFE. If you lose this, you lose access to your encrypted data.",
+                        ));
                       },
                       child: Text("SHARE SECURELY",
                           style: TextStyle(

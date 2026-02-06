@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/domain/services/intelligence_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -111,7 +111,7 @@ class AppTheme {
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
-          shadowColor: lightColors.divider.withOpacity(0.4),
+          shadowColor: lightColors.divider.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
             side: BorderSide(color: lightColors.divider, width: 1),

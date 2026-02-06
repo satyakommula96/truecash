@@ -20,7 +20,6 @@ import 'package:trueledger/domain/services/intelligence_service.dart';
 import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/data/datasources/database.dart';
 import 'package:trueledger/core/services/backup_encryption_service.dart';
-import 'package:trueledger/presentation/providers/backup_provider.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
@@ -128,13 +127,14 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         final directory = await getTemporaryDirectory();
         final file = File('${directory.path}/$actualFileName');
         await file.writeAsString(finalOutput);
-        await Share.shareXFiles([XFile(file.path)],
+        await SharePlus.instance.share(ShareParams(
+            files: [XFile(file.path)],
             subject: _encryptFullExport
                 ? 'TrueLedger Encrypted Export'
                 : 'TrueLedger Data Export',
             text: _encryptFullExport
                 ? 'Here is my secure encrypted financial data export from TrueLedger.'
-                : 'Here is my complete financial data export from TrueLedger.');
+                : 'Here is my complete financial data export from TrueLedger.'));
       }
 
       if (mounted) {
@@ -377,9 +377,10 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
         final directory = await getTemporaryDirectory();
         final file = File('${directory.path}/$fileName');
         await file.writeAsString(csv);
-        await Share.shareXFiles([XFile(file.path)],
+        await SharePlus.instance.share(ShareParams(
+            files: [XFile(file.path)],
             subject: 'TrueLedger ${type.toUpperCase()} Export',
-            text: 'Sharing my TrueLedger $type export.');
+            text: 'Sharing my TrueLedger $type export.'));
       }
 
       if (mounted) {
