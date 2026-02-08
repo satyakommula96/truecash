@@ -243,7 +243,7 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                         curve: Curves.easeOutExpo,
                         builder: (context, value, child) {
                           final text = CurrencyFormatter.format(
-                            value.toInt(),
+                            value,
                             compact: false,
                             isPrivate: isPrivate,
                           );
