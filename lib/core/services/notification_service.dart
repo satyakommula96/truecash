@@ -21,9 +21,11 @@ class NotificationService {
   /// otherwise they will silently overwrite each other.
   static const int dailyReminderId = 888;
 
-  /// Specifically used for the aggregated daily summary. Overwriting this ID
-  /// ensures the user doesn't get flooded with multiple digest entries in the tray.
+  /// Specifically used for the aggregated daily summary.
   static const int dailyBillDigestId = 999;
+
+  /// Notification ID for Salary Day alerts.
+  static const int salaryDayId = 777;
 
   /// Starting range for credit card specific reminders to avoid collisions.
   static const int creditCardBaseId = 10000;
