@@ -234,20 +234,28 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   }
 
   @override
-  Future<void> addEntry(String type, double amount, String category,
-      String note, String date) async {
+  Future<void> addEntry(
+      String type, double amount, String category, String note, String date,
+      [Set<TransactionTag>? tags]) async {
     final db = await AppDatabase.db;
+    final tagStr = tags?.map((t) => t.name).join(',');
+
     switch (type) {
       case 'Income':
-        await db.insert('income_sources',
-            {'source': category, 'amount': amount, 'date': date});
+        await db.insert('income_sources', {
+          'source': category,
+          'amount': amount,
+          'date': date,
+          'tags': tagStr ?? 'income'
+        });
         break;
       case 'Fixed':
         await db.insert('fixed_expenses', {
           'name': category,
           'amount': amount,
           'category': type,
-          'date': date
+          'date': date,
+          'tags': tagStr ?? 'transfer'
         });
         break;
       case 'Subscription':
@@ -265,7 +273,8 @@ class FinancialRepositoryImpl implements IFinancialRepository {
           'amount': amount,
           'active': 1,
           'type': category,
-          'date': date
+          'date': date,
+          'tags': tagStr ?? 'transfer'
         });
         break;
       default:
@@ -273,7 +282,8 @@ class FinancialRepositoryImpl implements IFinancialRepository {
           'date': date,
           'amount': amount,
           'category': category,
-          'note': note
+          'note': note,
+          'tags': tagStr ?? 'transfer'
         });
     }
   }
@@ -996,5 +1006,30 @@ class FinancialRepositoryImpl implements IFinancialRepository {
     final db = await AppDatabase.db;
     return await db.query('loan_audit_log',
         where: 'loan_id = ?', whereArgs: [loanId], orderBy: 'date DESC');
+  }
+
+  @override
+  Future<void> updateEntryTags(
+      String type, int id, Set<TransactionTag> tags) async {
+    final db = await AppDatabase.db;
+    String table;
+    switch (type) {
+      case 'Variable':
+        table = 'variable_expenses';
+        break;
+      case 'Fixed':
+        table = 'fixed_expenses';
+        break;
+      case 'Income':
+        table = 'income_sources';
+        break;
+      case 'Investment':
+        table = 'investments';
+        break;
+      default:
+        return;
+    }
+    await db.update(table, {'tags': tags.map((t) => t.name).join(',')},
+        where: 'id = ?', whereArgs: [id]);
   }
 }

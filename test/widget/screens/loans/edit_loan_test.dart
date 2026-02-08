@@ -35,6 +35,7 @@ void main() {
           any(),
           any(),
           any(),
+          any(),
         )).thenAnswer((_) async {});
     when(() => mockRepo.recordLoanAudit(
           loanId: any(named: 'loanId'),
@@ -108,7 +109,7 @@ void main() {
     await tester.pumpWidget(createSubject(loan));
     await tester.pumpAndSettle();
 
-    expect(find.text('FORECLOSURE / PAYOFF QUOTE'), findsOneWidget);
+    expect(find.text('PAYOFF QUOTE'), findsOneWidget);
     // Determine the expected payoff amount string
     // Since exact string matching might be tricky due to formatting, checking for existence of the card is a good start.
     // We can try to match approximation if needed, or check if specific widgets are present.
@@ -143,7 +144,8 @@ void main() {
     verify(() => mockRepo.addEntry(
           'Fixed',
           500.0,
-          'EMI / Loan Payment',
+          'EMI / Payment: Car Loan',
+          any(),
           any(),
           any(),
         )).called(1);

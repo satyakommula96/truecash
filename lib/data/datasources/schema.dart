@@ -23,6 +23,7 @@ class Schema {
   static const String colType = 'type';
   static const String colVersion = 'version';
   static const String colAppliedAt = 'applied_at';
+  static const String colTags = 'tags';
 
   // Specific columns
   static const String colSource = 'source'; // income_sources

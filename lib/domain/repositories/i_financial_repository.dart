@@ -8,7 +8,8 @@ abstract class IFinancialRepository {
   Future<List<SavingGoal>> getSavingGoals();
   Future<List<Budget>> getBudgets();
   Future<void> addEntry(
-      String type, double amount, String category, String note, String date);
+      String type, double amount, String category, String note, String date,
+      [Set<TransactionTag>? tags]);
   Future<void> checkAndProcessRecurring();
   Future<List<Map<String, dynamic>>> getMonthlyHistory([int? year]);
   Future<List<int>> getAvailableYears();
@@ -82,4 +83,5 @@ abstract class IFinancialRepository {
     required String type,
   });
   Future<List<Map<String, dynamic>>> getLoanAuditLog(int loanId);
+  Future<void> updateEntryTags(String type, int id, Set<TransactionTag> tags);
 }
