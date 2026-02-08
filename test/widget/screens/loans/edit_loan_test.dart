@@ -82,7 +82,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('UPDATE LOAN'), findsOneWidget);
-    // expect(find.text('HOME LOAN'), findsOneWidget); // Removed as it is not displayed in uppercase in this screen
     expect(find.widgetWithText(TextField, 'Home Loan'), findsOneWidget);
     expect(find.widgetWithText(TextField, '450000.0'), findsOneWidget);
     expect(find.text('RECORD EMI PAYMENT'), findsOneWidget);
