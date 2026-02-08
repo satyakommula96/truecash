@@ -795,11 +795,13 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   Future<int> getActiveStreak() async {
     final db = await AppDatabase.db;
     final results = await db.rawQuery('''
-      SELECT DISTINCT substr(date, 1, 10) as day FROM variable_expenses
-      UNION
-      SELECT DISTINCT substr(date, 1, 10) as day FROM fixed_expenses
-      UNION
-      SELECT DISTINCT substr(date, 1, 10) as day FROM income_sources
+      SELECT DISTINCT day FROM (
+        SELECT substr(date, 1, 10) as day FROM variable_expenses
+        UNION
+        SELECT substr(date, 1, 10) as day FROM fixed_expenses
+        UNION
+        SELECT substr(date, 1, 10) as day FROM income_sources
+      )
       ORDER BY day DESC
     ''');
 
