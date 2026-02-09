@@ -81,6 +81,9 @@ class AppDatabase {
       path = _dbName;
     } else {
       final docsDir = await getApplicationDocumentsDirectory();
+      if (!await docsDir.exists()) {
+        await docsDir.create(recursive: true);
+      }
       path = join(docsDir.path, _dbName);
 
       // Check for legacy migrations if the new stable DB doesn't exist
