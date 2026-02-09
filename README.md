@@ -137,10 +137,10 @@ flutter test --coverage
 flutter test test/unit/domain/usecases/
 ```
 
-**Test Results**: All 21 tests passing ✅
-- 19 Unit tests
-- 1 Widget test
-- 1 Integration test
+**Test Results**:
+- Unit tests
+- Widget tests
+- Integration tests
 
 ## 🤝 Contributing
 
