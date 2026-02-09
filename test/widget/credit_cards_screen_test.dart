@@ -138,10 +138,10 @@ void main() {
       // Should show current balance
       expect(find.text('CURRENT BALANCE'), findsOneWidget);
       expect(find.text('2.0% UTILIZED'), findsOneWidget);
-      
+
       // Should NOT show DUE badge
       expect(find.text('DUE'), findsNothing);
-      
+
       // Should NOT show Record Payment button
       expect(find.text('RECORD PAYMENT'), findsNothing);
     });

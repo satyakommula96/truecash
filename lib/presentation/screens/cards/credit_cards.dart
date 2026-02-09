@@ -576,7 +576,8 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
                           style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: semantic.secondaryText.withValues(alpha: 0.6),
+                              color:
+                                  semantic.secondaryText.withValues(alpha: 0.6),
                               letterSpacing: 0.5),
                         ),
                       ],
