@@ -78,7 +78,7 @@ jobs:
             libjsoncpp-dev libsqlite3-dev libsqlcipher-dev \
             libssl-dev xvfb
 
-      - run: xvfb-run flutter test integration_test/app_test.dart -d linux --timeout 10m
+      - run: xvfb-run -s "-screen 0 1280x720x24" flutter test integration_test/app_test.dart -d linux --timeout 10m
 
 # -------------------------
 # ANDROID INTEGRATION

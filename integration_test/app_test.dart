@@ -4,6 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:trueledger/main.dart' as app;
 
 import 'package:trueledger/core/config/app_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -12,46 +13,57 @@ void main() {
 
   testWidgets('App smoke test - verifies app launches', (tester) async {
     // Small delay to ensure binding is fully settled in headless environments
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(seconds: 1));
 
-    await app.main();
-    await tester.pump(const Duration(seconds: 2));
+    try {
+      // Mock shared preferences for headless CI environments
+      // This prevents potential hangs in SharedPreferences.getInstance() on some Linux runners
+      SharedPreferences.setMockInitialValues({});
 
-    // Poll for up to 60 seconds for the app to settle on a known screen
-    bool found = false;
-    for (int i = 0; i < 500; i++) {
-      await tester
-          .pump(const Duration(milliseconds: 100)); // 100ms * 300 = 30s max
+      await app.main();
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
 
-      final finder = find.byWidgetPredicate((widget) {
-        if (widget is Text) {
-          final data = widget.data;
-          // Check for Title of Intro OR Dashboard OR specific failure/loading states that indicate app is alive
-          return data == 'Track Your Wealth' || // Intro Title
-              data == 'Dashboard' || // Dashboard Title
-              data == 'Wealth Overview' || // Dashboard Section
-              data == 'Smart Budgeting' || // Intro Page 2
-              data == 'ANALYSIS & BUDGETS' || // Analysis Screen
-              data == 'TrueLedger' || // App Bar Title
-              data == 'Initializing...' || // Loading State
-              data == 'Initialization Failed'; // Error State
+      // Poll for up to 60 seconds for the app to settle on a known screen
+      bool found = false;
+      for (int i = 0; i < 500; i++) {
+        await tester
+            .pump(const Duration(milliseconds: 100)); // 100ms * 300 = 30s max
+
+        final finder = find.byWidgetPredicate((widget) {
+          if (widget is Text) {
+            final data = widget.data;
+            // Check for Title of Intro OR Dashboard OR specific failure/loading states that indicate app is alive
+            return data == 'Track Your Wealth' || // Intro Title
+                data == 'Dashboard' || // Dashboard Title
+                data == 'Wealth Overview' || // Dashboard Section
+                data == 'Smart Budgeting' || // Intro Page 2
+                data == 'ANALYSIS & BUDGETS' || // Analysis Screen
+                data == 'TrueLedger' || // App Bar Title
+                data == 'Initializing...' || // Loading State
+                data == 'Initialization Failed'; // Error State
+          }
+          return false;
+        });
+
+        if (finder.evaluate().isNotEmpty) {
+          found = true;
+          break;
         }
-        return false;
-      });
-
-      if (finder.evaluate().isNotEmpty) {
-        found = true;
-        break;
       }
-    }
 
-    if (!found) {
-      debugPrint(
-          'Test timed out waiting for app to load. Dumping widget tree:');
-      debugDumpApp();
-      fail("App did not load Intro or Dashboard within 50 seconds");
-    }
+      if (!found) {
+        debugPrint(
+            'Test timed out waiting for app to load. Dumping widget tree:');
+        debugDumpApp();
+        fail("App did not load Intro or Dashboard within 50 seconds");
+      }
 
-    expect(found, isTrue);
+      expect(found, isTrue);
+    } catch (e, stack) {
+      debugPrint('CRITICAL: Test failed during app launch: $e');
+      debugPrint(stack.toString());
+      rethrow;
+    }
   });
 }
