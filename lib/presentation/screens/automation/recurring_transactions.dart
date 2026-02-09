@@ -5,6 +5,7 @@ import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/presentation/providers/recurring_provider.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class RecurringTransactionsScreen extends ConsumerWidget {
@@ -157,8 +158,10 @@ class RecurringTransactionsScreen extends ConsumerWidget {
                     icon: Icon(Icons.delete_outline_rounded,
                         size: 18,
                         color: semantic.overspent.withValues(alpha: 0.5)),
-                    onPressed: () =>
-                        ref.read(recurringProvider.notifier).delete(item.id),
+                    onPressed: () {
+                      ref.read(recurringProvider.notifier).delete(item.id);
+                      ref.invalidate(dashboardProvider);
+                    },
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -285,6 +288,8 @@ class RecurringTransactionsScreen extends ConsumerWidget {
                                 dayOfMonth: dayOfMonth,
                                 dayOfWeek: dayOfWeek,
                               );
+                          // Invalidate dashboard to refresh payment calendar
+                          ref.invalidate(dashboardProvider);
                           Navigator.pop(context);
                         }
                       },
