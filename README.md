@@ -77,6 +77,24 @@ flutter pub get
 flutter run
 ```
 
+### 🐳 Docker Deployment (Web)
+
+For web deployment with Docker (ideal for Vercel, cloud hosting, or local testing):
+
+```bash
+# Quick start with Docker Compose
+cd docker
+docker-compose up --build
+
+# Or with Docker CLI
+docker build -f docker/Dockerfile -t trueledger-web .
+docker run -d -p 8080:80 --name trueledger trueledger-web
+```
+
+Access at: http://localhost:8080
+
+**📚 See [docs/deployment/docker-quickstart.md](docs/deployment/docker-quickstart.md) for quick reference or [docker/README.md](docker/README.md) for complete documentation.**
+
 ### Platform-Specific Setup
 
 #### Linux

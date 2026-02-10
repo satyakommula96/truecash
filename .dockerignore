@@ -1,0 +1,55 @@
+# Docker ignore file for Flutter web application
+# Flutter build outputs
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Test and coverage
+coverage/
+test_results.txt
+*.diff
+
+# Platform-specific (not needed for web)
+android/
+ios/
+linux/
+macos/
+windows/
+
+# Documentation and assets (keep only what's needed)
+docs/
+release_assets/
+site/
+
+# Python virtual environment
+.venv/
+
+# Integration tests (not needed for production build)
+integration_test/
+test_driver/
+
+# Misc
+*.log
+*.pyc
+*.swp
+.metadata
+new.diff
