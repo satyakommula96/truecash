@@ -327,7 +327,7 @@ class AppDatabase {
     await db.execute(
         'CREATE TABLE ${Schema.budgetsTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colCategory} TEXT, ${Schema.colMonthlyLimit} REAL, ${Schema.colLastReviewedAt} TEXT)');
     await db.execute(
-        'CREATE TABLE ${Schema.customCategoriesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colType} TEXT)');
+        'CREATE TABLE ${Schema.customCategoriesTable} (${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Schema.colName} TEXT, ${Schema.colType} TEXT, ${Schema.colOrderIndex} INTEGER DEFAULT 0)');
     await db.execute('''
           CREATE TABLE ${Schema.recurringTransactionsTable} (
             ${Schema.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -547,6 +547,7 @@ class AppDatabase {
     final random = Random();
     final categories = [
       'Food',
+      'Groceries',
       'Transport',
       'Shopping',
       'Utility',

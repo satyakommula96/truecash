@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/providers/usecase_providers.dart';
@@ -25,6 +26,7 @@ class QuickAddBottomSheet extends ConsumerStatefulWidget {
 class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
   String _selectedCategory = ''; // Will be set when categories load
   String? _suggestedCategory;
   String? _suggestedPaymentMethod;
@@ -146,7 +148,7 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
             note: _noteController.text.isEmpty
                 ? 'Quick add'
                 : _noteController.text,
-            date: DateTime.now().toIso8601String(),
+            date: _selectedDate.toIso8601String(),
             paymentMethod: _paymentMethod,
           ),
         );
@@ -497,6 +499,8 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
               ),
               const SizedBox(height: 24),
               _buildPaymentMethodSection(context, semantic),
+              const SizedBox(height: 24),
+              _buildDateSection(context, semantic),
               const SizedBox(height: 32),
               Container(
                 decoration: BoxDecoration(
@@ -860,6 +864,118 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDateSection(BuildContext context, AppColors semantic) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final curDate =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+    final isToday = curDate.isAtSameMomentAs(today);
+    final isYesterday = curDate.isAtSameMomentAs(yesterday);
+    final isOther = !isToday && !isYesterday;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "DATE",
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: semantic.secondaryText,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _buildDateChip(
+              label: "TODAY",
+              isSelected: isToday,
+              onTap: () => setState(() => _selectedDate = DateTime.now()),
+            ),
+            const SizedBox(width: 10),
+            _buildDateChip(
+              label: "YESTERDAY",
+              isSelected: isYesterday,
+              onTap: () => setState(() => _selectedDate =
+                  DateTime.now().subtract(const Duration(days: 1))),
+            ),
+            const SizedBox(width: 10),
+            _buildDateChip(
+              label:
+                  isOther ? DateFormat('MMM d').format(_selectedDate) : "OTHER",
+              isSelected: isOther,
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) {
+                  setState(() => _selectedDate = picked);
+                }
+              },
+              icon: Icons.calendar_month_rounded,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primary.withValues(alpha: 0.1)
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? colorScheme.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon,
+                  size: 14,
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

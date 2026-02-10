@@ -66,6 +66,7 @@ abstract class IFinancialRepository {
   Future<List<TransactionCategory>> getCategories(String type);
   Future<void> addCategory(String name, String type);
   Future<void> deleteCategory(int id);
+  Future<void> reorderCategories(List<TransactionCategory> categories);
   Future<List<Map<String, dynamic>>> getCategorySpendingForRange(
       DateTime start, DateTime end);
   Future<String?> getRecommendedCategory(String note);

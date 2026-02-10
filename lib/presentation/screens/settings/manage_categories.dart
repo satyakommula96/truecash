@@ -102,13 +102,36 @@ class _ManageCategoriesScreenState
             child: categoriesAsync.when(
               data: (categories) {
                 if (categories.isEmpty) return _buildEmptyState(semantic);
-                return ListView.separated(
+                return ReorderableListView.builder(
+                  buildDefaultDragHandles: false,
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                   itemCount: categories.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final cat = categories[index];
-                    return _buildCategoryItem(cat, index, semantic);
+                    return Container(
+                      key: ValueKey(cat.id),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: _buildCategoryItem(cat, index, semantic),
+                    );
+                  },
+                  onReorder: (oldIndex, newIndex) async {
+                    if (newIndex > oldIndex) newIndex--;
+                    final updatedList =
+                        List<TransactionCategory>.from(categories);
+                    final item = updatedList.removeAt(oldIndex);
+                    updatedList.insert(newIndex, item);
+
+                    // Optimistic update if needed, but here we just call repo
+                    await ref
+                        .read(financialRepositoryProvider)
+                        .reorderCategories(updatedList);
+                    ref.invalidate(categoriesProvider(selectedType));
+                  },
+                  proxyDecorator: (child, index, animation) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: child,
+                    );
                   },
                 );
               },
@@ -168,116 +191,136 @@ class _ManageCategoriesScreenState
   Widget _buildAddInput(AppColors semantic) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: categoryCtrl,
-              style: TextStyle(
-                  color: semantic.text,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14),
-              decoration: InputDecoration(
-                hintText: "Add new category...",
-                hintStyle: TextStyle(
-                    color: semantic.secondaryText.withValues(alpha: 0.5),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: TextField(
+                controller: categoryCtrl,
+                style: TextStyle(
+                    color: semantic.text,
+                    fontWeight: FontWeight.w900,
                     fontSize: 14),
-                filled: true,
-                fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: semantic.divider, width: 1.5),
+                decoration: InputDecoration(
+                  hintText: "Add new category...",
+                  hintStyle: TextStyle(
+                      color: semantic.secondaryText.withValues(alpha: 0.5),
+                      fontSize: 14),
+                  filled: true,
+                  fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.divider, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.divider, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: semantic.primary, width: 2),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: semantic.divider, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: semantic.primary, width: 2),
-                ),
+                onSubmitted: (_) => _addCategory(),
               ),
-              onSubmitted: (_) => _addCategory(),
             ),
-          ),
-          const SizedBox(width: 12),
-          HoverWrapper(
-            onTap: _addCategory,
-            borderRadius: 16,
-            child: Container(
-              height: 54,
-              width: 54,
-              decoration: BoxDecoration(
-                color: semantic.primary,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: semantic.primary.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ],
+            const SizedBox(width: 12),
+            HoverWrapper(
+              onTap: _addCategory,
+              borderRadius: 16,
+              child: Container(
+                width: 54,
+                decoration: BoxDecoration(
+                  color: semantic.primary,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: semantic.primary.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: const Icon(Icons.add_rounded,
+                    color: Colors.white, size: 28),
               ),
-              child:
-                  const Icon(Icons.add_rounded, color: Colors.white, size: 28),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCategoryItem(
       TransactionCategory cat, int index, AppColors semantic) {
-    return HoverWrapper(
-      onTap: () => Navigator.pop(context, cat.name),
-      borderRadius: 20,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
-        decoration: BoxDecoration(
-          color: semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: semantic.divider, width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: semantic.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Text(cat.name.isNotEmpty ? cat.name[0].toUpperCase() : "?",
-                  style: TextStyle(
-                      color: semantic.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: semantic.surfaceCombined.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: semantic.divider, width: 1.2),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ReorderableDragStartListener(
+            index: index,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              child: Icon(Icons.drag_indicator_rounded,
+                  size: 20,
+                  color: semantic.secondaryText.withValues(alpha: 0.3)),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                cat.name.toUpperCase(),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: semantic.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(cat.name.isNotEmpty ? cat.name[0].toUpperCase() : "?",
                 style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 13,
-                  color: semantic.text,
-                  letterSpacing: 0.5,
-                ),
+                    color: semantic.primary,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14)),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              cat.name.toUpperCase(),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 13,
+                color: semantic.text,
+                letterSpacing: 0.5,
               ),
             ),
-            _buildActionIcon(Icons.check_circle_outline_rounded,
-                () => Navigator.pop(context, cat.name), semantic,
-                color: semantic.income),
-            const SizedBox(width: 8),
-            _buildActionIcon(Icons.delete_outline_rounded,
-                () => _deleteCategory(cat), semantic,
-                color: semantic.overspent),
-          ],
-        ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildActionIcon(
+                Icons.check_circle_outline_rounded,
+                () => Navigator.pop(context, cat.name),
+                semantic,
+                color: semantic.income,
+              ),
+              const SizedBox(width: 8),
+              _buildActionIcon(
+                Icons.delete_outline_rounded,
+                () => _deleteCategory(cat),
+                semantic,
+                color: semantic.overspent,
+              ),
+            ],
+          ),
+        ],
       ),
     )
         .animate()

@@ -7,6 +7,8 @@ import 'package:trueledger/core/utils/date_helper.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/dashboard_provider.dart';
+import 'package:trueledger/presentation/providers/repository_providers.dart';
+import 'package:trueledger/domain/models/models.dart';
 
 class PaymentCalendar extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> bills;
@@ -294,19 +296,22 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
   }
 
   Widget _buildSummaryBar(List<String> paidLabels) {
-    double totalDue = 0;
+    double totalSum = 0;
     double totalPaid = 0;
 
     final daysInMonth = _getDaysInMonth(_focusedMonth);
     for (int d = 1; d <= daysInMonth; d++) {
       final events = _getEventsForDay(d, paidLabels);
       for (var e in events) {
-        totalDue += (e['amount'] as num).toDouble();
+        final amount = (e['amount'] as num).toDouble();
+        totalSum += amount;
         if (e['isPaid'] == true) {
-          totalPaid += (e['amount'] as num).toDouble();
+          totalPaid += amount;
         }
       }
     }
+
+    final totalDue = totalSum - totalPaid;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -326,12 +331,13 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
           ),
           _buildSummaryItem("PAID", totalPaid, Colors.green),
           const Spacer(),
-          if (totalDue > 0)
+          if (totalSum > 0)
             CircularProgressIndicator(
-              value: totalPaid / totalDue,
+              value: totalPaid / totalSum,
               strokeWidth: 3,
               backgroundColor: widget.semantic.divider,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  totalDue == 0 ? Colors.green : widget.semantic.overspent),
             ),
         ],
       ),
@@ -356,6 +362,7 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
   void _showDayDetails(int day, List<Map<String, dynamic>> events) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -365,22 +372,24 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
           top: false,
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  DateFormat('dd-MM-yyyy').format(
-                      DateTime(_focusedMonth.year, _focusedMonth.month, day)),
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
-                      color: widget.semantic.secondaryText),
-                ),
-                const SizedBox(height: 16),
-                ...events.map((e) => _buildDetailItem(e)),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    DateFormat('dd-MM-yyyy').format(
+                        DateTime(_focusedMonth.year, _focusedMonth.month, day)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                        color: widget.semantic.secondaryText),
+                  ),
+                  const SizedBox(height: 16),
+                  ...events.map((e) => _buildDetailItem(e, day)),
+                ],
+              ),
             ),
           ),
         );
@@ -388,7 +397,91 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
     );
   }
 
-  Widget _buildDetailItem(Map<String, dynamic> bill) {
+  Future<void> _handleMarkAsPaid(Map<String, dynamic> bill, int day) async {
+    final date = DateTime(_focusedMonth.year, _focusedMonth.month, day);
+    final dateStr = date.toIso8601String();
+
+    final name = bill['name'] ?? bill['title'] ?? 'Bill';
+    final amount = (bill['amount'] as num).toDouble();
+    final type = bill['type'];
+
+    String txType = 'Variable';
+    String category = 'Others';
+    Set<TransactionTag> tags = {};
+
+    if (type == 'LOAN EMI' || type == 'BORROWING DUE') {
+      txType = 'Fixed';
+      category = 'EMI / Payment: $name';
+      tags = {TransactionTag.loanEmi};
+    } else if (type == 'SUBSCRIPTION') {
+      txType = 'Variable';
+      category = 'Subscription';
+      tags = {TransactionTag.transfer};
+    } else if (type == 'CREDIT DUE') {
+      txType = 'Fixed';
+      category = 'Credit Card Payment: $name';
+      tags = {TransactionTag.transfer};
+
+      final idStr = bill['id'] as String;
+      if (idStr.startsWith('cc_')) {
+        final id = int.tryParse(idStr.substring(3));
+        if (id != null) {
+          await ref
+              .read(financialRepositoryProvider)
+              .payCreditCardBill(id, amount);
+        }
+      }
+    } else if (type == 'INVESTMENT DUE') {
+      txType = 'Investment';
+      category = 'Investment';
+      tags = {TransactionTag.transfer};
+    } else if (type == 'RECURRING INCOME') {
+      txType = 'Income';
+      category = 'Income';
+      tags = {TransactionTag.income};
+    } else if (type == 'RECURRING EXPENSE') {
+      txType = 'Variable';
+      category = 'Others';
+      tags = {TransactionTag.transfer};
+    }
+
+    try {
+      await ref.read(financialRepositoryProvider).addEntry(
+            txType,
+            amount,
+            category,
+            "Payment for $name (via Calendar)",
+            dateStr,
+            tags: tags,
+          );
+
+      // Refresh data
+      ref.invalidate(dashboardProvider);
+      final monthStr = DateFormat('yyyy-MM').format(_focusedMonth);
+      ref.invalidate(paidLabelsProvider(monthStr));
+
+      if (mounted) {
+        Navigator.pop(context); // Close bottom sheet
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$name marked as paid"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to mark as paid: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildDetailItem(Map<String, dynamic> bill, int day) {
     IconData icon = Icons.receipt_long;
     Color color = widget.semantic.secondaryText;
 
@@ -484,6 +577,39 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
                       fontWeight: FontWeight.w900,
                       color: Colors.green.shade700,
                       letterSpacing: 1),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: GestureDetector(
+                    onTap: () => _handleMarkAsPaid(bill, day),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: Colors.green.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_rounded,
+                              size: 10, color: Colors.green.shade700),
+                          const SizedBox(width: 4),
+                          Text(
+                            "MARK PAID",
+                            style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.green.shade700,
+                                letterSpacing: 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),

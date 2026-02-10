@@ -990,8 +990,10 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   @override
   Future<List<TransactionCategory>> getCategories(String type) async {
     final db = await AppDatabase.db;
-    var list = await db
-        .query('custom_categories', where: 'type = ?', whereArgs: [type]);
+    var list = await db.query('custom_categories',
+        where: 'type = ?',
+        whereArgs: [type],
+        orderBy: '${Schema.colOrderIndex} ASC, ${Schema.colId} ASC');
 
     if (list.isEmpty) {
       final allCount = Sqflite.firstIntValue(
@@ -1000,17 +1002,21 @@ class FinancialRepositoryImpl implements IFinancialRepository {
       // If the specific type is empty, and the table is entirely empty, seed all.
       if (allCount == 0) {
         final batch = db.batch();
+        int index = 0;
         for (var entry in _defaultCategories.entries) {
           for (var cat in entry.value) {
             batch.insert('custom_categories', {
               'name': cat,
               'type': entry.key,
+              Schema.colOrderIndex: index++,
             });
           }
         }
         await batch.commit(noResult: true);
-        list = await db
-            .query('custom_categories', where: 'type = ?', whereArgs: [type]);
+        list = await db.query('custom_categories',
+            where: 'type = ?',
+            whereArgs: [type],
+            orderBy: '${Schema.colOrderIndex} ASC, ${Schema.colId} ASC');
       }
     }
 
@@ -1020,9 +1026,17 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   @override
   Future<void> addCategory(String name, String type) async {
     final db = await AppDatabase.db;
+
+    // Get the current max order index for this type
+    final maxRes = await db.rawQuery(
+        'SELECT MAX(${Schema.colOrderIndex}) as max_idx FROM custom_categories WHERE type = ?',
+        [type]);
+    final maxIdx = (maxRes.first['max_idx'] as int? ?? -1) + 1;
+
     await db.insert('custom_categories', {
       'name': name,
       'type': type,
+      Schema.colOrderIndex: maxIdx,
     });
   }
 
@@ -1030,6 +1044,23 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   Future<void> deleteCategory(int id) async {
     final db = await AppDatabase.db;
     await db.delete('custom_categories', where: 'id = ?', whereArgs: [id]);
+  }
+
+  @override
+  Future<void> reorderCategories(List<TransactionCategory> categories) async {
+    final db = await AppDatabase.db;
+    final batch = db.batch();
+
+    for (int i = 0; i < categories.length; i++) {
+      batch.update(
+        'custom_categories',
+        {Schema.colOrderIndex: i},
+        where: 'id = ?',
+        whereArgs: [categories[i].id],
+      );
+    }
+
+    await batch.commit(noResult: true);
   }
 
   @override
@@ -1045,7 +1076,15 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   }
 
   static const Map<String, List<String>> _defaultCategories = {
-    'Variable': ['Food', 'Transport', 'Shopping', 'Entertainment', 'Others'],
+    'Variable': [
+      'Food',
+      'Groceries',
+      'Transport',
+      'Medical',
+      'Shopping',
+      'Entertainment',
+      'Others'
+    ],
     'Fixed': ['Rent', 'Utility', 'Insurance', 'EMI'],
     'Investment': [
       'Stocks',

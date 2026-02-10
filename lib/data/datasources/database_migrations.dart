@@ -240,6 +240,8 @@ final List<Migration> appMigrations = [
   MigrationV10(),
   MigrationV11(),
   MigrationV12(),
+  MigrationV13(),
+  MigrationV14(),
 ];
 
 class MigrationV12 extends Migration {
@@ -277,6 +279,47 @@ class MigrationV11 extends Migration {
     // Initialize current_balance with statement_balance for existing records
     await db.execute(
         "UPDATE ${Schema.creditCardsTable} SET ${Schema.colCurrentBalance} = ${Schema.colStatementBalance}");
+  }
+
+  @override
+  Future<void> down(common.DatabaseExecutor db) async {}
+}
+
+class MigrationV13 extends Migration {
+  MigrationV13() : super(13);
+
+  @override
+  Future<void> up(common.DatabaseExecutor db) async {
+    // Check and add Groceries
+    final groceries = await db.query(Schema.customCategoriesTable,
+        where: "${Schema.colName} = ? AND ${Schema.colType} = ?",
+        whereArgs: ['Groceries', 'Variable']);
+    if (groceries.isEmpty) {
+      await db.insert(Schema.customCategoriesTable,
+          {Schema.colName: 'Groceries', Schema.colType: 'Variable'});
+    }
+
+    // Check and add Medical
+    final medical = await db.query(Schema.customCategoriesTable,
+        where: "${Schema.colName} = ? AND ${Schema.colType} = ?",
+        whereArgs: ['Medical', 'Variable']);
+    if (medical.isEmpty) {
+      await db.insert(Schema.customCategoriesTable,
+          {Schema.colName: 'Medical', Schema.colType: 'Variable'});
+    }
+  }
+
+  @override
+  Future<void> down(common.DatabaseExecutor db) async {}
+}
+
+class MigrationV14 extends Migration {
+  MigrationV14() : super(14);
+
+  @override
+  Future<void> up(common.DatabaseExecutor db) async {
+    await addColumnSafe(db, Schema.customCategoriesTable, Schema.colOrderIndex,
+        "INTEGER DEFAULT 0");
   }
 
   @override

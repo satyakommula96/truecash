@@ -218,5 +218,36 @@ void main() {
       final restored = await repo.getAllValues('variable_expenses');
       expect(restored.first['amount'], 123);
     });
+
+    test('getCategories respects order_index and reorderCategories updates it',
+        () async {
+      // Clear to remove defaults and ensure clean state
+      await repo.clearData();
+
+      await repo.addCategory('C3', 'Variable'); // Max idx 0
+      await repo.addCategory('C1', 'Variable'); // Max idx 1
+      await repo.addCategory('C2', 'Variable'); // Max idx 2
+
+      var cats = await repo.getCategories('Variable');
+      expect(cats[0].name, 'C3');
+      expect(cats[1].name, 'C1');
+      expect(cats[2].name, 'C2');
+
+      // Reorder to C1, C2, C3
+      final newOrder = [cats[1], cats[2], cats[0]];
+      await repo.reorderCategories(newOrder);
+
+      cats = await repo.getCategories('Variable');
+      expect(cats[0].name, 'C1');
+      expect(cats[1].name, 'C2');
+      expect(cats[2].name, 'C3');
+    });
+
+    test('default categories contain Groceries and Medical', () async {
+      final cats = await repo.getCategories('Variable');
+      final names = cats.map((c) => c.name).toList();
+      expect(names, contains('Groceries'));
+      expect(names, contains('Medical'));
+    });
   });
 }

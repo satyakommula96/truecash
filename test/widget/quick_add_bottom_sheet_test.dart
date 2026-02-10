@@ -107,6 +107,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap Save
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
       await tester.tap(find.text('SAVE EXPENSE'));
       await tester.pumpAndSettle();
 
@@ -137,6 +138,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       await tester.enterText(find.byType(TextField).first, '100');
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
       await tester.tap(find.text('SAVE EXPENSE'));
       await tester.pumpAndSettle();
 
@@ -169,6 +171,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       await tester.enterText(find.byType(TextField).first, '100');
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
       await tester.tap(find.text('SAVE EXPENSE'));
       await tester.pumpAndSettle();
 
@@ -186,6 +189,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       await tester.enterText(find.byType(TextField).first, '100');
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
       await tester.tap(find.text('SAVE EXPENSE'));
       await tester.pumpAndSettle();
 
@@ -197,6 +201,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       await tester.enterText(find.byType(TextField).first, '0');
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
       await tester.tap(find.text('SAVE EXPENSE'));
       await tester.pumpAndSettle();
 
@@ -232,6 +237,35 @@ void main() {
           .pumpAndSettle(const Duration(seconds: 1)); // Wait for animation
 
       expect(_amountController(tester).text, '300.0');
+    });
+
+    testWidgets('should allow selecting past dates', (tester) async {
+      when(() => mockUseCase.call(any())).thenAnswer((_) async => Success(
+            AddTransactionResult(cancelDailyReminder: false),
+          ));
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Should show Today by default
+      expect(find.text('TODAY'), findsOneWidget);
+
+      // Select Yesterday
+      await tester.tap(find.text('YESTERDAY'));
+      await tester.pumpAndSettle();
+
+      // Enter details and save
+      await tester.enterText(find.byType(TextField).first, '100');
+      await tester.ensureVisible(find.text('SAVE EXPENSE'));
+      await tester.tap(find.text('SAVE EXPENSE'));
+      await tester.pumpAndSettle();
+
+      // Verify date is yesterday (approximately)
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final captured = verify(() => mockUseCase.call(captureAny()))
+          .captured
+          .single as AddTransactionParams;
+      expect(captured.date.substring(0, 10),
+          yesterday.toIso8601String().substring(0, 10));
     });
   });
 }
