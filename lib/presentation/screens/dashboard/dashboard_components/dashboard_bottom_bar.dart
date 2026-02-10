@@ -23,69 +23,77 @@ class DashboardBottomBar extends StatelessWidget {
     final semantic = Theme.of(context).extension<AppColors>()!;
     final padding = MediaQuery.of(context).padding;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + padding.bottom),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            height: 72,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            decoration: BoxDecoration(
-              color: semantic.surfaceCombined.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: semantic.divider, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + padding.bottom),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                height: 72,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: semantic.surfaceCombined.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: semantic.divider, width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                _buildActionIcon(
-                  context,
-                  Icons.account_balance_rounded,
-                  "Accounts",
-                  semantic.income,
-                  () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const LoansScreen())),
-                  semantic,
-                ),
-                _buildActionIcon(
-                  context,
-                  Icons.credit_card_rounded,
-                  "Cards",
-                  semantic.primary,
-                  () => Navigator.push(
+                child: Row(
+                  children: [
+                    _buildActionIcon(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => const CreditCardsScreen())),
-                  semantic,
-                ),
-                _buildActionIcon(
-                  context,
-                  Icons.auto_graph_rounded,
-                  "Analysis",
-                  const Color(0xFFA855F7),
-                  () => Navigator.push(
+                      Icons.account_balance_rounded,
+                      "Accounts",
+                      semantic.income,
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const LoansScreen())),
+                      semantic,
+                    ),
+                    _buildActionIcon(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => const AnalysisScreen())),
-                  semantic,
+                      Icons.credit_card_rounded,
+                      "Cards",
+                      semantic.primary,
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const CreditCardsScreen())),
+                      semantic,
+                    ),
+                    _buildActionIcon(
+                      context,
+                      Icons.auto_graph_rounded,
+                      "Analysis",
+                      const Color(0xFFA855F7),
+                      () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const AnalysisScreen())),
+                      semantic,
+                    ),
+                    _buildActionIcon(
+                      context,
+                      Icons.grid_view_rounded,
+                      "More",
+                      semantic.warning,
+                      () => _showMoreMenu(context, semantic),
+                      semantic,
+                    ),
+                  ],
                 ),
-                _buildActionIcon(
-                  context,
-                  Icons.grid_view_rounded,
-                  "More",
-                  semantic.warning,
-                  () => _showMoreMenu(context, semantic),
-                  semantic,
-                ),
-              ],
+              ),
             ),
           ),
         ),

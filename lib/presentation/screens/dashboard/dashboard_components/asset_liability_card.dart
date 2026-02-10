@@ -106,13 +106,19 @@ class AssetLiabilityCard extends ConsumerWidget {
                   ),
                   child: Icon(icon, size: 14, color: color),
                 ),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w900,
-                    color: semantic.secondaryText,
-                    letterSpacing: 1.5,
+                const SizedBox(width: 8), // Added space between icon and text
+                Expanded(
+                  // Changed Flexible to Expanded to ensure text takes available space
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w900,
+                      color: semantic.secondaryText,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ),
               ],
