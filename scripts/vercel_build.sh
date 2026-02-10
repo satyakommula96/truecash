@@ -21,4 +21,4 @@ echo "Getting dependencies..."
 flutter pub get
 
 echo "Building web application..."
-flutter build web --release --no-pub
+flutter build web --debug --no-pub
