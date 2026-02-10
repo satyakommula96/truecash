@@ -59,144 +59,165 @@ class _EditEntryScreenState extends ConsumerState<EditEntryScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildAmountHeader(semantic),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                  32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.entry.type == 'Income' ? "SOURCE" : "LABEL",
-                      style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          color: Colors.grey)),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: labelCtrl,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w900, color: semantic.text),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor:
-                            semantic.surfaceCombined.withValues(alpha: 0.5),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(color: semantic.divider),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(color: semantic.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(color: semantic.primary),
-                        )),
-                  ),
-                  if (widget.entry.type == 'Variable') ...[
-                    const SizedBox(height: 20),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final categoriesAsync =
-                            ref.watch(categoriesProvider('Variable'));
-                        return categoriesAsync.when(
-                          data: (categories) {
-                            if (categories.isEmpty) {
-                              return const SizedBox.shrink();
-                            }
-                            return Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: categories.map((cat) {
-                                final active = labelCtrl.text == cat.name;
-                                return ActionChip(
-                                  label: Text(cat.name.toUpperCase()),
-                                  onPressed: () => setState(() {
-                                    labelCtrl.text = cat.name;
-                                  }),
-                                  backgroundColor: active
-                                      ? semantic.primary
-                                      : Colors.transparent,
-                                  side: BorderSide(
-                                      color: active
-                                          ? semantic.primary
-                                          : semantic.divider),
-                                  labelStyle: TextStyle(
-                                      color:
-                                          active ? Colors.black : semantic.text,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 9,
-                                      letterSpacing: 1),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildAmountHeader(semantic),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.entry.type == 'Income' ? "SOURCE" : "LABEL",
+                          style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: Colors.grey)),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: labelCtrl,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, color: semantic.text),
+                        decoration: InputDecoration(
+                            filled: true,
+                            fillColor:
+                                semantic.surfaceCombined.withValues(alpha: 0.5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: semantic.divider),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: semantic.divider),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: semantic.primary),
+                            )),
+                      ),
+                      if (widget.entry.type == 'Variable') ...[
+                        const SizedBox(height: 20),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final categoriesAsync =
+                                ref.watch(categoriesProvider('Variable'));
+                            return categoriesAsync.when(
+                              data: (categories) {
+                                if (categories.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children: categories.map((cat) {
+                                    final active = labelCtrl.text == cat.name;
+                                    return Theme(
+                                      data: Theme.of(context).copyWith(
+                                          canvasColor: Colors.transparent),
+                                      child: ChoiceChip(
+                                        label: Text(cat.name.toUpperCase()),
+                                        selected: active,
+                                        onSelected: (_) => setState(() {
+                                          labelCtrl.text = cat.name;
+                                        }),
+                                        backgroundColor: semantic
+                                            .surfaceCombined
+                                            .withValues(alpha: 0.3),
+                                        selectedColor: semantic.primary
+                                            .withValues(alpha: 0.1),
+                                        side: BorderSide(
+                                            color: active
+                                                ? semantic.primary
+                                                : semantic.divider,
+                                            width: 1.5),
+                                        labelStyle: TextStyle(
+                                            color: active
+                                                ? semantic.primary
+                                                : semantic.secondaryText,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 10,
+                                            letterSpacing: 0.5),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
+                                        showCheckmark: false,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 );
-                              }).toList(),
+                              },
+                              loading: () => const SizedBox.shrink(),
+                              error: (err, stack) => const SizedBox.shrink(),
                             );
                           },
-                          loading: () => const SizedBox.shrink(),
-                          error: (err, stack) => const SizedBox.shrink(),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 48),
-                    const Text("NOTE",
-                        style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                            color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: noteCtrl,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700, color: semantic.text),
-                      decoration: InputDecoration(
-                          filled: true,
-                          fillColor:
-                              semantic.surfaceCombined.withValues(alpha: 0.5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: semantic.divider),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: semantic.divider),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide(color: semantic.primary),
-                          )),
-                    ),
-                  ],
-                  const SizedBox(height: 64),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 64,
-                    child: ElevatedButton(
-                      key: WidgetKeys.saveButton,
-                      onPressed: _update,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: semantic.primary,
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        elevation: 0,
-                      ),
-                      child: const Text("UPDATE ENTRY",
+                        ),
+                        const SizedBox(height: 48),
+                        const Text("NOTE",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                                color: Colors.grey)),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: noteCtrl,
                           style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 12,
-                              letterSpacing: 2)),
-                    ),
+                              fontWeight: FontWeight.w700,
+                              color: semantic.text),
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: semantic.surfaceCombined
+                                  .withValues(alpha: 0.5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(color: semantic.divider),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(color: semantic.divider),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(color: semantic.primary),
+                              )),
+                        ),
+                      ],
+                      const SizedBox(height: 64),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: ElevatedButton(
+                          key: WidgetKeys.saveButton,
+                          onPressed: _update,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: semantic.primary,
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            elevation: 0,
+                          ),
+                          child: const Text("UPDATE ENTRY",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12,
+                                  letterSpacing: 2)),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

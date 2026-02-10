@@ -47,6 +47,8 @@ class CurrencyFormatter {
     if (compact) {
       return "$sym${NumberFormat.compact(locale: locale).format(value)}";
     }
-    return "$sym${NumberFormat.decimalPattern(locale).format(value)}";
+    final formatter = NumberFormat.decimalPattern(locale);
+    formatter.maximumFractionDigits = 0;
+    return "$sym${formatter.format(value)}";
   }
 }

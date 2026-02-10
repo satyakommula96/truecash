@@ -77,92 +77,98 @@ class _EditBudgetScreenState extends ConsumerState<EditBudgetScreen> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "MONTHLY CEILING",
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2,
-                color: Colors.grey,
-              ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+                24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "MONTHLY CEILING",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: limitCtrl,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 48,
+                    letterSpacing: -2,
+                    color: semantic.text,
+                  ),
+                  decoration: InputDecoration(
+                    prefixText: "${CurrencyFormatter.symbol} ",
+                    border: InputBorder.none,
+                    hintText: "0",
+                    hintStyle: TextStyle(
+                        color: semantic.secondaryText.withValues(alpha: 0.1)),
+                  ),
+                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
+                const SizedBox(height: 64),
+                SizedBox(
+                  width: double.infinity,
+                  height: 64,
+                  child: OutlinedButton(
+                    onPressed: _markReviewed,
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      side: BorderSide(color: semantic.primary, width: 2),
+                    ),
+                    child: Text(
+                      "MARK AS REVIEWED",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
+                        letterSpacing: 2,
+                        color: semantic.primary,
+                      ),
+                    ),
+                  ),
+                )
+                    .animate(delay: 200.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.9, 0.9)),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 64,
+                  child: ElevatedButton(
+                    onPressed: _update,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: semantic.primary,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "UPDATE BUDGET",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                )
+                    .animate(delay: 300.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.9, 0.9)),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: limitCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 48,
-                letterSpacing: -2,
-                color: semantic.text,
-              ),
-              decoration: InputDecoration(
-                prefixText: "${CurrencyFormatter.symbol} ",
-                border: InputBorder.none,
-                hintText: "0",
-                hintStyle: TextStyle(
-                    color: semantic.secondaryText.withValues(alpha: 0.1)),
-              ),
-            ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
-            const SizedBox(height: 64),
-            SizedBox(
-              width: double.infinity,
-              height: 64,
-              child: OutlinedButton(
-                onPressed: _markReviewed,
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  side: BorderSide(color: semantic.primary, width: 2),
-                ),
-                child: Text(
-                  "MARK AS REVIEWED",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                    letterSpacing: 2,
-                    color: semantic.primary,
-                  ),
-                ),
-              ),
-            )
-                .animate(delay: 200.ms)
-                .fadeIn()
-                .scale(begin: const Offset(0.9, 0.9)),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 64,
-              child: ElevatedButton(
-                onPressed: _update,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: semantic.primary,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  "UPDATE BUDGET",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-            )
-                .animate(delay: 300.ms)
-                .fadeIn()
-                .scale(begin: const Offset(0.9, 0.9)),
-          ],
+          ),
         ),
       ),
     );

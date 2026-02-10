@@ -50,144 +50,197 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
     final semantic = Theme.of(context).extension<AppColors>()!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("NEW BORROWING")),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-            32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("LOAN CLASSIFICATION",
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
-                    color: Colors.grey)),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: loanTypes.map((t) {
-                final active = selectedType == t;
-                return ActionChip(
-                  label: Text(t.toUpperCase()),
-                  onPressed: () => setState(() => selectedType = t),
-                  backgroundColor: active
-                      ? colorScheme.primary.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  side: BorderSide(
-                      color: active ? colorScheme.primary : semantic.divider),
-                  labelStyle: TextStyle(
-                      color:
-                          active ? colorScheme.primary : colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 9,
-                      letterSpacing: 1),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 32),
-            _buildField("CREDITOR / LOAN NAME", nameCtrl,
-                hint: "e.g. HDFC Gold Loan", type: TextInputType.text),
-            const SizedBox(height: 24),
-            Row(
+      appBar: AppBar(
+        title: const Text("NEW BORROWING"),
+        centerTitle: true,
+      ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+                24, 24, 24, 32 + MediaQuery.of(context).padding.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                    child: _buildField("REMAINING BALANCE", remainingCtrl,
-                        hint: "0",
-                        type: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        prefix: CurrencyFormatter.symbol)),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: _buildField("TOTAL LOAN", totalCtrl,
-                        hint: "0",
-                        type: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        prefix: CurrencyFormatter.symbol)),
-              ],
-            ),
-            const SizedBox(height: 24),
-            if (selectedType != 'Individual') ...[
-              Row(
-                children: [
-                  Expanded(
-                      child: _buildField("MONTHLY EMI", emiCtrl,
-                          hint: "0",
-                          type: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          prefix: CurrencyFormatter.symbol)),
-                  const SizedBox(width: 16),
-                  Expanded(
-                      child: _buildField("INTEREST RATE", rateCtrl,
-                          hint: "0.0",
-                          type: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          prefix: "%")),
-                ],
-              ),
-              const SizedBox(height: 24),
-            ],
-            Row(
-              children: [
-                Expanded(
-                  child: _buildField(
-                      selectedType == 'Individual'
-                          ? "EXPECTED REPAYMENT DATE"
-                          : "DUE DATE (DAY OF MONTH)",
-                      dueCtrl,
-                      hint: selectedType == 'Individual'
-                          ? "Select Date"
-                          : "Select Day",
-                      type: TextInputType.text,
-                      readOnly: true,
-                      onTap: _pickDate),
+                const Text("LOAN CLASSIFICATION",
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                        color: Colors.grey)),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: loanTypes.map((t) {
+                    final active = selectedType == t;
+                    return Theme(
+                      data: Theme.of(context)
+                          .copyWith(canvasColor: Colors.transparent),
+                      child: ChoiceChip(
+                        label: Text(t.toUpperCase()),
+                        selected: active,
+                        onSelected: (_) => setState(() => selectedType = t),
+                        backgroundColor:
+                            semantic.surfaceCombined.withValues(alpha: 0.3),
+                        selectedColor:
+                            colorScheme.primary.withValues(alpha: 0.1),
+                        side: BorderSide(
+                            color:
+                                active ? colorScheme.primary : semantic.divider,
+                            width: 1.5),
+                        labelStyle: TextStyle(
+                            color: active
+                                ? colorScheme.primary
+                                : semantic.secondaryText,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10,
+                            letterSpacing: 0.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        showCheckmark: false,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                if (selectedType == 'Individual') ...[
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: TextButton(
-                      onPressed: () =>
-                          setState(() => dueCtrl.text = "Flexible"),
-                      child: const Text("FLEXIBLE"),
+                const SizedBox(height: 32),
+                _buildField("CREDITOR / LOAN NAME", nameCtrl,
+                    hint: "e.g. HDFC Gold Loan", type: TextInputType.text),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                        child: _buildField("REMAINING BALANCE", remainingCtrl,
+                            hint: "0",
+                            type: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            prefix: CurrencyFormatter.symbol)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                        child: _buildField("TOTAL LOAN", totalCtrl,
+                            hint: "0",
+                            type: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            prefix: CurrencyFormatter.symbol)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                if (selectedType != 'Individual') ...[
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _buildField("MONTHLY EMI", emiCtrl,
+                              hint: "0",
+                              type: const TextInputType.numberWithOptions(
+                                  decimal: true),
+                              prefix: CurrencyFormatter.symbol)),
+                      const SizedBox(width: 16),
+                      Expanded(
+                          child: _buildField("INTEREST RATE", rateCtrl,
+                              hint: "0.0",
+                              type: const TextInputType.numberWithOptions(
+                                  decimal: true),
+                              prefix: "%")),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildField(
+                          selectedType == 'Individual'
+                              ? "EXPECTED REPAYMENT DATE"
+                              : "DUE DATE (DAY OF MONTH)",
+                          dueCtrl,
+                          hint: selectedType == 'Individual'
+                              ? "Select Date"
+                              : "Select Day",
+                          type: TextInputType.text,
+                          readOnly: true,
+                          onTap: _pickDate),
+                    ),
+                    if (selectedType == 'Individual') ...[
+                      const SizedBox(width: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 22),
+                        child: TextButton(
+                          onPressed: () =>
+                              setState(() => dueCtrl.text = "Flexible"),
+                          style: TextButton.styleFrom(
+                            foregroundColor: colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("FLEXIBLE",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900, fontSize: 11)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: semantic.warning.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: semantic.warning.withValues(alpha: 0.1)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.info_outline_rounded,
+                            size: 14, color: semantic.warning),
+                        const SizedBox(width: 8),
+                        const Text(
+                          "Engine: Reducing balance (daily)",
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
+                const SizedBox(height: 48),
+                SizedBox(
+                  width: double.infinity,
+                  height: 64,
+                  child: ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      elevation: 0,
+                      shadowColor: colorScheme.primary.withValues(alpha: 0.4),
+                    ),
+                    child: const Text("COMMIT BORROWING",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2)),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Center(
-              child: Text(
-                "Interest calculation: Reducing balance (daily)",
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic),
-              ),
-            ),
-            const SizedBox(height: 48),
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.onSurface,
-                  foregroundColor: colorScheme.surface,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: const Text("COMMIT BORROWING",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2)),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -200,6 +253,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
       bool readOnly = false,
       VoidCallback? onTap}) {
     final semantic = Theme.of(context).extension<AppColors>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,19 +269,28 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
           keyboardType: type,
           readOnly: readOnly,
           onTap: onTap,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(
+                color: semantic.secondaryText.withValues(alpha: 0.5),
+                fontSize: 14,
+                fontWeight: FontWeight.normal),
             prefixText: prefix != null ? "$prefix " : null,
-            prefixStyle:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            prefixStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: semantic.secondaryText),
             filled: true,
-            fillColor: Theme.of(context).colorScheme.surface,
+            fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: semantic.divider)),
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: semantic.divider, width: 1.5)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2)),
           ),
         ),
       ],

@@ -172,340 +172,398 @@ class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("UPDATE LOAN"),
+        centerTitle: true,
         actions: [
           IconButton(
             key: WidgetKeys.deleteButton,
-            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            icon: const Icon(Icons.delete_outline_rounded,
+                color: Colors.redAccent),
             onPressed: _delete,
-          )
+          ),
+          const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-            32, 32, 32, 32 + MediaQuery.of(context).padding.bottom),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("LOAN CLASSIFICATION",
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
-                    color: Colors.grey)),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+                24, 24, 24, 32 + MediaQuery.of(context).padding.bottom),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                'Bank',
-                'Individual',
-                'Gold',
-                'Car',
-                'Home',
-                'Education'
-              ].map((t) {
-                final active = selectedType == t;
-                return ActionChip(
-                  label: Text(t.toUpperCase()),
-                  onPressed: () => setState(() => selectedType = t),
-                  backgroundColor: active
-                      ? colorScheme.primary.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  side: BorderSide(
-                      color: active ? colorScheme.primary : semantic.divider),
-                  labelStyle: TextStyle(
-                      color:
-                          active ? colorScheme.primary : colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 9,
-                      letterSpacing: 1),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 32),
-            _buildField("CREDITOR / LOAN NAME", nameCtrl,
-                type: TextInputType.text),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildField("REMAINING BALANCE", remainingCtrl,
-                        type: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        prefix: CurrencyFormatter.symbol)),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: _buildField("TOTAL LOAN", totalCtrl,
-                        type: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        prefix: CurrencyFormatter.symbol)),
-              ],
-            ),
-            const SizedBox(height: 24),
-            if (selectedType != 'Individual') ...[
-              Row(
-                children: [
-                  Expanded(
-                      child: _buildField("MONTHLY EMI", emiCtrl,
-                          type: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          prefix: CurrencyFormatter.symbol)),
-                  const SizedBox(width: 16),
-                  Expanded(
-                      child: _buildField("INTEREST RATE", rateCtrl,
-                          type: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          prefix: "%")),
-                ],
-              ),
-              const SizedBox(height: 24),
-            ],
-            Row(
-              children: [
-                Expanded(
-                  child: _buildField(
-                      selectedType == 'Individual'
-                          ? "EXPECTED REPAYMENT DATE"
-                          : "DUE DATE (DAY OF MONTH)",
-                      dueCtrl,
-                      type: TextInputType.text,
-                      readOnly: true,
-                      onTap: _pickDate),
+                const Text("LOAN CLASSIFICATION",
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                        color: Colors.grey)),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    'Bank',
+                    'Individual',
+                    'Gold',
+                    'Car',
+                    'Home',
+                    'Education'
+                  ].map((t) {
+                    final active = selectedType == t;
+                    return Theme(
+                      data: Theme.of(context)
+                          .copyWith(canvasColor: Colors.transparent),
+                      child: ChoiceChip(
+                        label: Text(t.toUpperCase()),
+                        selected: active,
+                        onSelected: (_) => setState(() => selectedType = t),
+                        backgroundColor:
+                            semantic.surfaceCombined.withValues(alpha: 0.3),
+                        selectedColor:
+                            colorScheme.primary.withValues(alpha: 0.1),
+                        side: BorderSide(
+                            color:
+                                active ? colorScheme.primary : semantic.divider,
+                            width: 1.5),
+                        labelStyle: TextStyle(
+                            color: active
+                                ? colorScheme.primary
+                                : semantic.secondaryText,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10,
+                            letterSpacing: 0.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        showCheckmark: false,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                if (selectedType == 'Individual') ...[
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: TextButton(
-                      onPressed: () =>
-                          setState(() => dueCtrl.text = "Flexible"),
-                      child: const Text("FLEXIBLE"),
+                const SizedBox(height: 32),
+                _buildField("CREDITOR / LOAN NAME", nameCtrl,
+                    type: TextInputType.text),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                        child: _buildField("REMAINING BALANCE", remainingCtrl,
+                            type: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            prefix: CurrencyFormatter.symbol)),
+                    const SizedBox(width: 16),
+                    Expanded(
+                        child: _buildField("TOTAL LOAN", totalCtrl,
+                            type: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            prefix: CurrencyFormatter.symbol)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                if (selectedType != 'Individual') ...[
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _buildField("MONTHLY EMI", emiCtrl,
+                              type: const TextInputType.numberWithOptions(
+                                  decimal: true),
+                              prefix: CurrencyFormatter.symbol)),
+                      const SizedBox(width: 16),
+                      Expanded(
+                          child: _buildField("INTEREST RATE", rateCtrl,
+                              type: const TextInputType.numberWithOptions(
+                                  decimal: true),
+                              prefix: "%")),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildField(
+                          selectedType == 'Individual'
+                              ? "EXPECTED REPAYMENT DATE"
+                              : "DUE DATE (DAY OF MONTH)",
+                          dueCtrl,
+                          type: TextInputType.text,
+                          readOnly: true,
+                          onTap: _pickDate),
+                    ),
+                    if (selectedType == 'Individual') ...[
+                      const SizedBox(width: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 22),
+                        child: TextButton(
+                          onPressed: () =>
+                              setState(() => dueCtrl.text = "Flexible"),
+                          style: TextButton.styleFrom(
+                            foregroundColor: colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("FLEXIBLE",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900, fontSize: 11)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: semantic.warning.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: semantic.warning.withValues(alpha: 0.1)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.info_outline_rounded,
+                            size: 14, color: semantic.warning),
+                        const SizedBox(width: 8),
+                        const Text(
+                          "Engine: Reducing balance (daily)",
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 24),
+                _buildPayoffCard(),
+                const SizedBox(height: 48),
+                if (selectedType != 'Individual') ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: OutlinedButton.icon(
+                      onPressed: _payEmi,
+                      icon: const Icon(Icons.payment_rounded),
+                      label: const Text("RECORD EMI PAYMENT",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colorScheme.primary,
+                        side:
+                            BorderSide(color: colorScheme.primary, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: OutlinedButton.icon(
+                      onPressed: _prepay,
+                      icon: const Icon(Icons.speed_rounded),
+                      label: const Text("RECORD PREPAYMENT",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.green,
+                        side: const BorderSide(color: Colors.green, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                 ],
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Center(
-              child: Text(
-                "Interest calculation: Reducing balance (daily)",
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildPayoffCard(),
-            const SizedBox(height: 48),
-            if (selectedType != 'Individual') ...[
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: OutlinedButton.icon(
-                  onPressed: _payEmi,
-                  icon: const Icon(Icons.payment),
-                  label: const Text("RECORD EMI PAYMENT",
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colorScheme.primary,
-                    side: BorderSide(color: colorScheme.primary),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                SizedBox(
+                  width: double.infinity,
+                  height: 64,
+                  child: ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      elevation: 0,
+                    ),
+                    child: const Text("UPDATE BORROWING",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2)),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: OutlinedButton.icon(
-                  onPressed: _prepay,
-                  icon: const Icon(Icons.speed),
-                  label: const Text("RECORD PREPAYMENT",
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.green,
-                    side: const BorderSide(color: Colors.green),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.onSurface,
-                  foregroundColor: colorScheme.surface,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: const Text("UPDATE BORROWING",
+                const SizedBox(height: 32),
+                const Text("PAYMENT HISTORY",
                     style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 2)),
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Text("PAYMENT HISTORY",
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                    color: Colors.grey)),
-            const SizedBox(height: 16),
-            if (_isLoadingHistory)
-              const Center(child: CircularProgressIndicator())
-            else if (_history.isEmpty)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Text("No recorded payment history found.",
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _history.length,
-                separatorBuilder: (context, index) =>
-                    Divider(color: semantic.divider, height: 1),
-                itemBuilder: (context, index) {
-                  final item = _history[index];
-                  final isEmi = item.tags.contains(TransactionTag.loanEmi);
-                  final isPrepayment =
-                      item.tags.contains(TransactionTag.loanPrepayment);
+                        letterSpacing: 0.5,
+                        color: Colors.grey)),
+                const SizedBox(height: 16),
+                if (_isLoadingHistory)
+                  const Center(child: CircularProgressIndicator())
+                else if (_history.isEmpty)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Text("No recorded payment history found.",
+                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _history.length,
+                    separatorBuilder: (context, index) =>
+                        Divider(color: semantic.divider, height: 1),
+                    itemBuilder: (context, index) {
+                      final item = _history[index];
+                      final isEmi = item.tags.contains(TransactionTag.loanEmi);
+                      final isPrepayment =
+                          item.tags.contains(TransactionTag.loanPrepayment);
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Column(
-                      children: [
-                        Row(
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.date.substring(0, 10),
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey)),
-                                  const SizedBox(height: 4),
-                                  Text(item.note ?? item.label,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  if (item.tags.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Wrap(
-                                      spacing: 4,
-                                      children: item.tags.map((t) {
-                                        final isLoan = t.name
-                                            .toLowerCase()
-                                            .contains('loan');
-                                        return Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: isLoan
-                                                ? Colors.blue
-                                                    .withValues(alpha: 0.1)
-                                                : Colors.grey
-                                                    .withValues(alpha: 0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                            border: Border.all(
-                                              color: isLoan
-                                                  ? Colors.blue
-                                                  : Colors.grey,
-                                              width: 0.5,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            t.name.toUpperCase(),
-                                            style: TextStyle(
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.w900,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item.date.substring(0, 10),
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey)),
+                                      const SizedBox(height: 4),
+                                      Text(item.note ?? item.label,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                      if (item.tags.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Wrap(
+                                          spacing: 4,
+                                          children: item.tags.map((t) {
+                                            final isLoan = t.name
+                                                .toLowerCase()
+                                                .contains('loan');
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
+                                              decoration: BoxDecoration(
                                                 color: isLoan
                                                     ? Colors.blue
-                                                    : Colors.grey),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  CurrencyFormatter.format(item.amount),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.redAccent),
-                                ),
-                                const SizedBox(height: 8),
-                                if (!isEmi && !isPrepayment)
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      visualDensity: VisualDensity.compact,
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                    onPressed: () => _updateTag(
-                                        item, TransactionTag.loanEmi),
-                                    icon: const Icon(Icons.add_circle_outline,
-                                        size: 14, color: Colors.blue),
-                                    label: const Text("MARK AS EMI",
-                                        style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w900)),
-                                  )
-                                else
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      visualDensity: VisualDensity.compact,
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                    onPressed: () => _updateTag(
-                                        item, TransactionTag.transfer),
-                                    icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                        size: 14,
-                                        color: Colors.grey),
-                                    label: const Text("NOT A PAYMENT",
-                                        style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.grey)),
+                                                        .withValues(alpha: 0.1)
+                                                    : Colors.grey
+                                                        .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                border: Border.all(
+                                                  color: isLoan
+                                                      ? Colors.blue
+                                                      : Colors.grey,
+                                                  width: 0.5,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                t.name.toUpperCase(),
+                                                style: TextStyle(
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: isLoan
+                                                        ? Colors.blue
+                                                        : Colors.grey),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ],
                                   ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      CurrencyFormatter.format(item.amount),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.redAccent),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (!isEmi && !isPrepayment)
+                                      TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                          visualDensity: VisualDensity.compact,
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        onPressed: () => _updateTag(
+                                            item, TransactionTag.loanEmi),
+                                        icon: const Icon(
+                                            Icons.add_circle_outline,
+                                            size: 14,
+                                            color: Colors.blue),
+                                        label: const Text("MARK AS EMI",
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w900)),
+                                      )
+                                    else
+                                      TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                          visualDensity: VisualDensity.compact,
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        onPressed: () => _updateTag(
+                                            item, TransactionTag.transfer),
+                                        icon: const Icon(
+                                            Icons.remove_circle_outline,
+                                            size: 14,
+                                            color: Colors.grey),
+                                        label: const Text("NOT A PAYMENT",
+                                            style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w900,
+                                                color: Colors.grey)),
+                                      ),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            const SizedBox(height: 40),
-          ],
+                      );
+                    },
+                  ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
         ),
       ),
     );

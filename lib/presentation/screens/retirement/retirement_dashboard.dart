@@ -123,80 +123,70 @@ class RetirementDashboard extends ConsumerWidget {
   Widget _buildCorpusHero(double total, AppColors semantic, bool isPrivate) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 220,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            semantic.primary.withValues(alpha: 0.9),
-            semantic.primary.withValues(alpha: 0.7),
-            semantic.primary.withValues(alpha: 0.6),
+            semantic.primary,
+            semantic.primary.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(36),
         boxShadow: [
           BoxShadow(
-            color: semantic.primary.withValues(alpha: 0.20),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            color: semantic.primary.withValues(alpha: 0.25),
+            blurRadius: 40,
+            offset: const Offset(0, 20),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(36),
         child: Stack(
           children: [
             Positioned(
-              right: -40,
-              top: -40,
+              right: -50,
+              bottom: -50,
               child: Container(
-                width: 180,
-                height: 180,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0),
-                    ],
-                  ),
+                  color: Colors.white.withValues(alpha: 0.05),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.all(32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: Colors.white.withValues(alpha: 0.2),
                         width: 1.0,
                       ),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.stars_rounded,
-                            size: 12, color: Colors.white),
-                        SizedBox(width: 6),
+                        Icon(Icons.auto_awesome_rounded,
+                            size: 14, color: Colors.white),
+                        SizedBox(width: 8),
                         Text(
                           "RETIREMENT READY",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
-                            fontSize: 9,
-                            letterSpacing: 1.2,
+                            fontSize: 10,
+                            letterSpacing: 1.5,
                           ),
                         ),
                       ],
@@ -204,15 +194,15 @@ class RetirementDashboard extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    "TOTAL CORPUS",
+                    "TOTAL RETIREMENT CORPUS",
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 10,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 11,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2.0,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
@@ -220,9 +210,9 @@ class RetirementDashboard extends ConsumerWidget {
                       key: WidgetKeys.retirementCorpusValue,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 48,
+                        fontSize: 52,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: -1.5,
+                        letterSpacing: -2,
                         height: 1.0,
                       ),
                     ),
@@ -240,11 +230,11 @@ class RetirementDashboard extends ConsumerWidget {
     return Container(
       key: WidgetKeys.retirementAccountItem(acc.id),
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: semantic.divider),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Row(
         children: [
@@ -257,7 +247,7 @@ class RetirementDashboard extends ConsumerWidget {
             child: Icon(Icons.account_balance_rounded,
                 color: semantic.primary, size: 20),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,18 +255,20 @@ class RetirementDashboard extends ConsumerWidget {
                 Text(
                   acc.name.toString().toUpperCase(),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: semantic.text,
-                    letterSpacing: 0.5,
+                    letterSpacing: 1,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  "Last updated: ${acc.lastUpdated}",
+                  "LATENCY: ${acc.lastUpdated}",
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 9,
                     color: semantic.secondaryText,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
@@ -285,9 +277,10 @@ class RetirementDashboard extends ConsumerWidget {
           Text(
             CurrencyFormatter.format(acc.balance, isPrivate: isPrivate),
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
               color: semantic.text,
+              letterSpacing: -0.5,
             ),
           ),
         ],
@@ -431,22 +424,23 @@ class RetirementDashboard extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child:
-                      _buildSimpleField("Current Age", ageController, "Years"),
+                  child: _buildSimpleField(
+                      context, "Current Age", ageController, "Years"),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildSimpleField(
-                      "Retirement Age", retAgeController, "Years"),
+                      context, "Retirement Age", retAgeController, "Years"),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            _buildSimpleField("Expected Return Rate", rateController, "% p.a."),
+            _buildSimpleField(
+                context, "Expected Return Rate", rateController, "% p.a."),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 64,
               child: ElevatedButton(
                 onPressed: () {
                   final newSettings = settings.copyWith(
@@ -465,12 +459,14 @@ class RetirementDashboard extends ConsumerWidget {
                       Theme.of(context).extension<AppColors>()!.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(20)),
                   elevation: 0,
                 ),
                 child: const Text("UPDATE TARGETS",
-                    style:
-                        TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        letterSpacing: 2)),
               ),
             ),
           ],
@@ -479,17 +475,21 @@ class RetirementDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildSimpleField(
-      String label, TextEditingController controller, String suffix) {
+  Widget _buildSimpleField(BuildContext context, String label,
+      TextEditingController controller, String suffix) {
+    final semantic = Theme.of(context).extension<AppColors>()!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label.toUpperCase(),
           style: const TextStyle(
-              fontSize: 10, fontWeight: FontWeight.w800, color: Colors.grey),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              color: Colors.grey,
+              letterSpacing: 1),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         TextField(
           controller: controller,
           keyboardType: TextInputType.number,
@@ -498,16 +498,16 @@ class RetirementDashboard extends ConsumerWidget {
             suffixText: suffix,
             suffixStyle: const TextStyle(
                 fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+            filled: true,
+            fillColor: semantic.surfaceCombined.withValues(alpha: 0.4),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide:
-                    BorderSide(color: Colors.grey.withValues(alpha: 0.2))),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide:
-                    BorderSide(color: Colors.grey.withValues(alpha: 0.2))),
+                borderSide: BorderSide(color: semantic.divider, width: 1.5)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: semantic.primary, width: 2)),
           ),
         ),
       ],
@@ -517,22 +517,24 @@ class RetirementDashboard extends ConsumerWidget {
   Widget _buildInsightCard(double corpus, AppColors semantic) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: semantic.income.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-            color: semantic.income.withValues(alpha: 0.2), width: 1.5),
+            color: semantic.income.withValues(alpha: 0.15), width: 1.5),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: semantic.income.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(Icons.eco_rounded, color: semantic.income, size: 24),
+            child: Icon(Icons.tips_and_updates_rounded,
+                color: semantic.income, size: 22),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -540,24 +542,25 @@ class RetirementDashboard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "SMART ADVICE",
+                  "WEALTH ADVISORY",
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
                     color: semantic.secondaryText,
-                    letterSpacing: 1.5,
+                    letterSpacing: 2,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 12),
                 Text(
                   corpus > 10000000
-                      ? "You're doing great! Keep your contributions steady to beat inflation."
-                      : "Consider increasing your monthly NPS/PPF contributions by 10% this year.",
+                      ? "Your trajectory is optimal. Maintain current velocity to ensure capital preservation against inflation."
+                      : "Velocity adjustment recommended. Increasing monthly contributions by 10% will accelerate your goal timeline.",
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
                     color: semantic.text,
-                    height: 1.4,
+                    height: 1.5,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],

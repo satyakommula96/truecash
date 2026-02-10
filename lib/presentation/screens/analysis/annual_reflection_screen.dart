@@ -34,7 +34,8 @@ class AnnualReflectionScreen extends ConsumerWidget {
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
           child: IconButton(
-            icon: Icon(Icons.close_rounded, color: semantic.text),
+            icon: Icon(Icons.arrow_back_ios_new_rounded,
+                color: semantic.text, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ),

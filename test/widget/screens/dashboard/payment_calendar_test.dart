@@ -4,12 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/presentation/screens/dashboard/dashboard_components/payment_calendar.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/domain/repositories/i_financial_repository.dart';
 import 'package:intl/intl.dart';
 
 class MockFinancialRepository extends Mock implements IFinancialRepository {}
+
+class _MockPrivacyNotifier extends PrivacyNotifier {
+  @override
+  bool build() => false;
+}
 
 void main() {
   late MockFinancialRepository mockRepo;
@@ -33,6 +39,7 @@ void main() {
     return ProviderScope(
       overrides: [
         financialRepositoryProvider.overrideWithValue(mockRepo),
+        privacyProvider.overrideWith(() => _MockPrivacyNotifier()),
       ],
       child: MaterialApp(
         theme: AppTheme.darkTheme,

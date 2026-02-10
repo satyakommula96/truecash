@@ -131,10 +131,15 @@ void main() {
             allowedExtensions: any(named: 'allowedExtensions'),
           )).thenAnswer((_) async => '/tmp/test_export.json');
 
+      tester.view.physicalSize = const Size(1200, 3000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(createExportScreen());
       await tester.pumpAndSettle();
 
-      final exportBtn = find.text('ONE-TAP EXPORT');
+      final exportBtn = find.text('EXPORT NOW');
+      await tester.ensureVisible(exportBtn);
       await tester.tap(exportBtn);
       await tester.pumpAndSettle();
 
@@ -191,7 +196,7 @@ void main() {
 
       await tester.pumpWidget(createExportScreen());
       await tester.pumpAndSettle();
-      final restoreTile = find.byIcon(Icons.settings_backup_restore_rounded);
+      final restoreTile = find.byIcon(Icons.history_rounded);
       await tester.ensureVisible(restoreTile);
       await tester.tap(restoreTile);
       await tester.pumpAndSettle();
@@ -236,7 +241,7 @@ void main() {
 
       await tester.pumpWidget(createExportScreen());
       await tester.pumpAndSettle();
-      final restoreTile = find.byIcon(Icons.settings_backup_restore_rounded);
+      final restoreTile = find.byIcon(Icons.history_rounded);
       await tester.ensureVisible(restoreTile);
       await tester.tap(restoreTile);
       await tester.pumpAndSettle();

@@ -1002,186 +1002,216 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: semantic.primary.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
+            color: semantic.primary.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(40),
+            border: Border.all(
+                color: semantic.primary.withValues(alpha: 0.1), width: 2),
           ),
           child: Icon(
-            Icons.file_copy_rounded,
+            Icons.account_tree_rounded,
             size: 48,
             color: semantic.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
-          "YOUR DATA, YOUR CONTROL",
+          "DATA SOVEREIGNTY",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w900,
             color: semantic.text,
-            letterSpacing: 0.5,
+            letterSpacing: 2,
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          "Export your financial records anytime. We believe in complete data portability and ownership.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              color: semantic.secondaryText,
-              fontSize: 13,
-              fontWeight: FontWeight.w700),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            "Complete data portability. Export your entire history in open formats anytime you want.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: semantic.secondaryText,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                height: 1.5),
+          ),
         ),
       ],
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
+    )
+        .animate()
+        .fadeIn(duration: 800.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart);
   }
 
   Widget _buildOneTapSection(AppColors semantic) {
-    return HoverWrapper(
-      onTap: _exportCompleteData,
-      borderRadius: 28,
-      glowColor: semantic.primary.withValues(alpha: 0.3),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [semantic.primary, semantic.primary.withValues(alpha: 0.7)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: semantic.primary.withValues(alpha: 0.25),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [semantic.primary, semantic.primary.withValues(alpha: 0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(51),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.rocket_launch_rounded,
-                      color: Colors.white, size: 20),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: semantic.primary.withValues(alpha: 0.25),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(width: 16),
-                const Text(
-                  "ONE-TAP EXPORT",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 14,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Download your entire financial footprint including history, budgets, and insights in a machine-readable JSON format.",
-              style: TextStyle(
+                child: const Icon(Icons.flash_on_rounded,
+                    color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                "ONE-TAP ARCHIVE",
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  height: 1.5),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: Theme(
-                    data: ThemeData(unselectedWidgetColor: Colors.white70),
-                    child: CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: _encryptFullExport,
-                      onChanged: (v) =>
-                          setState(() => _encryptFullExport = v ?? false),
-                      title: const Text("ENCRYPT FILENAME",
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            "Create a complete snapshot of your financial history, budgets, and AI insights in a secure JSON format.",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                height: 1.5,
+                letterSpacing: -0.2),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () =>
+                      setState(() => _encryptFullExport = !_encryptFullExport),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Checkbox(
+                          value: _encryptFullExport,
+                          onChanged: (v) =>
+                              setState(() => _encryptFullExport = v ?? false),
+                          activeColor: Colors.white,
+                          checkColor: semantic.primary,
+                          side: const BorderSide(color: Colors.white, width: 2),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text("ENCRYPT BACKUP",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
-                              fontWeight: FontWeight.w900)),
-                      activeColor: Colors.white,
-                      checkColor: semantic.primary,
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5)),
+                    ],
                   ),
                 ),
-                Container(
+              ),
+              InkWell(
+                onTap: _exportCompleteData,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     "EXPORT NOW",
                     style: TextStyle(
                         color: semantic.primary,
                         fontWeight: FontWeight.w900,
-                        fontSize: 12),
+                        fontSize: 12,
+                        letterSpacing: 1),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
-    ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
+    )
+        .animate()
+        .fadeIn(delay: 200.ms, duration: 800.ms)
+        .slideY(begin: 0.05, end: 0);
   }
 
   Widget _buildRestoreSection(AppColors semantic) {
-    return HoverWrapper(
-      onTap: _restoreData,
-      borderRadius: 28,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: semantic.divider, width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: semantic.overspent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(Icons.settings_backup_restore_rounded,
-                  color: semantic.overspent, size: 24),
+    return Container(
+      decoration: BoxDecoration(
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: semantic.divider, width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _restoreData,
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: semantic.overspent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(Icons.history_rounded,
+                      color: semantic.overspent, size: 24),
+                ),
+                const SizedBox(width: 20),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("RESTORE BACKUP",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
+                              letterSpacing: 1)),
+                      SizedBox(height: 4),
+                      Text("Import data from a previous export",
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    color: semantic.divider, size: 24),
+              ],
             ),
-            const SizedBox(width: 20),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("RESTORE BACKUP",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
-                          letterSpacing: 0.5)),
-                  SizedBox(height: 4),
-                  Text("Import data from a previous export",
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded,
-                color: semantic.divider, size: 24),
-          ],
+          ),
         ),
       ),
     );
@@ -1195,47 +1225,53 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
     required VoidCallback onTap,
     required AppColors semantic,
   }) {
-    return HoverWrapper(
-      onTap: onTap,
-      borderRadius: 24,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider, width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(icon, color: color, size: 22),
+    return Container(
+      decoration: BoxDecoration(
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: semantic.divider, width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(28),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                              letterSpacing: 1.5)),
+                      const SizedBox(height: 4),
+                      Text(subtitle,
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: semantic.secondaryText)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.download_rounded,
+                    color: semantic.divider.withValues(alpha: 0.5), size: 20),
+              ],
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 13,
-                          letterSpacing: 0.5)),
-                  const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: semantic.secondaryText)),
-                ],
-              ),
-            ),
-            Icon(Icons.download_rounded, color: semantic.divider, size: 20),
-          ],
+          ),
         ),
       ),
     );

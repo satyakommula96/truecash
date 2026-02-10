@@ -9,7 +9,6 @@ import 'package:trueledger/core/utils/currency_formatter.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:trueledger/presentation/components/hover_wrapper.dart';
 import 'package:trueledger/presentation/screens/analysis/annual_reflection_screen.dart';
 import 'package:trueledger/presentation/screens/retirement/retirement_dashboard.dart';
 
@@ -186,17 +185,18 @@ class AnalysisScreen extends ConsumerWidget {
           style: TextStyle(
               fontSize: 10,
               color: semantic.secondaryText,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2),
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 6),
         Text(
           title,
           style: TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.w900,
               color: semantic.text,
-              letterSpacing: -0.5),
+              letterSpacing: -1,
+              height: 1),
         ),
       ],
     );
@@ -205,15 +205,15 @@ class AnalysisScreen extends ConsumerWidget {
   Widget _buildCategoryBreakdown(BuildContext context,
       List<Map<String, dynamic>> data, AppColors semantic, bool isPrivate) {
     if (data.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40),
-          child: Text("No spending data yet",
-              style: TextStyle(
-                  color: semantic.secondaryText,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600)),
-        ),
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 60),
+        alignment: Alignment.center,
+        child: Text("NO DATA AVAILABLE",
+            style: TextStyle(
+                color: semantic.secondaryText.withValues(alpha: 0.5),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2)),
       );
     }
 
@@ -231,7 +231,13 @@ class AnalysisScreen extends ConsumerWidget {
         final progress = maxVal == 0 ? 0.0 : total / maxVal;
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 24),
+          margin: const EdgeInsets.only(bottom: 28),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: semantic.surfaceCombined.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: semantic.divider, width: 1.5),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -242,10 +248,10 @@ class AnalysisScreen extends ConsumerWidget {
                     child: Text(
                       item['category'].toString().toUpperCase(),
                       style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
                           color: semantic.text,
-                          letterSpacing: 0.5),
+                          letterSpacing: 1),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -254,42 +260,48 @@ class AnalysisScreen extends ConsumerWidget {
                     CurrencyFormatter.format(total, isPrivate: isPrivate),
                     style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        fontSize: 13,
-                        color: semantic.text),
+                        fontSize: 14,
+                        color: semantic.text,
+                        letterSpacing: -0.5),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               LayoutBuilder(builder: (context, constraints) {
                 return Stack(
                   children: [
                     Container(
-                      height: 8,
+                      height: 10,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: semantic.divider.withValues(alpha: 0.5),
+                        color: semantic.divider.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     AnimatedContainer(
-                      duration: 800.ms,
-                      curve: Curves.easeOutQuint,
-                      height: 8,
+                      duration: 1.seconds,
+                      curve: Curves.easeOutExpo,
+                      height: 10,
                       width: constraints.maxWidth * progress.clamp(0.02, 1.0),
                       decoration: BoxDecoration(
-                        color: semantic.primary.withValues(alpha: 0.8),
+                        gradient: LinearGradient(
+                          colors: [
+                            semantic.primary,
+                            semantic.primary.withValues(alpha: 0.6)
+                          ],
+                        ),
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
                             color: semantic.primary.withValues(alpha: 0.2),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           )
                         ],
                       ),
                     ).animate().shimmer(
-                        duration: 2.seconds,
-                        color: semantic.primary.withValues(alpha: 0.2)),
+                        duration: 3.seconds,
+                        color: Colors.white.withValues(alpha: 0.1)),
                   ],
                 );
               })
@@ -297,8 +309,8 @@ class AnalysisScreen extends ConsumerWidget {
           ),
         )
             .animate()
-            .fadeIn(delay: (40 * index).ms)
-            .slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuint);
+            .fadeIn(delay: (60 * index).ms)
+            .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart);
       }).toList(),
     );
   }
@@ -310,202 +322,204 @@ class AnalysisScreen extends ConsumerWidget {
     final last = (data[data.length - 2]['total'] as num).toDouble();
     final diff = current - last;
     final isIncrease = diff > 0;
+    final color = isIncrease ? semantic.overspent : semantic.income;
 
-    return HoverWrapper(
-      borderRadius: 24,
-      glowColor: isIncrease ? semantic.overspent : semantic.income,
-      glowOpacity: 0.1,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: (isIncrease ? semantic.overspent : semantic.income)
-              .withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-              color: (isIncrease ? semantic.overspent : semantic.income)
-                  .withValues(alpha: 0.2),
-              width: 1.5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: color.withValues(alpha: 0.15), width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  isIncrease
+                      ? Icons.trending_up_rounded
+                      : Icons.trending_down_rounded,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "MOMENTUM".toUpperCase(),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 3,
+                    color: semantic.secondaryText),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          RichText(
+            text: TextSpan(
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: semantic.text,
+                  height: 1.5,
+                  letterSpacing: -0.3),
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: (isIncrease ? semantic.overspent : semantic.income)
-                        .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    isIncrease
-                        ? Icons.trending_up_rounded
-                        : Icons.trending_down_rounded,
-                    color: isIncrease ? semantic.overspent : semantic.income,
-                    size: 18,
-                  ),
+                TextSpan(
+                    text: isIncrease
+                        ? "Velocity increased by "
+                        : "Excellent. Spending decreased by "),
+                TextSpan(
+                  text: CurrencyFormatter.format(diff.abs(),
+                      isPrivate: isPrivate),
+                  style: TextStyle(fontWeight: FontWeight.w900, color: color),
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  "INSIGHT",
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                      color: semantic.secondaryText),
-                ),
+                const TextSpan(text: " relative to last period."),
               ],
             ),
-            const SizedBox(height: 20),
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: semantic.text,
-                    height: 1.5),
-                children: [
-                  TextSpan(
-                      text: isIncrease
-                          ? "Spending is up by "
-                          : "Great job! Spending decreased by "),
-                  TextSpan(
-                    text: CurrencyFormatter.format(diff.abs(),
-                        isPrivate: isPrivate),
-                    style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color:
-                            isIncrease ? semantic.overspent : semantic.income),
-                  ),
-                  const TextSpan(text: " compared to last month."),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildAnnualReflectionBanner(
       BuildContext context, AppColors semantic) {
-    return HoverWrapper(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => AnnualReflectionScreen(year: DateTime.now().year)),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
-      borderRadius: 24,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider, width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: semantic.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(Icons.auto_awesome_rounded,
-                  color: semantic.primary, size: 24),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "YEAR-IN-REVIEW",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: semantic.secondaryText),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                    AnnualReflectionScreen(year: DateTime.now().year)),
+          ),
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: semantic.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "View your ${DateTime.now().year} reflection",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: semantic.text,
-                        letterSpacing: -0.2),
+                  child: Icon(Icons.auto_awesome_rounded,
+                      color: semantic.primary, size: 24),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "ARCHIVE",
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 3,
+                            color: semantic.secondaryText),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "${DateTime.now().year} Reflection",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: semantic.text,
+                            letterSpacing: -0.5),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    color: semantic.divider, size: 20),
+              ],
             ),
-            Icon(Icons.chevron_right_rounded, color: semantic.secondaryText),
-          ],
+          ),
         ),
       ),
     ).animate().shimmer(
-        delay: 1.seconds,
+        delay: 2.seconds,
         duration: 2.seconds,
-        color: semantic.primary.withValues(alpha: 0.15));
+        color: semantic.primary.withValues(alpha: 0.1));
   }
 
   Widget _buildRetirementBanner(BuildContext context, AppColors semantic) {
-    return HoverWrapper(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const RetirementDashboard()),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: semantic.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+            color: semantic.primary.withValues(alpha: 0.15), width: 1.5),
       ),
-      borderRadius: 24,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: semantic.primary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-              color: semantic.primary.withValues(alpha: 0.2), width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: semantic.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(Icons.beach_access_rounded,
-                  color: semantic.primary, size: 24),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "FINANCIAL FREEDOM",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                        color: semantic.secondaryText),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const RetirementDashboard()),
+          ),
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: semantic.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Retirement Deep Dive",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: semantic.text,
-                        letterSpacing: -0.2),
+                  child: Icon(Icons.security_rounded,
+                      color: semantic.primary, size: 24),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "GOAL TRACKING",
+                        style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 3,
+                            color: semantic.secondaryText),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Retirement Health",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: semantic.text,
+                            letterSpacing: -0.5),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Icon(Icons.chevron_right_rounded,
+                    color: semantic.divider, size: 20),
+              ],
             ),
-            Icon(Icons.chevron_right_rounded, color: semantic.secondaryText),
-          ],
+          ),
         ),
       ),
     );

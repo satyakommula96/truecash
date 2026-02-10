@@ -5,7 +5,6 @@ import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/presentation/providers/category_provider.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:trueledger/presentation/components/hover_wrapper.dart';
 
 class ManageCategoriesScreen extends ConsumerStatefulWidget {
   final String? initialType;
@@ -154,7 +153,7 @@ class _ManageCategoriesScreenState
 
   Widget _buildTypeSelector(AppColors semantic) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -163,31 +162,36 @@ class _ManageCategoriesScreenState
             final active = selectedType == t;
             return Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: AnimatedContainer(
-                duration: 300.ms,
-                curve: Curves.easeOutQuart,
+              child: Theme(
+                data:
+                    Theme.of(context).copyWith(canvasColor: Colors.transparent),
                 child: ChoiceChip(
                   label: Text(t.toUpperCase()),
                   selected: active,
                   onSelected: (_) => setState(() => selectedType = t),
-                  selectedColor: semantic.primary,
                   backgroundColor:
-                      semantic.surfaceCombined.withValues(alpha: 0.5),
+                      semantic.surfaceCombined.withValues(alpha: 0.3),
+                  selectedColor: semantic.primary.withValues(alpha: 0.1),
                   side: BorderSide(
-                    color: active ? Colors.transparent : semantic.divider,
-                    width: 1.5,
-                  ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  showCheckmark: false,
+                      color: active ? semantic.primary : semantic.divider,
+                      width: 1.5),
                   labelStyle: TextStyle(
-                    color: active ? Colors.white : semantic.secondaryText,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 10,
-                    letterSpacing: 1,
+                      color: active ? semantic.primary : semantic.secondaryText,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 10,
+                      letterSpacing: 0.5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  showCheckmark: false,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ),
+              ).animate(target: active ? 1 : 0).scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.05, 1.05),
+                    duration: 200.ms,
+                  ),
             );
           }).toList(),
         ),
@@ -197,7 +201,7 @@ class _ManageCategoriesScreenState
 
   Widget _buildAddInput(AppColors semantic) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -212,16 +216,13 @@ class _ManageCategoriesScreenState
                 decoration: InputDecoration(
                   hintText: "Add new category...",
                   hintStyle: TextStyle(
-                      color: semantic.secondaryText.withValues(alpha: 0.5),
-                      fontSize: 14),
+                      color: semantic.secondaryText.withValues(alpha: 0.3),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
                   filled: true,
                   fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: semantic.divider, width: 1.5),
-                  ),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(color: semantic.divider, width: 1.5),
@@ -235,24 +236,25 @@ class _ManageCategoriesScreenState
               ),
             ),
             const SizedBox(width: 12),
-            HoverWrapper(
-              onTap: _addCategory,
-              borderRadius: 16,
-              child: Container(
-                width: 54,
-                decoration: BoxDecoration(
-                  color: semantic.primary,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: semantic.primary.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
+            Container(
+              width: 58,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  colors: [
+                    semantic.primary,
+                    semantic.primary.withValues(alpha: 0.8)
                   ],
                 ),
-                child: const Icon(Icons.add_rounded,
-                    color: Colors.white, size: 28),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _addCategory,
+                  borderRadius: BorderRadius.circular(16),
+                  child: const Icon(Icons.add_rounded,
+                      color: Colors.white, size: 28),
+                ),
               ),
             ),
           ],
@@ -264,38 +266,37 @@ class _ManageCategoriesScreenState
   Widget _buildCategoryItem(
       TransactionCategory cat, int index, AppColors semantic) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: semantic.divider, width: 1.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: semantic.divider, width: 1.5),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ReorderableDragStartListener(
             index: index,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              padding: const EdgeInsets.all(8),
               child: Icon(Icons.drag_indicator_rounded,
                   size: 20,
                   color: semantic.secondaryText.withValues(alpha: 0.3)),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           Container(
-            width: 34,
-            height: 34,
+            width: 40,
+            height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: semantic.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Text(cat.name.isNotEmpty ? cat.name[0].toUpperCase() : "?",
                 style: TextStyle(
                     color: semantic.primary,
                     fontWeight: FontWeight.w900,
-                    fontSize: 14)),
+                    fontSize: 16)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -303,9 +304,9 @@ class _ManageCategoriesScreenState
               cat.name.toUpperCase(),
               style: TextStyle(
                 fontWeight: FontWeight.w900,
-                fontSize: 13,
+                fontSize: 12,
                 color: semantic.text,
-                letterSpacing: 0.5,
+                letterSpacing: 1,
               ),
             ),
           ),

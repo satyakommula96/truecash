@@ -61,9 +61,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ANALYSIS'), findsOneWidget);
-    expect(find.text('YEAR-IN-REVIEW'), findsOneWidget);
-    expect(find.text('INSIGHT'), findsNothing);
-    expect(find.text('No spending data yet'), findsOneWidget);
+    expect(find.text('ARCHIVE'), findsOneWidget);
+    expect(find.text('MOMENTUM'), findsNothing);
+    expect(find.text('NO DATA AVAILABLE'), findsOneWidget);
   });
 
   testWidgets('AnalysisScreen renders data', (tester) async {
@@ -90,8 +90,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('INSIGHT'), findsOneWidget);
-    expect(find.textContaining('Spending is up by', findRichText: true),
+    expect(find.text('MOMENTUM'), findsOneWidget);
+    expect(find.textContaining('Velocity increased by', findRichText: true),
         findsOneWidget);
     expect(find.text('MONTHLY TREND'), findsOneWidget);
     expect(find.text('DISTRIBUTION'), findsOneWidget);

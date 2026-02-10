@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
 import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:trueledger/core/utils/date_helper.dart';
@@ -89,44 +90,51 @@ class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Add Credit Card")),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-            24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
-        child: Column(
-          children: [
-            _buildField("Bank Name", bankCtrl, Icons.account_balance),
-            _buildField("Credit Limit", limitCtrl, Icons.speed,
-                isNumber: true, prefix: CurrencyFormatter.symbol),
-            _buildField(
-                "Last Statement Balance (Billed)", stmtCtrl, Icons.receipt_long,
-                isNumber: true, prefix: CurrencyFormatter.symbol),
-            _buildField("Current Outstanding Balance (Total Used)", currentCtrl,
-                Icons.account_balance_wallet,
-                isNumber: true, prefix: CurrencyFormatter.symbol),
-            _buildField("Minimum Due", minDueCtrl, Icons.low_priority,
-                isNumber: true, prefix: CurrencyFormatter.symbol),
-            _buildField(
-                "Statement Date (Every Month)", genDateCtrl, Icons.event,
-                readOnly: true, onTap: _pickGenDate),
-            _buildField("Payment Due Date", dueDateCtrl, Icons.calendar_today,
-                readOnly: true, onTap: _pickDueDate),
-            const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+                24, 24, 24, 32 + MediaQuery.of(context).padding.bottom),
+            child: Column(
+              children: [
+                _buildField("Bank Name", bankCtrl, Icons.account_balance),
+                _buildField("Credit Limit", limitCtrl, Icons.speed,
+                    isNumber: true, prefix: CurrencyFormatter.symbol),
+                _buildField("Last Statement Balance (Billed)", stmtCtrl,
+                    Icons.receipt_long,
+                    isNumber: true, prefix: CurrencyFormatter.symbol),
+                _buildField("Current Outstanding Balance (Total Used)",
+                    currentCtrl, Icons.account_balance_wallet,
+                    isNumber: true, prefix: CurrencyFormatter.symbol),
+                _buildField("Minimum Due", minDueCtrl, Icons.low_priority,
+                    isNumber: true, prefix: CurrencyFormatter.symbol),
+                _buildField(
+                    "Statement Date (Every Month)", genDateCtrl, Icons.event,
+                    readOnly: true, onTap: _pickGenDate),
+                _buildField(
+                    "Payment Due Date", dueDateCtrl, Icons.calendar_today,
+                    readOnly: true, onTap: _pickDueDate),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    child: const Text("ADD CARD",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
                 ),
-                child: const Text("ADD CARD",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -137,26 +145,52 @@ class _AddCreditCardScreenState extends ConsumerState<AddCreditCardScreen> {
       String? prefix,
       bool readOnly = false,
       VoidCallback? onTap}) {
+    final semantic = Theme.of(context).extension<AppColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: TextField(
-        controller: ctrl,
-        keyboardType: isNumber
-            ? const TextInputType.numberWithOptions(decimal: true)
-            : TextInputType.text,
-        readOnly: readOnly,
-        onTap: onTap,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon),
-          prefixText: prefix != null ? "$prefix " : null,
-          filled: true,
-          fillColor: colorScheme.onSurface.withValues(alpha: 0.05),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none),
-        ),
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                  color: Colors.grey)),
+          const SizedBox(height: 12),
+          TextField(
+            controller: ctrl,
+            keyboardType: isNumber
+                ? const TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.text,
+            readOnly: readOnly,
+            onTap: onTap,
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                color: semantic.text),
+            decoration: InputDecoration(
+              prefixIcon: Icon(icon, size: 20, color: semantic.secondaryText),
+              prefixText: prefix != null ? "$prefix " : null,
+              prefixStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: semantic.text),
+              filled: true,
+              fillColor: semantic.surfaceCombined.withValues(alpha: 0.5),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: semantic.divider, width: 1.5)),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2)),
+            ),
+          ),
+        ],
       ),
     );
   }

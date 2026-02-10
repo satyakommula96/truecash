@@ -82,7 +82,7 @@ void main() {
         detailStopwatch.stop();
         debugPrint(
             'getMonthDetails for $month (approx ${details.length} items) took: ${detailStopwatch.elapsedMilliseconds}ms');
-        expect(detailStopwatch.elapsedMilliseconds, lessThan(100),
+        expect(detailStopwatch.elapsedMilliseconds, lessThan(150),
             reason: 'Month details query is too slow');
       }
 

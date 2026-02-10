@@ -8,6 +8,7 @@ import 'package:trueledger/core/utils/date_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
+import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:trueledger/domain/models/models.dart';
 
 class PaymentCalendar extends ConsumerStatefulWidget {
@@ -296,6 +297,7 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
   }
 
   Widget _buildSummaryBar(List<String> paidLabels) {
+    final isPrivate = ref.watch(privacyProvider);
     double totalSum = 0;
     double totalPaid = 0;
 
@@ -322,14 +324,15 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
       ),
       child: Row(
         children: [
-          _buildSummaryItem("TOTAL DUE", totalDue, widget.semantic.overspent),
+          _buildSummaryItem(
+              "TOTAL DUE", totalDue, widget.semantic.overspent, isPrivate),
           Container(
             width: 1,
             height: 24,
             color: widget.semantic.divider,
             margin: const EdgeInsets.symmetric(horizontal: 20),
           ),
-          _buildSummaryItem("PAID", totalPaid, Colors.green),
+          _buildSummaryItem("PAID", totalPaid, Colors.green, isPrivate),
           const Spacer(),
           if (totalSum > 0)
             CircularProgressIndicator(
@@ -344,7 +347,8 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
     ).animate().fadeIn(delay: 200.ms);
   }
 
-  Widget _buildSummaryItem(String label, double amount, Color color) {
+  Widget _buildSummaryItem(
+      String label, double amount, Color color, bool isPrivate) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -352,7 +356,8 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
             style: const TextStyle(
                 fontSize: 8, fontWeight: FontWeight.w900, color: Colors.grey)),
         const SizedBox(height: 2),
-        Text(CurrencyFormatter.format(amount, compact: true),
+        Text(
+            isPrivate ? "•••" : CurrencyFormatter.format(amount, compact: true),
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w900, color: color)),
       ],

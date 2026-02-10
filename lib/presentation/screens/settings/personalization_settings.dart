@@ -133,26 +133,26 @@ class _PersonalizationSettingsScreenState
 
   Widget _buildInfoCard(AppColors semantic) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: semantic.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(28),
+        color: semantic.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(
-            color: semantic.primary.withValues(alpha: 0.2), width: 1.5),
+            color: semantic.primary.withValues(alpha: 0.15), width: 1.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: semantic.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(14),
             ),
             child:
-                Icon(Icons.shield_rounded, color: semantic.primary, size: 20),
+                Icon(Icons.security_rounded, color: semantic.primary, size: 22),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,14 +160,14 @@ class _PersonalizationSettingsScreenState
                 Text("PRIVATE & LOCAL",
                     style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        fontSize: 16,
+                        fontSize: 14,
                         color: semantic.text,
-                        letterSpacing: 0.5)),
-                const SizedBox(height: 4),
+                        letterSpacing: 1)),
+                const SizedBox(height: 8),
                 Text(
-                  "All personalization data is stored only on your device. We never sync or upload your behavior patterns.",
+                  "All personalization data is stored only on your device. We never sync or upload your behavior patterns or sensitive financial identifiers.",
                   style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: semantic.secondaryText,
                       fontWeight: FontWeight.w700,
                       height: 1.5),
@@ -177,59 +177,65 @@ class _PersonalizationSettingsScreenState
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
+    ).animate().fadeIn(duration: 800.ms).slide(
+          begin: const Offset(0, 0.05),
+          end: const Offset(0, 0),
+          curve: Curves.easeOutQuart,
+        );
   }
 
   Widget _buildMainToggle(AppColors semantic) {
     final enabled = _settings.personalizationEnabled;
-    return HoverWrapper(
-      onTap: () =>
-          _updateSettings(_settings.copyWith(personalizationEnabled: !enabled)),
-      borderRadius: 28,
-      glowColor: semantic.primary.withValues(alpha: enabled ? 0.3 : 0),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: enabled
-              ? semantic.primary.withValues(alpha: 0.1)
-              : semantic.surfaceCombined.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-              color: enabled
-                  ? semantic.primary.withValues(alpha: 0.3)
-                  : semantic.divider,
-              width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("ENABLE PERSONALIZATION",
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: enabled
+            ? semantic.primary.withValues(alpha: 0.05)
+            : semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+            color: enabled
+                ? semantic.primary.withValues(alpha: 0.3)
+                : semantic.divider,
+            width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _updateSettings(
+              _settings.copyWith(personalizationEnabled: !enabled)),
+          borderRadius: BorderRadius.circular(32),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("DYNAMIC ADAPTATION",
+                        style: TextStyle(
+                            color: enabled ? semantic.primary : semantic.text,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            letterSpacing: 1.5)),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Allow experience to adapt to your patterns.",
                       style: TextStyle(
-                          color: enabled ? semantic.primary : semantic.text,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
-                          letterSpacing: 0.5)),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Allow the app to learn from your patterns.",
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: semantic.secondaryText),
-                  ),
-                ],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: semantic.secondaryText),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Switch.adaptive(
-              value: enabled,
-              activeTrackColor: semantic.primary,
-              onChanged: (v) => _updateSettings(
-                  _settings.copyWith(personalizationEnabled: v)),
-            ),
-          ],
+              Switch.adaptive(
+                value: enabled,
+                activeTrackColor: semantic.primary,
+                onChanged: (v) => _updateSettings(
+                    _settings.copyWith(personalizationEnabled: v)),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -257,44 +263,50 @@ class _PersonalizationSettingsScreenState
     required ValueChanged<bool> onChanged,
     required AppColors semantic,
   }) {
-    return HoverWrapper(
-      onTap: () => onChanged(!value),
-      borderRadius: 24,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: semantic.surfaceCombined.withValues(alpha: 0.5),
+    return Container(
+      decoration: BoxDecoration(
+        color: semantic.surfaceCombined.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: semantic.divider, width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onChanged(!value),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: semantic.divider, width: 1.5),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 12,
-                          color: semantic.text,
-                          letterSpacing: 0.5)),
-                  const SizedBox(height: 4),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: semantic.secondaryText)),
-                ],
-              ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12,
+                              color: semantic.text,
+                              letterSpacing: 1)),
+                      const SizedBox(height: 6),
+                      Text(subtitle,
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: semantic.secondaryText,
+                              height: 1.4)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Switch.adaptive(
+                  value: value,
+                  activeTrackColor: semantic.primary,
+                  onChanged: onChanged,
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Switch.adaptive(
-              value: value,
-              activeTrackColor: semantic.primary,
-              onChanged: onChanged,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -589,14 +601,20 @@ class _PersonalizationSettingsScreenState
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1),
                   filled: true,
-                  fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
-                  border: OutlineInputBorder(
+                  fillColor: semantic.surfaceCombined.withValues(alpha: 0.4),
+                  contentPadding: const EdgeInsets.all(18),
+                  enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: semantic.divider)),
+                      borderSide:
+                          BorderSide(color: semantic.divider, width: 1.5)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          BorderSide(color: semantic.primary, width: 2)),
                 ),
                 autofocus: true,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               TextField(
                 controller: amountController,
                 style: TextStyle(
@@ -609,10 +627,16 @@ class _PersonalizationSettingsScreenState
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1),
                   filled: true,
-                  fillColor: semantic.surfaceCombined.withValues(alpha: 0.3),
-                  border: OutlineInputBorder(
+                  fillColor: semantic.surfaceCombined.withValues(alpha: 0.4),
+                  contentPadding: const EdgeInsets.all(18),
+                  enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: semantic.divider)),
+                      borderSide:
+                          BorderSide(color: semantic.divider, width: 1.5)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide:
+                          BorderSide(color: semantic.primary, width: 2)),
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),

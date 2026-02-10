@@ -8,6 +8,7 @@ import 'package:trueledger/core/services/notification_service.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
 import 'package:trueledger/presentation/screens/cards/edit_card.dart';
+import 'package:trueledger/core/theme/theme.dart';
 
 class MockFinancialRepository extends Mock implements IFinancialRepository {}
 
@@ -41,6 +42,7 @@ void main() {
         notificationServiceProvider.overrideWithValue(mockNotification),
       ],
       child: MaterialApp(
+        theme: AppTheme.darkTheme,
         home: EditCreditCardScreen(card: tCard),
       ),
     );

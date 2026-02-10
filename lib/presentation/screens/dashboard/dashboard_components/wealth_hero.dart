@@ -190,7 +190,7 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                 ),
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -198,6 +198,7 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
+                            flex: 5,
                             child: _buildHeaderPill(
                               context,
                               "NET WORTH",
@@ -206,7 +207,9 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                               semantic: semantic,
                             ),
                           ),
+                          const SizedBox(width: 8),
                           Flexible(
+                            flex: 6,
                             child: _buildHeaderPill(
                               context,
                               "${widget.activeStreak} DAY STREAK",

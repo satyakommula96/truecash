@@ -39,7 +39,7 @@ void main() {
         financialRepositoryProvider.overrideWithValue(mockRepo),
       ],
       child: MaterialApp(
-        theme: AppTheme.lightTheme,
+        theme: AppTheme.darkTheme,
         home: EditLoanScreen(loan: tLoan),
       ),
     );
@@ -68,7 +68,7 @@ void main() {
     await tester.pumpWidget(createEditLoanScreen());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.tap(find.byIcon(Icons.delete_outline_rounded));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('DELETE'));

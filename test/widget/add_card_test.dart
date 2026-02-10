@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:trueledger/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:trueledger/presentation/providers/repository_providers.dart';
@@ -30,45 +31,31 @@ void main() {
         financialRepositoryProvider.overrideWithValue(mockRepository),
         notificationServiceProvider.overrideWithValue(mockNotificationService),
       ],
-      child: const MaterialApp(
-        home: AddCreditCardScreen(),
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: const AddCreditCardScreen(),
       ),
     );
   }
 
   group('AddCreditCardScreen', () {
     testWidgets('should add credit card successfully', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       when(() => mockRepository.addCreditCard(
               any(), any(), any(), any(), any(), any(), any()))
           .thenAnswer((_) async => {});
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      // Enter data using precise predicate finders
-      await tester.enterText(
-          find.byWidgetPredicate(
-              (w) => w is TextField && w.decoration?.labelText == 'Bank Name'),
-          'Test Bank');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField && w.decoration?.labelText == 'Credit Limit'),
-          '100000');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField &&
-              (w.decoration?.labelText?.contains('Statement Balance') ??
-                  false)),
-          '5000');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField &&
-              (w.decoration?.labelText?.contains('Current Outstanding') ??
-                  false)),
-          '5000');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField && w.decoration?.labelText == 'Minimum Due'),
-          '500');
+      // Enter data using index as labelText is now a separate Text widget
+      await tester.enterText(find.byType(TextField).at(0), 'Test Bank');
+      await tester.enterText(find.byType(TextField).at(1), '100000');
+      await tester.enterText(find.byType(TextField).at(2), '5000');
+      await tester.enterText(find.byType(TextField).at(3), '5000');
+      await tester.enterText(find.byType(TextField).at(4), '500');
 
       await tester.pumpAndSettle();
 
@@ -90,22 +77,16 @@ void main() {
 
     testWidgets('should show error if current balance exceeds limit',
         (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(createWidgetUnderTest());
 
-      await tester.enterText(
-          find.byWidgetPredicate(
-              (w) => w is TextField && w.decoration?.labelText == 'Bank Name'),
-          'Test Bank');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField && w.decoration?.labelText == 'Credit Limit'),
-          '5000');
-      await tester.enterText(
-          find.byWidgetPredicate((w) =>
-              w is TextField &&
-              (w.decoration?.labelText?.contains('Current Outstanding') ??
-                  false)),
-          '10000');
+      await tester.enterText(find.byType(TextField).at(0), 'Test Bank');
+      await tester.enterText(find.byType(TextField).at(1), '5000');
+      await tester.enterText(find.byType(TextField).at(2), '0');
+      await tester.enterText(find.byType(TextField).at(3), '10000');
 
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('ADD CARD'));
@@ -119,6 +100,10 @@ void main() {
     });
 
     testWidgets('should show date pickers', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(createWidgetUnderTest());
 
       // Tap on Statement Date
