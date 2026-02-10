@@ -242,6 +242,7 @@ final List<Migration> appMigrations = [
   MigrationV12(),
   MigrationV13(),
   MigrationV14(),
+  MigrationV15(),
 ];
 
 class MigrationV12 extends Migration {
@@ -320,6 +321,59 @@ class MigrationV14 extends Migration {
   Future<void> up(common.DatabaseExecutor db) async {
     await addColumnSafe(db, Schema.customCategoriesTable, Schema.colOrderIndex,
         "INTEGER DEFAULT 0");
+  }
+
+  @override
+  Future<void> down(common.DatabaseExecutor db) async {}
+}
+
+class MigrationV15 extends Migration {
+  MigrationV15() : super(15);
+
+  @override
+  Future<void> up(common.DatabaseExecutor db) async {
+    final Map<String, List<String>> defaults = {
+      'Variable': [
+        'Food',
+        'Groceries',
+        'Transport',
+        'Medical',
+        'Shopping',
+        'Entertainment',
+        'Others'
+      ],
+      'Fixed': ['Rent', 'Utility', 'Insurance', 'EMI'],
+      'Investment': [
+        'Stocks',
+        'Mutual Funds',
+        'SIP',
+        'Crypto',
+        'Gold',
+        'Lending',
+        'Retirement',
+        'Other'
+      ],
+      'Income': ['Salary', 'Freelance', 'Dividends'],
+      'Subscription': ['OTT', 'Software', 'Gym'],
+    };
+
+    for (var entry in defaults.entries) {
+      final type = entry.key;
+      for (var name in entry.value) {
+        // Check if exists
+        final existing = await db.query(Schema.customCategoriesTable,
+            where: "${Schema.colName} = ? AND ${Schema.colType} = ?",
+            whereArgs: [name, type]);
+
+        if (existing.isEmpty) {
+          await db.insert(Schema.customCategoriesTable, {
+            Schema.colName: name,
+            Schema.colType: type,
+            Schema.colOrderIndex: 0,
+          });
+        }
+      }
+    }
   }
 
   @override

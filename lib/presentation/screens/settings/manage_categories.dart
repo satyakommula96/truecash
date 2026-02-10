@@ -94,53 +94,60 @@ class _ManageCategoriesScreenState
           const SizedBox(width: 8),
         ],
       ),
-      body: Column(
-        children: [
-          _buildTypeSelector(semantic),
-          _buildAddInput(semantic),
-          Expanded(
-            child: categoriesAsync.when(
-              data: (categories) {
-                if (categories.isEmpty) return _buildEmptyState(semantic);
-                return ReorderableListView.builder(
-                  buildDefaultDragHandles: false,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final cat = categories[index];
-                    return Container(
-                      key: ValueKey(cat.id),
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: _buildCategoryItem(cat, index, semantic),
-                    );
-                  },
-                  onReorder: (oldIndex, newIndex) async {
-                    if (newIndex > oldIndex) newIndex--;
-                    final updatedList =
-                        List<TransactionCategory>.from(categories);
-                    final item = updatedList.removeAt(oldIndex);
-                    updatedList.insert(newIndex, item);
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            children: [
+              _buildTypeSelector(semantic),
+              _buildAddInput(semantic),
+              Expanded(
+                child: categoriesAsync.when(
+                  data: (categories) {
+                    if (categories.isEmpty) return _buildEmptyState(semantic);
+                    return ReorderableListView.builder(
+                      buildDefaultDragHandles: false,
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final cat = categories[index];
+                        return Container(
+                          key: ValueKey(cat.id),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: _buildCategoryItem(cat, index, semantic),
+                        );
+                      },
+                      onReorder: (oldIndex, newIndex) async {
+                        if (newIndex > oldIndex) newIndex--;
+                        final updatedList =
+                            List<TransactionCategory>.from(categories);
+                        final item = updatedList.removeAt(oldIndex);
+                        updatedList.insert(newIndex, item);
 
-                    // Optimistic update if needed, but here we just call repo
-                    await ref
-                        .read(financialRepositoryProvider)
-                        .reorderCategories(updatedList);
-                    ref.invalidate(categoriesProvider(selectedType));
-                  },
-                  proxyDecorator: (child, index, animation) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: child,
+                        // Optimistic update if needed, but here we just call repo
+                        await ref
+                            .read(financialRepositoryProvider)
+                            .reorderCategories(updatedList);
+                        ref.invalidate(categoriesProvider(selectedType));
+                      },
+                      proxyDecorator: (child, index, animation) {
+                        return Material(
+                          color: Colors.transparent,
+                          child: child,
+                        );
+                      },
                     );
                   },
-                );
-              },
-              loading: () => Center(
-                  child: CircularProgressIndicator(color: semantic.primary)),
-              error: (err, stack) => Center(child: Text("Error: $err")),
-            ),
+                  loading: () => Center(
+                      child:
+                          CircularProgressIndicator(color: semantic.primary)),
+                  error: (err, stack) => Center(child: Text("Error: $err")),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

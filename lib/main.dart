@@ -31,7 +31,7 @@ Future<void> main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  // 2. Load basic config (Shared Prefs)
+  // 2. Load basic config (Shared Prefs)`
   final prefs = await SharedPreferences.getInstance();
 
   // 3. Set global theme from prefs

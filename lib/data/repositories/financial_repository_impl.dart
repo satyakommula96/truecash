@@ -995,24 +995,24 @@ class FinancialRepositoryImpl implements IFinancialRepository {
         whereArgs: [type],
         orderBy: '${Schema.colOrderIndex} ASC, ${Schema.colId} ASC');
 
+    // If this specific type is empty, seed its defaults
     if (list.isEmpty) {
-      final allCount = Sqflite.firstIntValue(
-              await db.rawQuery('SELECT COUNT(*) FROM custom_categories')) ??
-          0;
-      // If the specific type is empty, and the table is entirely empty, seed all.
-      if (allCount == 0) {
+      final typeDefaults = _defaultCategories[type];
+      if (typeDefaults != null) {
         final batch = db.batch();
         int index = 0;
-        for (var entry in _defaultCategories.entries) {
-          for (var cat in entry.value) {
-            batch.insert('custom_categories', {
-              'name': cat,
-              'type': entry.key,
-              Schema.colOrderIndex: index++,
-            });
-          }
+
+        // Get current max index for this type to be safe, though it's empty
+        for (var cat in typeDefaults) {
+          batch.insert('custom_categories', {
+            'name': cat,
+            'type': type,
+            Schema.colOrderIndex: index++,
+          });
         }
         await batch.commit(noResult: true);
+
+        // Fetch again after seeding
         list = await db.query('custom_categories',
             where: 'type = ?',
             whereArgs: [type],
