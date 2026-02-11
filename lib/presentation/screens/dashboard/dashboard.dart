@@ -98,24 +98,26 @@ class Dashboard extends ConsumerWidget {
               return Scaffold(
                 extendBody: true,
                 backgroundColor: semantic.surfaceCombined,
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () async {
-                    final added = await showModalBottomSheet<bool>(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => const QuickAddBottomSheet(),
-                    );
-                    if (added == true) {
-                      reload();
-                    }
-                  },
-                  backgroundColor: semantic.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 8,
-                  child: const Icon(Icons.add_rounded, size: 32),
+                floatingActionButton: Padding(
+                  padding: const EdgeInsets.only(bottom: 90),
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      final added = await showModalBottomSheet<bool>(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const QuickAddBottomSheet(),
+                      );
+                      if (added == true) {
+                        reload();
+                      }
+                    },
+                    backgroundColor: semantic.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 8,
+                    child: const Icon(Icons.add_rounded, size: 32),
+                  ),
                 ),
-                bottomNavigationBar: DashboardBottomBar(onLoad: reload),
                 body: Stack(
                   children: [
                     // Persistent Background Mesh Effects
@@ -157,93 +159,124 @@ class Dashboard extends ConsumerWidget {
                         if (!AppConfig.isTest) c.repeat(reverse: true);
                       }).move(duration: 12.seconds, end: const Offset(50, -30)),
                     ),
-                    SafeArea(
-                      child: RefreshIndicator(
-                        onRefresh: reload,
-                        color: semantic.primary,
-                        backgroundColor: semantic.surfaceCombined,
-                        child: CustomScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          slivers: [
-                            DashboardHeader(isDark: isDark, onLoad: reload),
-                            SliverLayoutBuilder(
-                                builder: (context, constraints) {
-                              final isWide = constraints.crossAxisExtent > 800;
-                              return SliverPadding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                sliver: isWide
-                                    ? SliverToBoxAdapter(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
+                    Positioned.fill(
+                      child: SafeArea(
+                        child: RefreshIndicator(
+                          onRefresh: reload,
+                          color: semantic.primary,
+                          backgroundColor: semantic.surfaceCombined,
+                          child: CustomScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            slivers: [
+                              DashboardHeader(isDark: isDark, onLoad: reload),
+                              SliverLayoutBuilder(
+                                  builder: (context, constraints) {
+                                final isWide =
+                                    constraints.crossAxisExtent > 768;
+                                final horizontalPadding = isWide ? 40.0 : 20.0;
+                                return SliverPadding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: horizontalPadding),
+                                  sliver: isWide
+                                      ? SliverToBoxAdapter(
+                                          child: Center(
+                                            child: ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  maxWidth: 1400),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  ..._buildTopSection(
-                                                      semantic,
-                                                      data,
-                                                      summary,
-                                                      ref,
-                                                      reload),
-                                                  const SizedBox(height: 24),
-                                                  ..._buildSummariesSection(
-                                                      semantic,
-                                                      data,
-                                                      summary,
-                                                      ref,
-                                                      currentMonth),
-                                                  const SizedBox(height: 32),
-                                                  _buildAssetsSection(semantic,
-                                                      summary, reload),
-                                                  const SizedBox(height: 120),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .stretch,
+                                                      children: [
+                                                        ..._buildTopSection(
+                                                            semantic,
+                                                            data,
+                                                            summary,
+                                                            ref,
+                                                            reload),
+                                                        const SizedBox(
+                                                            height: 24),
+                                                        ..._buildSummariesSection(
+                                                            semantic,
+                                                            data,
+                                                            summary,
+                                                            ref,
+                                                            currentMonth),
+                                                        const SizedBox(
+                                                            height: 32),
+                                                        _buildAssetsSection(
+                                                            semantic,
+                                                            summary,
+                                                            reload),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 40),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .stretch,
+                                                      children: [
+                                                        _buildInsightsSection(
+                                                            semantic,
+                                                            ref,
+                                                            summary,
+                                                            budgets),
+                                                        const SizedBox(
+                                                            height: 32),
+                                                        _buildCalendarSection(
+                                                            semantic,
+                                                            upcomingBills),
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
-                                            const SizedBox(width: 32),
-                                            Expanded(
-                                              child: Column(
-                                                children: [
-                                                  _buildInsightsSection(
-                                                      semantic,
-                                                      ref,
-                                                      summary,
-                                                      budgets),
-                                                  const SizedBox(height: 32),
-                                                  _buildCalendarSection(
-                                                      semantic, upcomingBills),
-                                                  const SizedBox(height: 120),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                                          ),
+                                        )
+                                      : SliverList(
+                                          delegate: SliverChildListDelegate([
+                                            ..._buildTopSection(semantic, data,
+                                                summary, ref, reload),
+                                            const SizedBox(height: 24),
+                                            ..._buildSummariesSection(
+                                                semantic,
+                                                data,
+                                                summary,
+                                                ref,
+                                                currentMonth),
+                                            const SizedBox(height: 32),
+                                            _buildAssetsSection(
+                                                semantic, summary, reload),
+                                            const SizedBox(height: 32),
+                                            _buildInsightsSection(semantic, ref,
+                                                summary, budgets),
+                                            const SizedBox(height: 32),
+                                            _buildCalendarSection(
+                                                semantic, upcomingBills),
+                                          ]),
                                         ),
-                                      )
-                                    : SliverList(
-                                        delegate: SliverChildListDelegate([
-                                          ..._buildTopSection(semantic, data,
-                                              summary, ref, reload),
-                                          const SizedBox(height: 24),
-                                          ..._buildSummariesSection(semantic,
-                                              data, summary, ref, currentMonth),
-                                          const SizedBox(height: 32),
-                                          _buildAssetsSection(
-                                              semantic, summary, reload),
-                                          const SizedBox(height: 32),
-                                          _buildInsightsSection(
-                                              semantic, ref, summary, budgets),
-                                          const SizedBox(height: 32),
-                                          _buildCalendarSection(
-                                              semantic, upcomingBills),
-                                          const SizedBox(height: 120),
-                                        ]),
-                                      ),
-                              );
-                            }),
-                          ],
+                                );
+                              }),
+                              const SliverToBoxAdapter(
+                                  child: SizedBox(height: 120)),
+                            ],
+                          ),
                         ),
                       ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: DashboardBottomBar(onLoad: reload),
                     ),
                   ],
                 ),

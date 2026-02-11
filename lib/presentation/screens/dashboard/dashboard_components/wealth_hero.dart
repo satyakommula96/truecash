@@ -66,6 +66,9 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
     final isTouch = Theme.of(context).platform == TargetPlatform.iOS ||
         Theme.of(context).platform == TargetPlatform.android;
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth > 768;
+
     final mainContent = Stack(
       alignment: Alignment.topCenter,
       children: [
@@ -79,7 +82,7 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
             // ignore: deprecated_member_use
             ..translate(0.0, _isHovered ? -2.0 : 0.0),
           width: double.infinity,
-          height: 220,
+          height: isWide ? 260 : 220,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [

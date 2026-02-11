@@ -33,40 +33,80 @@ class OnboardingActionCards extends StatelessWidget {
             ),
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          child: Row(
-            children: [
-              _buildActionCard(
-                context,
-                "Log First Expense",
-                "Track where your money goes",
-                Icons.add_shopping_cart_rounded,
-                semantic.overspent,
-                onAddTransaction,
-              ),
-              const SizedBox(width: 16),
-              _buildActionCard(
-                context,
-                "Set a Budget",
-                "Keep your spending in check",
-                Icons.account_balance_rounded,
-                semantic.income,
-                onAddBudget,
-              ),
-              const SizedBox(width: 16),
-              _buildActionCard(
-                context,
-                "See Analysis",
-                "Identity spending patterns",
-                Icons.insights_rounded,
-                Colors.purpleAccent,
-                onCheckAnalysis,
-              ),
-            ],
-          ),
-        ),
+        LayoutBuilder(builder: (context, constraints) {
+          final useWrap = constraints.maxWidth > 400;
+          return useWrap
+              ? Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: [
+                    _buildActionCard(
+                      context,
+                      "Log First Expense",
+                      "Track where your money goes",
+                      Icons.add_shopping_cart_rounded,
+                      semantic.overspent,
+                      onAddTransaction,
+                      constraints.maxWidth,
+                    ),
+                    _buildActionCard(
+                      context,
+                      "Set a Budget",
+                      "Keep your spending in check",
+                      Icons.account_balance_rounded,
+                      semantic.income,
+                      onAddBudget,
+                      constraints.maxWidth,
+                    ),
+                    _buildActionCard(
+                      context,
+                      "See Analysis",
+                      "Identity spending patterns",
+                      Icons.insights_rounded,
+                      Colors.purpleAccent,
+                      onCheckAnalysis,
+                      constraints.maxWidth,
+                    ),
+                  ],
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
+                  child: Row(
+                    children: [
+                      _buildActionCard(
+                        context,
+                        "Log First Expense",
+                        "Track where your money goes",
+                        Icons.add_shopping_cart_rounded,
+                        semantic.overspent,
+                        onAddTransaction,
+                        constraints.maxWidth,
+                      ),
+                      const SizedBox(width: 16),
+                      _buildActionCard(
+                        context,
+                        "Set a Budget",
+                        "Keep your spending in check",
+                        Icons.account_balance_rounded,
+                        semantic.income,
+                        onAddBudget,
+                        constraints.maxWidth,
+                      ),
+                      const SizedBox(width: 16),
+                      _buildActionCard(
+                        context,
+                        "See Analysis",
+                        "Identity spending patterns",
+                        Icons.insights_rounded,
+                        Colors.purpleAccent,
+                        onCheckAnalysis,
+                        constraints.maxWidth,
+                      ),
+                    ],
+                  ),
+                );
+        }),
       ],
     ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1, end: 0);
   }
@@ -78,12 +118,16 @@ class OnboardingActionCards extends StatelessWidget {
     IconData icon,
     Color color,
     VoidCallback onTap,
+    double parentWidth,
   ) {
+    // Adapt width based on available space
+    final cardWidth = parentWidth > 600 ? 240.0 : 200.0;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        width: 200,
+        width: cardWidth,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),

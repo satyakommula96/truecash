@@ -103,10 +103,8 @@ void main() {
     verify(() => mockPrefs.setBool('intro_seen', true)).called(1);
     verify(() => mockPrefs.setString('user_name', 'Satya')).called(1);
 
-    // Pump repeatedly to allow navigation to finish
-    for (int i = 0; i < 5; i++) {
-      await tester.pump(const Duration(milliseconds: 200));
-    }
+    // Allow navigation and all entrance animations to complete
+    await tester.pumpAndSettle();
 
     // Should navigate to Dashboard
     expect(find.byType(Dashboard), findsOneWidget);
