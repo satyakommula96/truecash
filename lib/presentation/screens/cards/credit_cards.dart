@@ -524,61 +524,77 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
                     ),
                     const SizedBox(height: 20),
                     // Progress Bar
-                    Stack(
-                      children: [
-                        Container(
-                          height: 8,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: semantic.divider.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        AnimatedContainer(
-                          duration: 1200.ms,
-                          curve: Curves.easeOutCubic,
-                          height: 8,
-                          width: (MediaQuery.of(context).size.width - 96) *
-                              (currentUtil / 100).clamp(0.01, 1.0),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                currentBarColor,
-                                currentBarColor.withValues(alpha: 0.6)
-                              ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Stack(
+                          children: [
+                            Container(
+                              height: 8,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: semantic.divider.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: currentBarColor.withValues(alpha: 0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4)),
-                            ],
-                          ),
-                        ),
-                      ],
+                            AnimatedContainer(
+                              duration: 1200.ms,
+                              curve: Curves.easeOutCubic,
+                              height: 8,
+                              width: constraints.maxWidth *
+                                  (currentUtil / 100).clamp(0.01, 1.0),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    currentBarColor,
+                                    currentBarColor.withValues(alpha: 0.6)
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: currentBarColor.withValues(
+                                          alpha: 0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     // Progress Info
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "${currentUtil.toStringAsFixed(1)}% UTILIZED",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color: currentBarColor,
-                              letterSpacing: 0.5),
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "${currentUtil.toStringAsFixed(1)}% UTILIZED",
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: currentBarColor,
+                                  letterSpacing: 0.5),
+                            ),
+                          ),
                         ),
-                        Text(
-                          "AVAILABLE: ${CurrencyFormatter.format(limit - current, isPrivate: isPrivate, compact: true)}",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color:
-                                  semantic.secondaryText.withValues(alpha: 0.6),
-                              letterSpacing: 0.5),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "AVAILABLE: ${CurrencyFormatter.format(limit - current, isPrivate: isPrivate, compact: true)}",
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: semantic.secondaryText
+                                      .withValues(alpha: 0.6),
+                                  letterSpacing: 0.5),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -646,14 +662,17 @@ class _CreditCardsScreenState extends ConsumerState<CreditCardsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            CurrencyFormatter.format(totalBalance,
-                compact: false, isPrivate: isPrivate),
-            style: TextStyle(
-              color: semantic.text,
-              fontSize: 36,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -1,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              CurrencyFormatter.format(totalBalance,
+                  compact: false, isPrivate: isPrivate),
+              style: TextStyle(
+                color: semantic.text,
+                fontSize: 36,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
             ),
           )
               .animate()

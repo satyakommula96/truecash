@@ -132,27 +132,35 @@ class BudgetSection extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            CurrencyFormatter.format(b.spent,
-                                isPrivate: isPrivate),
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                color: isOver
-                                    ? semantic.overspent
-                                    : semantic.text),
-                          ),
-                          Text(
-                            "of ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
-                            style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: semantic.secondaryText),
-                          ),
-                        ],
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                CurrencyFormatter.format(b.spent,
+                                    isPrivate: isPrivate),
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w900,
+                                    color: isOver
+                                        ? semantic.overspent
+                                        : semantic.text),
+                              ),
+                            ),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "of ${CurrencyFormatter.format(b.monthlyLimit, isPrivate: isPrivate)}",
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: semantic.secondaryText),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

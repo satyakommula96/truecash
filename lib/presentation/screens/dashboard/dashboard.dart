@@ -172,7 +172,8 @@ class Dashboard extends ConsumerWidget {
                                   isDark: isDark,
                                   onLoad: reload,
                                   activeStreak: data.activeStreak,
-                                  hasLoggedToday: data.todaySpend > 0),
+                                  hasLoggedToday:
+                                      data.todayTransactionCount > 0),
                               SliverLayoutBuilder(
                                   builder: (context, constraints) {
                                 final isWide =
@@ -323,7 +324,7 @@ class Dashboard extends ConsumerWidget {
       WealthHero(
         summary: summary,
         activeStreak: data.activeStreak,
-        hasLoggedToday: data.todaySpend > 0,
+        hasLoggedToday: data.todayTransactionCount > 0,
         onTapNetWorth: () {
           Navigator.push(
             ref.context,

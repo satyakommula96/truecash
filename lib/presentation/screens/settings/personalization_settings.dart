@@ -646,6 +646,7 @@ class _PersonalizationSettingsScreenState
                 final categories = ref.watch(categoriesProvider('Variable'));
                 return categories.when(
                   data: (list) => DropdownButtonFormField<String>(
+                    isExpanded: true,
                     dropdownColor: semantic.surfaceCombined,
                     style: TextStyle(
                         color: semantic.text, fontWeight: FontWeight.w900),
@@ -666,8 +667,11 @@ class _PersonalizationSettingsScreenState
                     items: list
                         .map((c) => DropdownMenuItem(
                             value: c.name,
-                            child: Text(c.name.toUpperCase(),
-                                style: const TextStyle(fontSize: 12))))
+                            child: Text(
+                              c.name.toUpperCase(),
+                              style: const TextStyle(fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            )))
                         .toList(),
                     onChanged: (v) => category = v,
                   ),

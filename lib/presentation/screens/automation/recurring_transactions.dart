@@ -88,7 +88,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: HoverWrapper(
-        onTap: () {},
+        onTap: () => _showAddDialog(context, ref, item: item),
         borderRadius: 24,
         child: Container(
           key: WidgetKeys.recurringItem(item.id),
@@ -179,14 +179,16 @@ class RecurringTransactionsScreen extends ConsumerWidget {
     ).animate().fadeIn(delay: (index * 50).ms).slideX(begin: 0.1, end: 0);
   }
 
-  void _showAddDialog(BuildContext context, WidgetRef ref) {
-    final nameController = TextEditingController();
-    final amountController = TextEditingController();
-    String type = 'EXPENSE';
-    String frequency = 'MONTHLY';
-    String category = 'Others';
-    int dayOfMonth = 1;
-    int dayOfWeek = 1;
+  void _showAddDialog(BuildContext context, WidgetRef ref,
+      {RecurringTransaction? item}) {
+    final nameController = TextEditingController(text: item?.name);
+    final amountController =
+        TextEditingController(text: item?.amount.toString());
+    String type = item?.type ?? 'EXPENSE';
+    String frequency = item?.frequency ?? 'MONTHLY';
+    String category = item?.category ?? 'Others';
+    int dayOfMonth = item?.dayOfMonth ?? 1;
+    int dayOfWeek = item?.dayOfWeek ?? 1;
 
     showModalBottomSheet(
       context: context,
@@ -208,7 +210,7 @@ class RecurringTransactionsScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("NEW AUTOMATION",
+                  Text(item == null ? "NEW AUTOMATION" : "EDIT AUTOMATION",
                       style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 18,
@@ -284,23 +286,43 @@ class RecurringTransactionsScreen extends ConsumerWidget {
                       onPressed: () {
                         if (nameController.text.isNotEmpty &&
                             amountController.text.isNotEmpty) {
-                          ref.read(recurringProvider.notifier).add(
-                                name: nameController.text,
-                                amount:
-                                    double.tryParse(amountController.text) ?? 0,
-                                category: category,
-                                type: type,
-                                frequency: frequency,
-                                dayOfMonth: dayOfMonth,
-                                dayOfWeek: dayOfWeek,
-                              );
+                          final notifier = ref.read(recurringProvider.notifier);
+                          final amount =
+                              double.tryParse(amountController.text) ?? 0;
+
+                          if (item == null) {
+                            notifier.add(
+                              name: nameController.text,
+                              amount: amount,
+                              category: category,
+                              type: type,
+                              frequency: frequency,
+                              dayOfMonth: dayOfMonth,
+                              dayOfWeek: dayOfWeek,
+                            );
+                          } else {
+                            notifier.updateTransaction(
+                              id: item.id,
+                              name: nameController.text,
+                              amount: amount,
+                              category: category,
+                              type: type,
+                              frequency: frequency,
+                              dayOfMonth: dayOfMonth,
+                              dayOfWeek: dayOfWeek,
+                            );
+                          }
+
                           // Invalidate dashboard to refresh payment calendar
                           ref.invalidate(dashboardProvider);
                           Navigator.pop(context);
                         }
                       },
-                      child: const Text("SAVE AUTOMATION",
-                          style: TextStyle(fontWeight: FontWeight.w900)),
+                      child: Text(
+                          item == null
+                              ? "SAVE AUTOMATION"
+                              : "UPDATE AUTOMATION",
+                          style: const TextStyle(fontWeight: FontWeight.w900)),
                     ),
                   ),
                 ],

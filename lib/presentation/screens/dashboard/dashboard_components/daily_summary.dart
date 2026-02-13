@@ -29,7 +29,7 @@ class DailySummary extends ConsumerWidget {
       onTap: onTap,
       borderRadius: 24,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
@@ -53,13 +53,18 @@ class DailySummary extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  "TODAY",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: semantic.secondaryText,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "TODAY",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: semantic.secondaryText,
+                      ),
+                    ),
                   ),
                 ),
               ],

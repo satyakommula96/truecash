@@ -493,105 +493,125 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                       ],
                     ),
                   ),
-                  Text(
-                    "${(progress * 100).toStringAsFixed(0)}%",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: progressColor,
-                      letterSpacing: -0.5,
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "${(progress * 100).toStringAsFixed(0)}%",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: progressColor,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              Stack(
-                children: [
-                  Container(
-                    height: 10,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: semantic.divider.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  AnimatedContainer(
-                    duration: 1200.ms,
-                    curve: Curves.easeOutCubic,
-                    height: 10,
-                    width: (MediaQuery.of(context).size.width - 88) * progress,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          progressColor,
-                          progressColor.withValues(alpha: 0.6)
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: progressColor.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Stack(
+                    children: [
+                      Container(
+                        height: 10,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: semantic.divider.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                      AnimatedContainer(
+                        duration: 1200.ms,
+                        curve: Curves.easeOutCubic,
+                        height: 10,
+                        width: constraints.maxWidth * progress,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              progressColor,
+                              progressColor.withValues(alpha: 0.6)
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: progressColor.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "SAVED",
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          color: semantic.secondaryText,
-                          letterSpacing: 1,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "SAVED",
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: semantic.secondaryText,
+                            letterSpacing: 1,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        CurrencyFormatter.format(goal.currentAmount,
-                            isPrivate: isPrivate, compact: true),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: semantic.income,
-                          letterSpacing: -0.3,
+                        const SizedBox(height: 4),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            CurrencyFormatter.format(goal.currentAmount,
+                                isPrivate: isPrivate, compact: true),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: semantic.income,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "TARGET",
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          color: semantic.secondaryText,
-                          letterSpacing: 1,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "TARGET",
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: semantic.secondaryText,
+                            letterSpacing: 1,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        CurrencyFormatter.format(goal.targetAmount,
-                            isPrivate: isPrivate, compact: true),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: semantic.text,
-                          letterSpacing: -0.3,
+                        const SizedBox(height: 4),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            CurrencyFormatter.format(goal.targetAmount,
+                                isPrivate: isPrivate, compact: true),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: semantic.text,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

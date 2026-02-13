@@ -1078,13 +1078,16 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
                     color: Colors.white, size: 22),
               ),
               const SizedBox(width: 16),
-              const Text(
-                "ONE-TAP ARCHIVE",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                  letterSpacing: 2,
+              const Flexible(
+                child: Text(
+                  "ONE-TAP ARCHIVE",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    letterSpacing: 2,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -1100,37 +1103,43 @@ class _DataExportScreenState extends ConsumerState<DataExportScreen> {
                 letterSpacing: -0.2),
           ),
           const SizedBox(height: 32),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 16,
+            runSpacing: 16,
             children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () =>
-                      setState(() => _encryptFullExport = !_encryptFullExport),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Checkbox(
-                          value: _encryptFullExport,
-                          onChanged: (v) =>
-                              setState(() => _encryptFullExport = v ?? false),
-                          activeColor: Colors.white,
-                          checkColor: semantic.primary,
-                          side: const BorderSide(color: Colors.white, width: 2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)),
-                        ),
+              InkWell(
+                onTap: () =>
+                    setState(() => _encryptFullExport = !_encryptFullExport),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: Checkbox(
+                        value: _encryptFullExport,
+                        onChanged: (v) =>
+                            setState(() => _encryptFullExport = v ?? false),
+                        activeColor: Colors.white,
+                        checkColor: semantic.primary,
+                        side: const BorderSide(color: Colors.white, width: 2),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
                       ),
-                      const SizedBox(width: 12),
-                      const Text("ENCRYPT BACKUP",
+                    ),
+                    const SizedBox(width: 12),
+                    const Flexible(
+                      child: Text("ENCRYPT BACKUP",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5)),
-                    ],
-                  ),
+                              letterSpacing: 0.5),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
                 ),
               ),
               InkWell(

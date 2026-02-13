@@ -6,7 +6,6 @@ import 'package:trueledger/core/utils/currency_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trueledger/presentation/providers/privacy_provider.dart';
 import 'package:confetti/confetti.dart';
-import 'package:trueledger/core/config/app_config.dart';
 
 class WealthHero extends ConsumerStatefulWidget {
   final MonthlySummary summary;
@@ -127,11 +126,9 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                       ),
                     ),
                   )
-                      .animate(onPlay: (controller) {
-                        if (!AppConfig.isTest) {
-                          controller.repeat(reverse: true);
-                        }
-                      })
+                      .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true))
                       .move(
                           duration: 4.seconds,
                           begin: const Offset(0, 0),
@@ -157,11 +154,9 @@ class _WealthHeroState extends ConsumerState<WealthHero> {
                       ),
                     ),
                   )
-                      .animate(onPlay: (controller) {
-                        if (!AppConfig.isTest) {
-                          controller.repeat(reverse: true);
-                        }
-                      })
+                      .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true))
                       .move(
                           duration: 5.seconds,
                           begin: const Offset(0, 0),

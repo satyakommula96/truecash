@@ -123,34 +123,42 @@ class InvestmentsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "NET PORTFOLIO VALUE",
-                style: TextStyle(
-                  color: semantic.secondaryText,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
+              Flexible(
+                child: Text(
+                  "NET PORTFOLIO VALUE",
+                  style: TextStyle(
+                    color: semantic.secondaryText,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Icon(Icons.auto_graph_rounded, color: semantic.success, size: 20),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            CurrencyFormatter.format(total, isPrivate: isPrivate),
-            style: TextStyle(
-              color: semantic.text,
-              fontSize: 40,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -1.0,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              CurrencyFormatter.format(total, isPrivate: isPrivate),
+              style: TextStyle(
+                color: semantic.text,
+                fontSize: 40,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1.0,
+              ),
             ),
           ),
           const SizedBox(height: 24),
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
               _buildSimpleInsightTag(
                   semantic, Icons.trending_up_rounded, "Growth +12.4%"),
-              const SizedBox(width: 12),
               _buildSimpleInsightTag(
                   semantic, Icons.verified_user_rounded, "Diversified"),
             ],
@@ -173,12 +181,14 @@ class InvestmentsScreen extends ConsumerWidget {
         children: [
           Icon(icon, size: 14, color: semantic.primary),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              color: semantic.primary,
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: semantic.primary,
+              ),
             ),
           ),
         ],
@@ -203,12 +213,15 @@ class InvestmentsScreen extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      entry.key.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: semantic.text,
+                    Flexible(
+                      child: Text(
+                        entry.key.toUpperCase(),
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: semantic.text,
+                        ),
                       ),
                     ),
                     Text(
@@ -303,12 +316,17 @@ class InvestmentsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          Text(
-            CurrencyFormatter.format(inv.amount, isPrivate: isPrivate),
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: semantic.text,
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                CurrencyFormatter.format(inv.amount, isPrivate: isPrivate),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: semantic.text,
+                ),
+              ),
             ),
           ),
         ],

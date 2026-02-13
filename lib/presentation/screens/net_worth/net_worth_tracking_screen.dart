@@ -360,13 +360,18 @@ class _NetWorthTrackingScreenState
                       Icon(Icons.account_balance_wallet_rounded,
                           color: semantic.income, size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        "ASSETS",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: semantic.secondaryText,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "ASSETS",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: semantic.secondaryText,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -419,13 +424,18 @@ class _NetWorthTrackingScreenState
                       Icon(Icons.credit_card_rounded,
                           color: semantic.overspent, size: 18),
                       const SizedBox(width: 8),
-                      Text(
-                        "LIABILITIES",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: semantic.secondaryText,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "LIABILITIES",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: semantic.secondaryText,
+                            ),
+                          ),
                         ),
                       ),
                     ],

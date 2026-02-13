@@ -1,10 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trueledger/presentation/providers/notification_provider.dart';
 import 'package:trueledger/core/theme/theme.dart';
 import 'package:trueledger/presentation/components/hover_wrapper.dart';
+
+class RefreshIntent extends Intent {
+  const RefreshIntent();
+}
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -135,6 +140,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    ref.invalidate(pendingNotificationsProvider);
+    await ref.read(pendingNotificationsProvider.future);
+  }
+
   IconData _getNotificationIcon(String? title) {
     if (title == null) return Icons.notifications_outlined;
     final lowerTitle = title.toLowerCase();
@@ -143,6 +153,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       return Icons.credit_card_rounded;
     }
     if (lowerTitle.contains('daily')) return Icons.today_rounded;
+    if (lowerTitle.contains('recurring') || lowerTitle.contains('automatic')) {
+      return Icons.autorenew_rounded;
+    }
     return Icons.notifications_rounded;
   }
 
@@ -161,57 +174,86 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final semantic = Theme.of(context).extension<AppColors>()!;
     final notificationsAsync = ref.watch(pendingNotificationsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('NOTIFICATIONS'),
-        centerTitle: true,
-        actions: [
-          notificationsAsync.when(
-            data: (notifications) {
-              if (notifications.isNotEmpty) {
-                return IconButton(
-                  icon: const Icon(Icons.delete_sweep_rounded),
-                  tooltip: 'Cancel All',
-                  onPressed: () => _cancelAllNotifications(semantic),
-                );
-              }
-              return const SizedBox();
-            },
-            loading: () => const SizedBox(),
-            error: (_, __) => const SizedBox(),
+    return Shortcuts(
+      shortcuts: <ShortcutActivator, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyR):
+            const RefreshIntent(),
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyR):
+            const RefreshIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          RefreshIntent: CallbackAction<RefreshIntent>(
+            onInvoke: (intent) => _handleRefresh(),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh',
-            onPressed: () => ref.refresh(pendingNotificationsProvider),
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('NOTIFICATIONS'),
+            centerTitle: true,
+            actions: [
+              notificationsAsync.when(
+                data: (notifications) {
+                  if (notifications.isNotEmpty) {
+                    return IconButton(
+                      icon: const Icon(Icons.delete_sweep_rounded),
+                      tooltip: 'Cancel All',
+                      onPressed: () => _cancelAllNotifications(semantic),
+                    );
+                  }
+                  return const SizedBox();
+                },
+                loading: () => const SizedBox(),
+                error: (_, __) => const SizedBox(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: 'Refresh',
+                onPressed: _handleRefresh,
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: notificationsAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: semantic.primary)),
-        error: (error, _) => _buildErrorState(semantic),
-        data: (notifications) {
-          if (notifications.isEmpty) return _buildEmptyState(semantic);
-          return RefreshIndicator(
-            onRefresh: () async => ref.refresh(pendingNotificationsProvider),
+          body: RefreshIndicator(
+            onRefresh: _handleRefresh,
             color: semantic.primary,
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-              itemCount: notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                final iconColor =
-                    _getNotificationColor(notification.title, semantic);
+            child: notificationsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: _buildErrorState(semantic),
+                ),
+              ),
+              data: (notifications) {
+                if (notifications.isEmpty) {
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: _buildEmptyState(semantic),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+                  itemCount: notifications.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final notification = notifications[index];
+                    final iconColor =
+                        _getNotificationColor(notification.title, semantic);
 
-                return _buildNotificationItem(
-                    notification, index, iconColor, semantic);
+                    return _buildNotificationItem(
+                        notification, index, iconColor, semantic);
+                  },
+                );
               },
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -224,7 +266,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       glowColor: color.withValues(alpha: 0.3),
       glowOpacity: 0.05,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
@@ -233,8 +275,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         child: Row(
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -242,16 +284,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               child: Icon(
                 _getNotificationIcon(notification.title),
                 color: color,
-                size: 24,
+                size: 22,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     (notification.title ?? 'UNTITLED').toUpperCase(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -267,7 +311,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         fontWeight: FontWeight.w700,
                         color: semantic.secondaryText,
                       ),
-                      maxLines: 2,
+                      maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

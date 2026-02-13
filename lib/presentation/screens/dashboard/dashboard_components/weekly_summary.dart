@@ -48,7 +48,7 @@ class WeeklySummary extends ConsumerWidget {
       onTap: onTap,
       borderRadius: 24,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
@@ -72,13 +72,18 @@ class WeeklySummary extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  "WEEK",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: semantic.secondaryText,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "WEEK",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: semantic.secondaryText,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -102,16 +107,21 @@ class WeeklySummary extends ConsumerWidget {
               children: [
                 Icon(changeStatusIcon, size: 14, color: changeColor),
                 const SizedBox(width: 4),
-                Text(
-                  isUp
-                      ? "+$percentChange%"
-                      : isDown
-                          ? "-$percentChange%"
-                          : "Stable",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: changeColor,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      isUp
+                          ? "+$percentChange%"
+                          : isDown
+                              ? "-$percentChange%"
+                              : "Stable",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: changeColor,
+                      ),
+                    ),
                   ),
                 ),
               ],

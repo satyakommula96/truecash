@@ -38,8 +38,11 @@ class TrendChart extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
                 "TRENDS",
@@ -50,12 +53,15 @@ class TrendChart extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-              Row(
-                children: [
-                  _buildLegendItem(semantic.income, "INCOME"),
-                  const SizedBox(width: 16),
-                  _buildLegendItem(semantic.overspent, "SPENDING"),
-                ],
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  children: [
+                    _buildLegendItem(semantic.income, "INCOME"),
+                    const SizedBox(width: 16),
+                    _buildLegendItem(semantic.overspent, "SPENDING"),
+                  ],
+                ),
               ),
             ],
           ),

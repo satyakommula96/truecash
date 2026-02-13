@@ -94,13 +94,16 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                       ),
                       const SizedBox(height: 24),
                       Center(
-                        child: Text(
-                          "TrueLedger",
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -1,
-                            color: colorScheme.onSurface,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "TrueLedger",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -1,
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                         )
                             .animate()
@@ -108,12 +111,16 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
                             .slideY(begin: 0.2, end: 0),
                       ),
                       Center(
-                        child: Text(
-                          "Your private financial companion.",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Your private financial companion.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
                         )
                             .animate()

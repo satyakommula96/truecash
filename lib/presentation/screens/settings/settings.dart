@@ -1326,8 +1326,10 @@ class SettingsScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 24,
+            runSpacing: 12,
             children: [
               _buildFooterLink("TRUST GUARANTEES", () {
                 Navigator.push(
@@ -1335,12 +1337,10 @@ class SettingsScreen extends ConsumerWidget {
                     MaterialPageRoute(
                         builder: (_) => const TrustCenterScreen()));
               }, semantic),
-              const SizedBox(width: 24),
               _buildFooterLink("PRIVACY POLICY", () {
                 launchUrl(Uri.parse(
                     "https://satyakommula96.github.io/trueledger/privacy/"));
               }, semantic),
-              const SizedBox(width: 24),
               _buildFooterLink("LICENSES", () {
                 showLicensePage(
                   context: context,
@@ -1405,6 +1405,8 @@ class SettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: semantic.text,
                           fontWeight: FontWeight.w900,
