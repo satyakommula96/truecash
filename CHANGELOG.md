@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.3] - 2026-02-13
+
+### Added
+- **Recurring Transaction Editing**: Full support for modifying existing recurring transactions directly from the automation list.
+- **Enhanced Test Suite**: Added comprehensive unit tests for recurring transactions and resolved flakiness in navigation tests (`LockScreen`, `IntroScreen`).
+
+## [1.4.2] - 2026-02-12
+
+### Added
+- **UI Polish**: Minor visual refinements across settings and navigation headers.
+- **Stability**: Addressed timeout issues in widget testing suite.
+
 ## [1.4.1] - 2026-02-11
 
 ### Added
