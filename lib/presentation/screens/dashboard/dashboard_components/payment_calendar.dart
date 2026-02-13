@@ -178,7 +178,7 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
               crossAxisCount: 7,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
-              childAspectRatio: 1.0,
+              childAspectRatio: 0.85,
             ),
             itemCount: daysInMonth + (firstDayWeekday - 1),
             itemBuilder: (context, index) {
@@ -221,54 +221,59 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
                                 color: Colors.green.withValues(alpha: 0.2))
                             : null),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("$day",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: events.isNotEmpty || isToday
-                                  ? FontWeight.w900
-                                  : FontWeight.normal,
-                              color: allPaid
-                                  ? Colors.green
-                                  : (events.isNotEmpty || isToday
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Colors.grey))),
-                      if (events.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        if (allPaid)
-                          const Icon(Icons.check_rounded,
-                              size: 10, color: Colors.green)
-                        else
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: events.take(4).map((e) {
-                              Color dotColor = widget.semantic.secondaryText;
-                              if (e['isPaid'] == true) {
-                                dotColor = widget.semantic.divider;
-                              } else {
-                                if (e['type'] == 'CREDIT DUE') {
-                                  dotColor = Colors.red;
-                                } else if (e['type'] == 'LOAN EMI') {
-                                  dotColor = Colors.orange;
-                                } else if (e['type'] == 'SUBSCRIPTION') {
-                                  dotColor = widget.semantic.overspent;
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("$day",
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: events.isNotEmpty || isToday
+                                    ? FontWeight.w900
+                                    : FontWeight.normal,
+                                color: allPaid
+                                    ? Colors.green
+                                    : (events.isNotEmpty || isToday
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                        : Colors.grey))),
+                        if (events.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          if (allPaid)
+                            const Icon(Icons.check_rounded,
+                                size: 10, color: Colors.green)
+                          else
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: events.take(4).map((e) {
+                                Color dotColor = widget.semantic.secondaryText;
+                                if (e['isPaid'] == true) {
+                                  dotColor = widget.semantic.divider;
+                                } else {
+                                  if (e['type'] == 'CREDIT DUE') {
+                                    dotColor = Colors.red;
+                                  } else if (e['type'] == 'LOAN EMI') {
+                                    dotColor = Colors.orange;
+                                  } else if (e['type'] == 'SUBSCRIPTION') {
+                                    dotColor = widget.semantic.overspent;
+                                  }
                                 }
-                              }
 
-                              return Container(
-                                width: 3,
-                                height: 3,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 1),
-                                decoration: BoxDecoration(
-                                    color: dotColor, shape: BoxShape.circle),
-                              );
-                            }).toList(),
-                          )
-                      ]
-                    ],
+                                return Container(
+                                  width: 3,
+                                  height: 3,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 1),
+                                  decoration: BoxDecoration(
+                                      color: dotColor, shape: BoxShape.circle),
+                                );
+                              }).toList(),
+                            )
+                        ]
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -317,23 +322,28 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: widget.semantic.surfaceCombined.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          _buildSummaryItem(
-              "TOTAL DUE", totalDue, widget.semantic.overspent, isPrivate),
+          Expanded(
+            child: _buildSummaryItem(
+                "TOTAL DUE", totalDue, widget.semantic.overspent, isPrivate),
+          ),
           Container(
             width: 1,
             height: 24,
             color: widget.semantic.divider,
-            margin: const EdgeInsets.symmetric(horizontal: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          _buildSummaryItem("PAID", totalPaid, Colors.green, isPrivate),
-          const Spacer(),
+          Expanded(
+            child:
+                _buildSummaryItem("PAID", totalPaid, Colors.green, isPrivate),
+          ),
+          const SizedBox(width: 8),
           if (totalSum > 0)
             CircularProgressIndicator(
               value: totalPaid / totalSum,
@@ -356,10 +366,15 @@ class _PaymentCalendarState extends ConsumerState<PaymentCalendar> {
             style: const TextStyle(
                 fontSize: 8, fontWeight: FontWeight.w900, color: Colors.grey)),
         const SizedBox(height: 2),
-        Text(
-            isPrivate ? "•••" : CurrencyFormatter.format(amount, compact: true),
-            style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w900, color: color)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+              isPrivate
+                  ? "•••"
+                  : CurrencyFormatter.format(amount, compact: true),
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w900, color: color)),
+        ),
       ],
     );
   }

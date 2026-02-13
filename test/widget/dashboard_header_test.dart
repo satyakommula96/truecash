@@ -83,7 +83,9 @@ void main() {
     expect(visibilityIconFinder, findsOneWidget);
 
     await tester.tap(visibilityIconFinder);
-    await tester.pumpAndSettle();
+    await tester.pump(); // Start animation
+    await tester
+        .pump(const Duration(milliseconds: 500)); // Allow animation to play
 
     // After toggle, it should show visibility_off
     expect(find.byIcon(Icons.visibility_off_rounded), findsOneWidget);
@@ -102,7 +104,8 @@ void main() {
 
     await tester.tap(settingsIconFinder);
     // Wait for navigation animation
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verify we are on Settings screen (or at least it pushed)
     // We can check for some text in SettingsScreen
@@ -110,7 +113,8 @@ void main() {
 
     // Better: just pop
     await tester.pageBack();
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(onLoadCalledCount, 0);
   });
@@ -126,7 +130,8 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
 
     await tester.tap(find.byIcon(Icons.sort_rounded));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verify we are on Settings screen
     expect(find.text('SETTINGS'), findsOneWidget);
@@ -135,7 +140,8 @@ void main() {
     // In real usage, onLoad is only called when Navigator.pop returns true
     // For this test, we just verify the navigation works
     Navigator.of(tester.element(find.text('SETTINGS'))).pop();
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Should be back on dashboard
     expect(find.text('TrueLedger'), findsOneWidget);

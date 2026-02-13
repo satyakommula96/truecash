@@ -13,6 +13,7 @@ import 'package:trueledger/presentation/providers/repository_providers.dart';
 import 'package:trueledger/presentation/screens/settings/manage_categories.dart';
 import 'package:trueledger/domain/models/models.dart';
 import 'package:trueledger/domain/services/personalization_service.dart';
+import 'package:trueledger/presentation/providers/dashboard_provider.dart';
 import 'package:trueledger/core/utils/currency_formatter.dart';
 
 class QuickAddBottomSheet extends ConsumerStatefulWidget {
@@ -181,6 +182,7 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
         );
       }
 
+      ref.invalidate(dashboardProvider);
       if (mounted) {
         if (_creditCardNames.contains(_paymentMethod)) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -892,21 +894,21 @@ class _QuickAddBottomSheetState extends ConsumerState<QuickAddBottomSheet> {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
           children: [
             _buildDateChip(
               label: "TODAY",
               isSelected: isToday,
               onTap: () => setState(() => _selectedDate = DateTime.now()),
             ),
-            const SizedBox(width: 10),
             _buildDateChip(
               label: "YESTERDAY",
               isSelected: isYesterday,
               onTap: () => setState(() => _selectedDate =
                   DateTime.now().subtract(const Duration(days: 1))),
             ),
-            const SizedBox(width: 10),
             _buildDateChip(
               label:
                   isOther ? DateFormat('MMM d').format(_selectedDate) : "OTHER",

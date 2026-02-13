@@ -202,9 +202,15 @@ class FinancialRepositoryImpl implements IFinancialRepository {
   Future<List<Map<String, dynamic>>> getCategorySpending() async {
     final db = await AppDatabase.db;
     final nowStr = DateTime.now().toIso8601String().substring(0, 7);
-    return await db.rawQuery(
-        'SELECT category, SUM(amount) as total FROM variable_expenses WHERE substr(date, 1, 7) = ? GROUP BY category ORDER BY total DESC',
-        [nowStr]);
+    return await db.rawQuery('''
+      SELECT cat as category, SUM(amt) as total FROM (
+        SELECT category as cat, amount as amt FROM variable_expenses WHERE substr(date, 1, 7) = ?
+        UNION ALL
+        SELECT name as cat, amount as amt FROM fixed_expenses WHERE substr(date, 1, 7) = ?
+        UNION ALL
+        SELECT name as cat, amount as amt FROM subscriptions WHERE substr(date, 1, 7) = ?
+      ) GROUP BY cat ORDER BY total DESC
+    ''', [nowStr, nowStr, nowStr]);
   }
 
   @override
@@ -806,6 +812,7 @@ class FinancialRepositoryImpl implements IFinancialRepository {
       {'name': 'income_sources', 'type': 'Income'},
       {'name': 'fixed_expenses', 'type': 'Fixed'},
       {'name': 'investments', 'type': 'Investment'},
+      {'name': 'subscriptions', 'type': 'Subscription'},
     ];
 
     for (var table in tables) {
@@ -892,10 +899,21 @@ class FinancialRepositoryImpl implements IFinancialRepository {
     final db = await AppDatabase.db;
     final todayStr =
         DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD
-    final result = await db.rawQuery(
+
+    final resVar = await db.rawQuery(
         'SELECT SUM(amount) FROM variable_expenses WHERE substr(date, 1, 10) = ?',
         [todayStr]);
-    return (result.first.values.first as num? ?? 0).toDouble();
+    final resFixed = await db.rawQuery(
+        'SELECT SUM(amount) FROM fixed_expenses WHERE substr(date, 1, 10) = ?',
+        [todayStr]);
+    final resSubs = await db.rawQuery(
+        'SELECT SUM(amount) FROM subscriptions WHERE substr(date, 1, 10) = ?',
+        [todayStr]);
+
+    double total = (resVar.first.values.first as num? ?? 0).toDouble();
+    total += (resFixed.first.values.first as num? ?? 0).toDouble();
+    total += (resSubs.first.values.first as num? ?? 0).toDouble();
+    return total;
   }
 
   @override
@@ -903,10 +921,22 @@ class FinancialRepositoryImpl implements IFinancialRepository {
     final db = await AppDatabase.db;
     final todayStr =
         DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD
-    final result = await db.rawQuery(
-        'SELECT COUNT(*) FROM variable_expenses WHERE substr(date, 1, 10) = ?',
-        [todayStr]);
-    return Sqflite.firstIntValue(result) ?? 0;
+
+    int count = 0;
+    final tables = [
+      'variable_expenses',
+      'fixed_expenses',
+      'income_sources',
+      'investments',
+      'subscriptions'
+    ];
+    for (final table in tables) {
+      final res = await db.rawQuery(
+          'SELECT COUNT(*) FROM $table WHERE substr(date, 1, 10) = ?',
+          [todayStr]);
+      count += Sqflite.firstIntValue(res) ?? 0;
+    }
+    return count;
   }
 
   @override
@@ -923,25 +953,33 @@ class FinancialRepositoryImpl implements IFinancialRepository {
     final lastWeekStart = thisWeekStart.subtract(const Duration(days: 7));
     final lastWeekEnd = now.subtract(const Duration(days: 7));
 
-    final thisWeekResult = await db.rawQuery('''
-      SELECT SUM(amount) FROM variable_expenses
-      WHERE substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
-    ''', [
-      thisWeekStart.toIso8601String().substring(0, 10),
-      now.toIso8601String().substring(0, 10)
-    ]);
+    final tables = ['variable_expenses', 'fixed_expenses', 'subscriptions'];
+    double thisWeek = 0;
+    double lastWeek = 0;
 
-    final lastWeekResult = await db.rawQuery('''
-      SELECT SUM(amount) FROM variable_expenses
-      WHERE substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
-    ''', [
-      lastWeekStart.toIso8601String().substring(0, 10),
-      lastWeekEnd.toIso8601String().substring(0, 10)
-    ]);
+    for (final table in tables) {
+      final resThis = await db.rawQuery('''
+        SELECT SUM(amount) FROM $table
+        WHERE substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
+      ''', [
+        thisWeekStart.toIso8601String().substring(0, 10),
+        now.toIso8601String().substring(0, 10)
+      ]);
+      thisWeek += (resThis.first.values.first as num? ?? 0).toDouble();
+
+      final resLast = await db.rawQuery('''
+        SELECT SUM(amount) FROM $table
+        WHERE substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
+      ''', [
+        lastWeekStart.toIso8601String().substring(0, 10),
+        lastWeekEnd.toIso8601String().substring(0, 10)
+      ]);
+      lastWeek += (resLast.first.values.first as num? ?? 0).toDouble();
+    }
 
     return {
-      'thisWeek': (thisWeekResult.first.values.first as num? ?? 0).toDouble(),
-      'lastWeek': (lastWeekResult.first.values.first as num? ?? 0).toDouble(),
+      'thisWeek': thisWeek,
+      'lastWeek': lastWeek,
     };
   }
 
@@ -1285,5 +1323,33 @@ class FinancialRepositoryImpl implements IFinancialRepository {
       Schema.colDayOfWeek: dayOfWeek,
       Schema.colActive: 1,
     });
+  }
+
+  @override
+  Future<void> updateRecurringTransaction({
+    required int id,
+    required String name,
+    required double amount,
+    required String category,
+    required String type,
+    required String frequency,
+    int? dayOfMonth,
+    int? dayOfWeek,
+  }) async {
+    final db = await AppDatabase.db;
+    await db.update(
+      Schema.recurringTransactionsTable,
+      {
+        Schema.colName: name,
+        Schema.colAmount: amount,
+        Schema.colCategory: category,
+        Schema.colType: type,
+        Schema.colFrequency: frequency,
+        Schema.colDayOfMonth: dayOfMonth,
+        Schema.colDayOfWeek: dayOfWeek,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

@@ -46,7 +46,7 @@ class TrustCenterScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             _buildSectionHeader("OUR GUARANTEES", semantic),
             const SizedBox(height: 16),
-            _buildGuaranteesGrid(semantic),
+            _buildGuaranteesGrid(context, semantic),
             const SizedBox(height: 32),
             _buildSectionHeader("STRICT POLICIES", semantic),
             const SizedBox(height: 16),
@@ -62,7 +62,7 @@ class TrustCenterScreen extends ConsumerWidget {
                   maxCrossAxisExtent: 250,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 1.6,
+                  childAspectRatio: 1.4,
                 ),
                 children: [
                   _StatCard(
@@ -295,7 +295,7 @@ class TrustCenterScreen extends ConsumerWidget {
     ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.05, end: 0);
   }
 
-  Widget _buildGuaranteesGrid(AppColors semantic) {
+  Widget _buildGuaranteesGrid(BuildContext context, AppColors semantic) {
     const guarantees = [
       (
         "NO ADS",
@@ -319,27 +319,23 @@ class TrustCenterScreen extends ConsumerWidget {
       ),
     ];
 
-    return Column(
-      children: [
-        for (int i = 0; i < guarantees.length; i += 2) ...[
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: _buildGuaranteeCard(guarantees[i], semantic)),
-                const SizedBox(width: 16),
-                if (i + 1 < guarantees.length)
-                  Expanded(
-                      child: _buildGuaranteeCard(guarantees[i + 1], semantic))
-                else
-                  const Expanded(child: SizedBox()),
-              ],
+    return LayoutBuilder(builder: (context, constraints) {
+      final isNarrow = constraints.maxWidth < 600;
+      final itemWidth =
+          isNarrow ? constraints.maxWidth : (constraints.maxWidth - 16) / 2;
+
+      return Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: [
+          for (final g in guarantees)
+            SizedBox(
+              width: itemWidth,
+              child: _buildGuaranteeCard(g, semantic),
             ),
-          ),
-          if (i + 2 < guarantees.length) const SizedBox(height: 16),
         ],
-      ],
-    ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
+      ).animate().fadeIn(delay: 200.ms, duration: 600.ms);
+    });
   }
 
   Widget _buildGuaranteeCard((String, String, IconData) g, AppColors semantic) {
@@ -607,7 +603,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: semantic.surfaceCombined.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(24),
@@ -624,12 +620,15 @@ class _StatCard extends StatelessWidget {
                   color: semantic.secondaryText,
                   letterSpacing: 1)),
           const SizedBox(height: 4),
-          Text(value,
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: color ?? semantic.text,
-                  letterSpacing: -0.5)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(value,
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: color ?? semantic.text,
+                    letterSpacing: -0.5)),
+          ),
         ],
       ),
     );

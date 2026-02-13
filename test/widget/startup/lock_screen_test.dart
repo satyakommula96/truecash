@@ -29,6 +29,8 @@ class MockNotificationService extends Mock implements NotificationService {}
 
 class MonthlySummaryFake extends Fake implements MonthlySummary {}
 
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
+
 void main() {
   late MockSecureStorage mockStorage;
   late MockSharedPreferences mockPrefs;
@@ -40,6 +42,7 @@ void main() {
     registerFallbackValue(NoParams());
     registerFallbackValue(InsightSurface.main);
     registerFallbackValue(MonthlySummaryFake());
+    registerFallbackValue(MaterialPageRoute<void>(builder: (_) => Container()));
   });
 
   setUp(() {
@@ -124,21 +127,70 @@ void main() {
   });
 
   testWidgets('Should navigate to Dashboard on correct PIN', (tester) async {
+    final mockObserver = MockNavigatorObserver();
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
-    await tester.pumpWidget(createLockScreen());
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          secureStorageProvider.overrideWithValue(mockStorage),
+          sharedPreferencesProvider.overrideWithValue(mockPrefs),
+          financialRepositoryProvider.overrideWithValue(mockRepo),
+          intelligenceServiceProvider.overrideWithValue(mockIntelligence),
+          notificationServiceProvider.overrideWithValue(mockNotification),
+          dashboardProvider.overrideWith((ref) => DashboardData(
+                summary: MonthlySummary(
+                    totalIncome: 0,
+                    totalFixed: 0,
+                    totalVariable: 0,
+                    totalSubscriptions: 0,
+                    totalInvestments: 0,
+                    netWorth: 0,
+                    creditCardDebt: 0,
+                    loansTotal: 0,
+                    totalMonthlyEMI: 0),
+                categorySpending: [],
+                budgets: [],
+                savingGoals: [],
+                trendData: [],
+                upcomingBills: [],
+                billsDueToday: [],
+                todaySpend: 0,
+                thisWeekSpend: 0,
+                lastWeekSpend: 0,
+                activeStreak: 0,
+                todayTransactionCount: 0,
+              )),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const LockScreen(expectedPinLength: 4),
+          navigatorObservers: [mockObserver],
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('1'));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.text('2'));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.text('3'));
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.text('4'));
 
-    await tester.pumpAndSettle();
+    // Wait for the navigation to happen using explicit pumps to avoid infinite animation timeouts
+    // Wait for the navigation to happen using explicit pumps to avoid infinite animation timeouts
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    expect(find.byType(LockScreen), findsNothing);
+    // Verify navigation without waiting for infinite animations in the new route
+    verify(() => mockObserver.didReplace(
+        newRoute: any(named: 'newRoute'),
+        oldRoute: any(named: 'oldRoute'))).called(1);
   });
 
   testWidgets('Should show error on incorrect PIN', (tester) async {

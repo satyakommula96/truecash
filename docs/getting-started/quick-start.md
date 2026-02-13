@@ -6,7 +6,7 @@ Get started with TrueLedger in 5 minutes!
 
 When you first launch TrueLedger, you'll see the **Intro Screen** with a brief overview of the app's features.
 
-1. **Swipe through** the intro slides or tap **SKIP** to go directly to the dashboard
+1. Tap **GET STARTED** or **SKIP** to go directly to the dashboard.
 2. **Grant notification permissions** (optional) to receive reminders for bills and budgets
 
 ## Dashboard Overview

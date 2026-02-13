@@ -217,18 +217,24 @@ class DashboardBottomBar extends StatelessWidget {
               child: Icon(icon, color: color),
             ),
             const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(subtitle,
-                    style:
-                        TextStyle(color: semantic.secondaryText, fontSize: 12)),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                  Text(subtitle,
+                      style: TextStyle(
+                          color: semantic.secondaryText, fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                ],
+              ),
             ),
-            const Spacer(),
+            const SizedBox(width: 16),
             Icon(Icons.chevron_right_rounded, color: semantic.divider),
           ],
         ),

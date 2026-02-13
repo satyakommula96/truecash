@@ -93,29 +93,36 @@ class RetirementDashboard extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              sub.toUpperCase(),
-              style: TextStyle(
-                  fontSize: 10,
-                  color: semantic.secondaryText,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              title,
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: semantic.text,
-                  letterSpacing: -0.5),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                sub.toUpperCase(),
+                style: TextStyle(
+                    fontSize: 10,
+                    color: semantic.secondaryText,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                title,
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: semantic.text,
+                    letterSpacing: -0.5),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
-        if (trailing != null) trailing,
+        if (trailing != null) ...[
+          const SizedBox(width: 16),
+          trailing,
+        ],
       ],
     );
   }
@@ -180,13 +187,16 @@ class RetirementDashboard extends ConsumerWidget {
                         Icon(Icons.auto_awesome_rounded,
                             size: 14, color: Colors.white),
                         SizedBox(width: 8),
-                        Text(
-                          "RETIREMENT READY",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 10,
-                            letterSpacing: 1.5,
+                        Flexible(
+                          child: Text(
+                            "RETIREMENT READY",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 10,
+                              letterSpacing: 1.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -407,12 +417,15 @@ class RetirementDashboard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "PROJECTION SETTINGS",
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5),
+                const Expanded(
+                  child: Text(
+                    "PROJECTION SETTINGS",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded),

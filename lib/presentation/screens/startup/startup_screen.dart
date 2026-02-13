@@ -49,9 +49,12 @@ class StartupScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.error_outline, size: 64, color: Colors.red),
                 const SizedBox(height: 24),
-                const Text("Initialization Failed",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                const FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text("Initialization Failed",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                ),
                 const SizedBox(height: 8),
                 Text(err.toString(), textAlign: TextAlign.center),
                 const SizedBox(height: 32),

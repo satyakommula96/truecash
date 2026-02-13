@@ -205,13 +205,15 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
                         Icon(Icons.info_outline_rounded,
                             size: 14, color: semantic.warning),
                         const SizedBox(width: 8),
-                        const Text(
-                          "Engine: Reducing balance (daily)",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey,
-                              fontStyle: FontStyle.italic),
+                        const Flexible(
+                          child: Text(
+                            "Engine: Reducing balance (daily)",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
+                                fontStyle: FontStyle.italic),
+                          ),
                         ),
                       ],
                     ),

@@ -238,17 +238,21 @@ class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
                           ],
                         ),
                       ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          CurrencyFormatter.format(netValue,
-                              isPrivate: isPrivate),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color:
-                                positive ? semantic.income : semantic.overspent,
-                            fontSize: 22,
-                            letterSpacing: -0.8,
+                      const SizedBox(width: 16),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            CurrencyFormatter.format(netValue,
+                                isPrivate: isPrivate),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: positive
+                                  ? semantic.income
+                                  : semantic.overspent,
+                              fontSize: 22,
+                              letterSpacing: -0.8,
+                            ),
                           ),
                         ),
                       ),
@@ -332,13 +336,17 @@ class _MonthlyHistoryScreenState extends ConsumerState<MonthlyHistoryScreen> {
           children: [
             Icon(icon, size: 10, color: color.withValues(alpha: 0.7)),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w900,
-                color: semantic.secondaryText,
-                letterSpacing: 1.2,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w900,
+                  color: semantic.secondaryText,
+                  letterSpacing: 1.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

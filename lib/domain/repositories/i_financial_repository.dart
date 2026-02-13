@@ -102,4 +102,14 @@ abstract class IFinancialRepository {
     int? dayOfMonth,
     int? dayOfWeek,
   });
+  Future<void> updateRecurringTransaction({
+    required int id,
+    required String name,
+    required double amount,
+    required String category,
+    required String type,
+    required String frequency,
+    int? dayOfMonth,
+    int? dayOfWeek,
+  });
 }

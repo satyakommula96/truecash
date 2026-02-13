@@ -335,13 +335,16 @@ class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
                         Icon(Icons.info_outline_rounded,
                             size: 14, color: semantic.warning),
                         const SizedBox(width: 8),
-                        const Text(
-                          "Engine: Reducing balance (daily)",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey,
-                              fontStyle: FontStyle.italic),
+                        const Flexible(
+                          child: Text(
+                            "Engine: Reducing balance (daily)",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
+                                fontStyle: FontStyle.italic),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
@@ -729,10 +732,14 @@ class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Expanded(
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+                overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 8),
           Text(CurrencyFormatter.format(value, compact: false),
               style: TextStyle(
                   fontSize: 12,
@@ -749,11 +756,15 @@ class _EditLoanScreenState extends ConsumerState<EditLoanScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                  color: Colors.grey)),
+          Expanded(
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                    color: Colors.grey),
+                overflow: TextOverflow.ellipsis),
+          ),
+          const SizedBox(width: 8),
           Text(
               isCount
                   ? value.toInt().toString()

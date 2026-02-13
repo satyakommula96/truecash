@@ -29,7 +29,7 @@ class SummaryCard extends StatelessWidget {
       glowColor: valueColor,
       glowOpacity: 0.1,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: semantic.surfaceCombined.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
@@ -49,13 +49,18 @@ class SummaryCard extends StatelessWidget {
                   ),
                   child: Icon(icon, size: 16, color: valueColor),
                 ),
-                Text(
-                  label.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: semantic.secondaryText,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: semantic.secondaryText,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1,
+                      ),
+                    ),
                   ),
                 ),
               ],

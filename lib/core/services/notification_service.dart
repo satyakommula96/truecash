@@ -347,6 +347,39 @@ class NotificationService {
         'Bill payment due on the $day$ordinal of every month', routeCards);
   }
 
+  Future<void> scheduleRecurringReminder(
+    String name,
+    String frequency,
+    double amount, {
+    int? dayOfMonth,
+    int? dayOfWeek,
+  }) async {
+    if (!_isInitialized) await init();
+
+    final id = generateStableHash('recurring_reminder_$name');
+    String body =
+        "Automatic $frequency transaction for ${CurrencyFormatter.format(amount)} is scheduled.";
+
+    if (frequency == 'MONTHLY' && dayOfMonth != null) {
+      body =
+          "Scheduled for the ${DateHelper.getOrdinal(dayOfMonth)} of every month.";
+    } else if (frequency == 'WEEKLY' && dayOfWeek != null) {
+      final days = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ];
+      body = "Scheduled for every ${days[(dayOfWeek - 1) % 7]}.";
+    }
+
+    await _saveScheduledNotification(
+        id, 'RECURRING: $name', body.toUpperCase(), routeDashboard);
+  }
+
   Future<void> showDailyBillDigest(List<BillSummary> bills) async {
     if (bills.isEmpty) return;
     if (!_isInitialized) await init();
@@ -400,7 +433,7 @@ class NotificationService {
         // 2. Pragmatic Pruning: If a notification exists in local tracking but NOT in OS,
         // and we are on a platform that supports OS pending requests, we prune the local.
         // This prevents "ghost" notifications in the UI if the system was reset.
-        if (osPending.isNotEmpty || !Platform.isLinux) {
+        if (osPending.isNotEmpty) {
           final localsToRemove = localNotifications
               .where((l) => !osIds.contains(l.id))
               .map((l) => l.id)

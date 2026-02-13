@@ -317,21 +317,25 @@ class _MonthDetailScreenState extends ConsumerState<MonthDetailScreen> {
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        semantic.divider.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    type.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      color: semantic.secondaryText,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 1.2,
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: semantic.divider
+                                          .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      type.toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: semantic.secondaryText,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ),
